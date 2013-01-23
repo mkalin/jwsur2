@@ -1,0 +1,167 @@
+<?xml version = "1.0" encoding = "UTF-8"?>  
+<!-- The assumption is that all source files (HTML, JSP, Java,
+     and even web.xml) are in the directory named "src" under
+     your current working directory (cwd). Your cwd holds this file
+ 
+        build.xml
+
+     Of course, Ant must be installed. Version 1.6 or greater should
+     do the trick.
+
+     The build.xml file must be edited but only one line needs to be
+     changed:
+
+        <property name="tomcat.home" value="/home/mkalin/tomcat7">
+
+     The value of the tomcat.home property must be set to the install
+     directory for Tomcat, in this case the directory /home/mkalin/tomcat7.
+
+     Once the Ant script is run
+
+        ant 
+
+     or
+
+        ant -f build.xml 
+
+     at the command-line prompt, Ant will execute the necessary tasks and
+     a copy of the deployed WAR file will remain in your cwd. The deployed
+     copy will be in TOMCAT_HOME/webapps.
+
+     You provide the applicaton's name (hence, the name of its
+     WAR file) with a -D flag. Here's a sample:
+
+           ant deploy -Dwar.name=app1
+
+     or
+
+           ant -Dwar.name=app1 deploy
+
+     The Ant task addes the .war extension to your file so that app1.war
+     is the deployed file.
+
+     To begin, you can just type 
+     
+          ant
+
+     at the command-line prompt. You'll see that you can either build 
+     (ant build) or deploy (ant -Dwar.name=app1 deploy).
+
+     Source code can and usually should reside in packages. For instance, if my
+     servlet is in package com.foo, then my src directory looks
+     like
+
+                    src: *.html, *.jsp, etc. and web.xml
+                     |
+                    com
+                     |
+                    foo: HelloWorldServlet.java
+
+     The Ant script automatically constructs the
+
+                    WEB-INF/classes/com/foo
+
+     tree and puts the compiled *.class files therein. 
+
+     This build.xml file includes, for convenience, the Java source in the deployed WAR.
+     In a production environment, this would not follow best practices, of course.
+-->
+
+<project name="TomcatProject" basedir="." default="usage">  
+
+  <!-- #### Change for your system. #### -->
+  <property name="tomcat.home" value="/home/mkalin/tomcat7"/>
+
+  <!-- Leave the rest as they are. -->
+  <property name="tomcat.lib"  value="${tomcat.home}/lib"/>
+  <property name="deploy.path" value="${tomcat.home}/webapps"/>
+  
+  <property name="src.dir"   value="${basedir}/src"/>  
+  <property name="build.dir" value="${basedir}/build"/>  
+  <property name="dist.dir"  value="${basedir}/dist"/>
+  <property name="war.name"  value="(Please supply a name!)"/>
+  
+  <property name="name" value="TomcatProject"/>  
+  <path id="master-classpath">  
+    <fileset dir="${tomcat.lib}">  
+      <include name="*.jar"/>  
+    </fileset>  
+    <fileset dir="${src.dir}">
+      <include name="*.jar"/>
+    </fileset>
+    <pathelement path="${build.dir}"/>  
+  </path>  
+  
+  <target name="usage">  
+    <echo message=""/>  
+    <echo message="${name} build file"/>  
+    <echo message=""/>  
+    <echo message="ant build                   --> to build the application"/>  
+    <echo message="ant deploy -Dwar.name=test1 --> to deploy test1.war"/>  
+    <echo message=""/>  
+  </target>  
+  
+  <target name="clean" description="clean up">
+    <delete dir="${build.dir}" />
+  </target>
+  
+  <target name="prepare" depends="clean">
+    <mkdir dir="${build.dir}"/>
+    <mkdir dir="${build.dir}/WEB-INF"/>
+    <mkdir dir="${build.dir}/WEB-INF/classes"/>
+    <mkdir dir="${build.dir}/WEB-INF/lib"/>
+    <mkdir dir="${build.dir}/WEB-INF/data"/>
+    
+    <!-- Copy files from source to build directory  -->
+    <copy todir="${build.dir}">
+      <fileset dir="${src.dir}">
+        <include name="**/*.java"/>
+	<include name="*.jsp"/>
+	<include name="*.html"/>
+      </fileset>
+    </copy>
+    <copy todir="${build.dir}/WEB-INF">
+      <fileset dir="${src.dir}">
+        <include name="*.xml"/>
+      </fileset>
+    </copy>
+    <copy todir="${build.dir}/WEB-INF/data">
+      <fileset dir="${src.dir}">
+        <include name="*.db"/>
+      </fileset>
+    </copy>
+    <copy todir="${build.dir}/WEB-INF/lib">
+      <fileset dir="${src.dir}">
+        <include name="*.jar"/>
+      </fileset>
+    </copy>
+
+  </target>
+  
+  <target name="build" depends="prepare" 
+          description="compile main source tree java files">  
+    <javac destdir="${build.dir}/WEB-INF/classes" debug="true"  
+           deprecation="false" optimize="false" failonerror="true">  
+      <src path="${src.dir}"/>  
+      <classpath refid="master-classpath"/>  
+    </javac>  
+  </target>  
+  
+  <target name="deploy" depends="build" 
+          description="deploy application as a war file">  
+    <delete>
+      <fileset dir="${build.dir}" includes="*.java,*.db,*.jar,web.xml"/>
+    </delete>
+    <war destfile="${war.name}.war"  
+         webxml="${build.dir}/WEB-INF/web.xml">  
+      <fileset dir="${build.dir}">  
+        <include name="**/*.*"/>  
+      </fileset>  
+    </war>  
+    <copy todir="${deploy.path}" preservelastmodified="true">  
+      <fileset dir=".">  
+        <include name="*.war"/>  
+      </fileset>  
+    </copy>  
+  </target>  
+</project> 
