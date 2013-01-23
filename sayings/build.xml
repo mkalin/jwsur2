@@ -86,6 +86,9 @@
     <fileset dir="${tomcat.lib}">  
       <include name="*.jar"/>  
     </fileset>  
+    <fileset dir="${src.dir}">
+      <include name="*.jar"/>
+    </fileset>
     <pathelement path="${build.dir}"/>  
   </path>  
   
