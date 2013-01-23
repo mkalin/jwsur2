@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>JWS and JSON</title>
+    <script type = "text/javascript" 
+	    src = "http://code.jquery.com/jquery-latest.min.js">
+    </script>
+    <script type = "text/javascript">
+      $.getJSON('http://localhost:8080/cds/getCDs.jsp', function(response) {
+         alert(JSON.stringify(response.catalog.cd));
+         <!-- proof of concept -->
+         $('#container').append('<li>' + response.catalog.cd[0].title + '</li>');
+         $('#container').append('<li>' + response.catalog.cd[1].title + '</li>');
+         $('#container').append('<li>' + response.catalog.cd[2].title + '</li>');
+      });
+    </script>  
+</head>
+  <body>
+    <ul id = 'container' class = 'container'>
+    </ul>
+  </body>
+</html>

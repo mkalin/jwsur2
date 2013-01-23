@@ -1,0 +1,641 @@
+     1	                                  JAX-WS and JSON
+     2	
+     3	## Motivation
+     4	
+     5	JSON (JavaScript Object Notation) is an increasingly popular option to XML,
+     6	including SOAP, as the format for web service payloads. One reason is that
+     7	the clients for web services in general are regularly web pages with
+     8	embedded JavaScript. This handout illustrates some possibilities, using 
+     9	jQuery as a framework for making "ajaxy" calls from web pages. 
+    10	
+    11	There are various reasons for JSON's popularity. For one thing, JSON is as
+    12	expressive as XML but many programmers find it to be "cleaner" because it has
+    13	no start/stop tags, angel brackets, and so on. A more important reason is that
+    14	a JSON document is a JavaScript object. Here's a simple example to illustrate:
+    15	
+    16	  // Point obj to a JavaScript object with two fields, id and name.
+    17	  var obj = {id :    1,
+    18	             name : 'foobar'};
+    19	
+    20	The JSON starts with the left brace { and ends with the right brace }. The
+    21	instance fields id and name can be accessed straightforwardly:
+    22	
+    23	   var the_id = obj.id;
+    24	   var the_name = obj.name;
+    25	
+    26	Objects can be nested to any level in JSON;
+    27	  
+    28	  var obj = {id :    1,
+    29	             name : 'foobar',
+    30	             hobbies : { /*...*/ }
+    31	            };
+    32	
+    33	JavaScript code that receives JSON receives, in effect, a native object and thus
+    34	can manipulate the object in typically JavaScript fashion.
+    35	
+    36	## Polling example
+    37	
+    38	The example is simple but illustrates a practical use. Here's a sketch of the
+    39	application architecure:
+    40	
+    41	-- Various browsers connect to a web site, downloading a page (in this case,
+    42	the traditionally named index.html). The page contains jQuery, which makes 
+    43	Ajax calls back to the server (in this example, to get the value of a simple
+    44	integer counter).
+    45	
+    46	-- A user who downloads the page can be completely passive after the download
+    47	and do nothing else. Nonetheless, the embedded jQuery continues to poll the
+    48	server for updates to the counter.
+    49	
+    50	-- A user also could hit hyperlinks to
+    51	
+    52	   -- increment the counter
+    53	   -- decrement the counter
+    54	   -- reset the counter to zero
+    55	
+    56	Any active index.html page then will get the value of updated counter through 
+    57	its pollling.
+    58	
+    59	
+    60	
+    61	
+    62	## Application setup
+    63	
+    64	For this example, I'm using the json-simple library 
+    65	(http://code.google.com/p/json-simple) package. Other Java-JSON libraries are 
+    66	available, including Gson (http://code.google.com/p/google-gson/) for JAX-B 
+    67	conversions between Java and JSON. Here are application pieces:
+    68	
+    69	   -- index.html:                      home page with embedded jQuery
+    70	   -- service.jsp:                     server-side script that uses simple-json
+    71	   -- WEB-INF/lib/json-simple-1.1.jar: simple-json library
+    72	
+    73	To deploy:
+    74	
+    75	   % jar cvf jayson.war *.html *.jsp WEB-INF
+    76	   % cp jayson.war TOMCAT_HOME/webapps
+    77	
+    78	Open a browser to
+    79	
+    80	   http://localhost:8080/jayson.war/index.html
+    81	
+    82	## Server side: service.jsp
+    83	
+    84	<%@ page import = "org.json.simple.JSONObject" %>
+    85	<%! 
+    86	   // instance field: one for the entire JSP script
+    87	   private int counter = 0;
+    88	%>
+    89	
+    90	<%
+    91	   /* Extract the query string and, depending on its value,
+    92	      perform one of the following operations:
+    93	   
+    94	      null  ==> return the current counter
+    95	      inc   ==> return the incremented counter
+    96	      dec   ==> return the decremented counter
+    97	   */
+    98	   String qs = request.getQueryString(); // implicit object reference
+    99	   JSONObject json = new JSONObject();
+   100	
+   101	   if (null == qs)
+   102	     json.put("counter", counter);
+   103	   else if (qs.equals("inc")) 
+   104	     json.put("counter", ++counter);
+   105	   else if (qs.equals("dec"))
+   106	     json.put("counter", --counter);
+   107	   else // same as null case
+   108	     json.put("counter", counter);
+   109	
+   110	   // Pause for 5 seconds for demo purposes.
+   111	   try {
+   112	      Thread.sleep(5);
+   113	   } catch(Exception e) { }
+   114	
+   115	   // Send the JSON to requester.
+   116	   out.print(json.toJSONString());
+   117	   out.flush();
+   118	%>
+   119	
+   120	
+   121	
+   122	## Client side: index.html
+   123	
+   124	<!DOCTYPE html>
+   125	<html>
+   126	  <head>
+   127	    <title>Long polling test</title>
+   128	    <style type = "text/css">
+   129	      a {color: #151b8d; text-decoration:none; font-size: 110%; 
+   130	         font-weight: bold;}
+   131	      a:visited {color: #151b8d;}
+   132	      a:hover {color: #fff; background-color: #666;}
+   133	    </style>
+   134	  </head>
+   135	  
+   136	  <body>
+   137	    <h2 style = 'color: #b00000'>Ajax-based polling test</h2>
+   138	    <p>
+   139	      <textarea id = 'textarea' rows = '2' cols = '16' 
+   140			style = 'background-color: #66ffff;font-weight: bold; 
+   141	                         font-size: 125%;'>
+   142	      </textarea>
+   143	    </p>
+   144	  </body>
+   145	  <script type = "text/javascript" 
+   146		  src = "http://code.jquery.com/jquery-latest.min.js">
+   147	  </script>
+   148	
+   149	  <script type = "text/javascript">
+   150	    // Client requests of for two URIs:
+   151	    //  -- the first time, the client requests /jsstatus to
+   152	    //     get the current value of the counter
+   153	    //  -- thereafter, the client requests /jsupdate to get an
+   154	    //     update of the counter
+   155	    var client = new function() {
+   156	      var _poll = function() {
+   157	        $.getJSON('http://localhost:8080/jayson/service.jsp', function(response) {
+   158	          var counter = response.counter
+   159	          $('textarea').text(counter);
+   160	          _poll();
+   161	        });
+   162	      }
+   163	      
+   164	      // Invoked after the browser generates the DOM.
+   165	      // The body of this function invokes _poll(), defined above,
+   166	      // which polls the server for any new data, updates the textarea, 
+   167	      // and so on indefinitely.
+   168	      $.getJSON('http://localhost:8080/jayson/service.jsp', function(response) {
+   169	         var counter = response.counter;
+   170	         $('textarea').text(counter);
+   171	         _poll();
+   172	      });
+   173	    }
+   174	  </script>
+   175	</html>
+   176	;;;;;
+   177	
+   178	
+   179	
+   180	
+   181	
+   182	## A JSP script with a back-end JavaBean going aginst a W3C service
+   183	
+   184	The W3C hosts various web services, including the Restful one at:
+   185	
+   186	   http://www.w3schools.com/xml/cd_catalog.xml
+   187	
+   188	The W3C hosts various web services, including the Restful one at:
+   189	
+   190	   http://www.w3schools.com/xml/cd_catalog.xml
+   191	
+   192	As the URL indicates, the response is an XML document. The second
+   193	application thus has the following structure. The HTML page fetch.html
+   194	
+   195	;;;
+   196	<!DOCTYPE html>
+   197	<html>
+   198	  <head>
+   199	    <title>JWS and JSON</title>
+   200	    <script type = "text/javascript" 
+   201		    src = "http://code.jquery.com/jquery-latest.min.js">
+   202	    </script>
+   203	    <script type = "text/javascript">
+   204	      $.getJSON('http://localhost:8080/cds/getCDs.jsp', function(response) {
+   205	         alert(JSON.stringify(response.catalog.cd));
+   206	         <!-- proof of concept -->
+   207	         $('#container').append('<li>' + response.catalog.cd[0].title + '</li>');
+   208	         $('#container').append('<li>' + response.catalog.cd[1].title + '</li>');
+   209	         $('#container').append('<li>' + response.catalog.cd[2].title + '</li>');
+   210	      });
+   211	    </script>  
+   212	</head>
+   213	  <body>
+   214	    <ul id = 'container' class = 'container'>
+   215	    </ul>
+   216	  </body>
+   217	</html>
+   218	;;;
+   219	
+   220	has embedded JavaScript that makes a GET request against the JSP server-side
+   221	script getCDs.jsp, to be examined shortly. First, however, here is a slice of 
+   222	the JSON that the jQuery receives from the server:
+   223	
+   224	
+   225	
+   226	
+   227	
+   228	
+   229	
+   230	
+   231	
+   232	
+   233	
+   234	
+   235	
+   236	
+   237	
+   238	
+   239	
+   240	
+   241	
+   242	;;;
+   243	{"catalog":
+   244	   {"cd":
+   245	     [{"title":"empire burlesque",
+   246	        "price":10.9,
+   247	        "company":"columbia",
+   248	        "year":1985,
+   249	        "artist":"bob dylan",
+   250	        "country":"usa"},
+   251	      {"title":"hide your heart",
+   252	        "price":9.9,
+   253	        "company":"cbs records",
+   254	        "year":1988,
+   255	        "artist":"bonnie tyler",
+   256	        "country":"uk"},
+   257	      ...
+   258	      {"title":"unchain my heart",
+   259	        "price":8.2,
+   260	        "company":"emi",
+   261	        "year":1987,
+   262	        "artist":"joe cocker",
+   263	        "country":"usa"
+   264	     ]
+   265	   }
+   266	}
+   267	;;;
+   268	
+   269	The jQuery treats the received JSON as a first-class object:
+   270	
+   271	    response is the encpasulating object
+   272	    response.catalog is an encapsulated object
+   273	    response.catalog.cd is an encapsulated object, an array of CDs
+   274	    response.catalog.cd[0] is the first array element
+   275	    response.catalog.cd[0].title is the 1st CD's title
+   276	    ...
+   277	
+   278	As proof of concept, the jQuery alters the DOM that the browser displays
+   279	by appending three titles to the unordered HTML list with the ID 
+   280	container:
+   281	
+   282	   $('#container').append('<li>' + response.catalog.cd[0].title + '</li>');	
+   283	   ...
+   284	
+   285	## The server-side JSP script
+   286	
+   287	Here is getCDs.jsp, the server-side JSP script that the client-side
+   288	jQuery accesses in order to get the CDs:
+   289	
+   290	;;;
+   291	<jsp:useBean id = "fetcher" 
+   292		     type = "fetcher.FetchXML" 
+   293		     class = "fetcher.FetchXML">  
+   294	</jsp:useBean> 
+   295	<jsp:getProperty name = "fetcher" property = "json" />
+   296	;;;
+   297	
+   298	
+   299	
+   300	
+   301	
+   302	This script uses JSP "customized tags" such as 
+   303	
+   304	   <jsp:useBean> 
+   305	   <jsp:getPropertty>
+   306	
+   307	to access a back-end JavaBean or POJO, an instance of FetchXML.java:
+   308	
+   309	;;;
+   310	
+   311	package fetcher;
+   312	
+   313	/* Backend POJO for a JSP script. 
+   314	   The bean 
+   315	      -- gets data, in XML format, from a W3C web site
+   316	      -- converts the data to JSON format
+   317	      -- returns the JSON
+   318	*/
+   319	
+   320	import org.json.JSONException;
+   321	import org.json.JSONObject;
+   322	import org.json.XML;
+   323	import java.io.BufferedReader;
+   324	import java.io.InputStreamReader;
+   325	import java.io.InputStream;
+   326	import java.net.URL;
+   327	import java.net.URLConnection;
+   328	
+   329	public class FetchXML {
+   330	    private JSONObject json;
+   331	
+   332	    // Json property
+   333	    public void setJson(JSONObject json) { this.json = json; }
+   334	    public JSONObject getJson() {
+   335		JSONObject json = null;
+   336		try {
+   337		    String xml = "";
+   338	
+   339		    URL url = new URL("http://www.w3schools.com/xml/cd_catalog.xml");
+   340		    URLConnection conn  = url.openConnection();
+   341	
+   342		    BufferedReader in = 
+   343			new BufferedReader(new InputStreamReader(conn.getInputStream()));
+   344	
+   345		    String line = null;
+   346		    while ((line = in.readLine()) != null) 
+   347			xml += line;
+   348		    in.close();
+   349	
+   350		    xml = xml.replace("'", "");
+   351		    json = XML.toJSONObject(xml.toLowerCase());
+   352		}
+   353		catch(Exception e) { }
+   354		return json;
+   355	    }
+   356	}
+   357	;;;
+   358	
+   359	
+   360	
+   361	
+   362	## Data conversion: XML to JSON
+   363	
+   364	The XML from W3C, formatted for readability, is:
+   365	
+   366	;;;   
+   367	<?xml version="1.0" encoding="ISO-8859-1"?>
+   368	<!-- Edited by XMLSpy -->
+   369	<CATALOG>	
+   370	   <CD>		
+   371	     <TITLE>Empire Burlesque</TITLE>		
+   372	     <ARTIST>Bob Dylan</ARTIST>		
+   373	     <COUNTRY>USA</COUNTRY>		
+   374	     <COMPANY>Columbia</COMPANY>		
+   375	     <PRICE>10.90</PRICE>		
+   376	     <YEAR>1985</YEAR>	
+   377	   </CD>	
+   378	   ...
+   379	   <CD>		
+   380	     <TITLE>Unchain my heart</TITLE>		
+   381	     <ARTIST>Joe Cocker</ARTIST>		
+   382	     <COUNTRY>USA</COUNTRY>		
+   383	     <COMPANY>EMI</COMPANY>		
+   384	     <PRICE>8.20</PRICE>		
+   385	     <YEAR>1987</YEAR>	
+   386	   </CD>
+   387	</CATALOG>
+   388	;;;
+   389	
+   390	The Java code in FetchXML.java gets XML and converts the XML to JSON, using
+   391	the org.json libraries. The resulting JSON, formatted for readability, is:
+   392	
+   393	;;;
+   394	{"catalog":
+   395	   {"cd":
+   396	     [{"title":"empire burlesque",
+   397	        "price":10.9,
+   398	        "company":"columbia",
+   399	        "year":1985,
+   400	        "artist":"bob dylan",
+   401	        "country":"usa"},
+   402	      {"title":"hide your heart",
+   403	        "price":9.9,
+   404	        "company":"cbs records",
+   405	        "year":1988,
+   406	        "artist":"bonnie tyler",
+   407	        "country":"uk"},
+   408	      ...
+   409	      {"title":"unchain my heart",
+   410	        "price":8.2,
+   411	        "company":"emi",
+   412	        "year":1987,
+   413	        "artist":"joe cocker",
+   414	        "country":"usa"
+   415	     ]
+   416	   }
+   417	}
+   418	;;;
+   419	
+   420	
+   421	
+   422	## The deployed WAR files
+   423	
+   424	The two applications are jayson.war and cds.war. Each has a 
+   425	
+   426	   WEB-INF/lib
+   427	
+   428	subdirectory with a JAR file, in each case a Java JSON library.
+   429	The first application uses the simple-json library, the second
+   430	uses the org-json library. Including the libraries in the WAR
+   431	files "freezes" each application in that each then needs only 
+   432	the standard Java libraries to execute; and Tomcat uses the host
+   433	machine's Java runtime, which includes the standard libraries.
+   434	
+   435	If you unwar the WAR files, it's best to do so in separate directories
+   436	as the WEB-INF subtrees are different. Once deployed in 
+   437	
+   438	   TOMCAT_HOME/webapps
+   439	
+   440	the available URLS (with comments above) are:
+   441	
+   442	   <!-- page with jQuery that displays counter -->
+   443	   http://localhost:8080/jayson/index.html
+   444	
+   445	   <!-- the data service itself with samples of how to
+   446	        increment and decrement counter -->
+   447	   http://localhost:8080/jayson/service.jsp?inc
+   448	   http://localhsot:8080/jayson/service.jsp?dec
+   449	
+   450	   <!-- page to display CD information for W3C -->
+   451	   http://localhost:8080/cds/fetch.html
+   452	
+   453	   <!-- service to access the raw JSON -->
+   454	   http://localhost:8080/cds/getCDs.jsp
+   455	
+   456	## Looking ahead: Meteor web framework
+   457	
+   458	Meteor (http://meteor.com) is a JavaScript-only framework. The
+   459	start-up has had recent success in attracting venture capital. The
+   460	central ideas are:
+   461	
+   462	   -- When a page is downloaded to a browser, it should be
+   463	      a template and, therefore, downloaded only once. 
+   464	
+   465	   -- Any accompanying CSS also should be downloaded only once.
+   466	
+   467	   -- Thereafter, any visible changes to the page result from
+   468	      ajaxy behavior on the part of JavaScript. 
+   469	
+   470	   -- JavaScript is the language on the server side and on the
+   471	      server side. The distinguishing difference between the two
+   472	      is that the database resides on the server; but server or
+   473	      client can make changes to the database.
+   474	
+   475	In effect, a meteor client is a consumer of data -- not HTML or
+   476	CSS, which provide structure for the data -- over the web. In
+   477	equivalent terms, a client is a web service consumer.
+   478	
+   479	
+   480	
+   481	
+   482	# Sample
+   483	
+   484	One of Meteor's demos is a ranking system for famous mathematicians and
+   485	scientists. Here's the HTML template:
+   486	
+   487	;;;
+   488	<!-- leaderboard.html -->
+   489	<head>
+   490	  <title>Leaderboard</title>
+   491	</head>
+   492	
+   493	<body>
+   494	  <div id="outer">
+   495	    {{> leaderboard}}
+   496	  </div>
+   497	</body>
+   498	
+   499	<template name="leaderboard">
+   500	  <div class="leaderboard">
+   501	    {{#each players}}
+   502	      {{> player}}
+   503	    {{/each}}
+   504	  </div>
+   505	
+   506	  {{#if selected_name}}
+   507	  <div class="details">
+   508	    <div class="name">{{selected_name}}</div>
+   509	    <input type="button" class="inc" value="Give 5 points" />
+   510	  </div>
+   511	  {{/if}}
+   512	
+   513	  {{#unless selected_name}}
+   514	  <div class="none">Click a player to select</div>
+   515	  {{/unless}}
+   516	</template>
+   517	
+   518	<template name="player">
+   519	  <div class="player {{selected}}">
+   520	    <span class="name">{{name}}</span>
+   521	    <span class="score">{{score}}</span>
+   522	  </div>
+   523	</template>
+   524	;;;
+   525	
+   526	The CSS is standard. Here's a slice:
+   527	
+   528	;;;
+   529	body {
+   530	    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+   531	    font-weight: 200;
+   532	    margin: 50px 0;
+   533	    padding: 0;
+   534	    -webkit-user-select: none;
+   535	    -khtml-user-select: none;
+   536	    -moz-user-select: none;
+   537	    -o-user-select: none;
+   538	    user-select: none;
+   539	}
+   540	
+   541	
+   542	#outer {
+   543	    width: 600px;
+   544	    margin: 0 auto;    
+   545	}
+   546	
+   547	.player {
+   548	    cursor: pointer;
+   549	    padding: 5px;
+   550	}
+   551	...
+   552	;;;
+   553	  
+   554	Here's the underlying JavaScript:
+   555	
+   556	;;;
+   557	
+   558	// Set up a collection to contain player information. On the server,
+   559	// it is backed by a MongoDB collection named "players".
+   560	Players = new Meteor.Collection("players");
+   561	
+   562	if (Meteor.isClient) {
+   563	  Template.leaderboard.players = function () {
+   564	    return Players.find({}, {sort: {score: -1, name: 1}});
+   565	  };
+   566	
+   567	  Template.leaderboard.selected_name = function () {
+   568	    var player = Players.findOne(Session.get("selected_player"));
+   569	    return player && player.name;
+   570	  };
+   571	
+   572	  Template.player.selected = function () {
+   573	    return Session.equals("selected_player", this._id) ? "selected" : '';
+   574	  };
+   575	
+   576	  Template.leaderboard.events({
+   577	    'click input.inc': function () {
+   578	      Players.update(Session.get("selected_player"), {$inc: {score: 5}});
+   579	    }
+   580	  });
+   581	
+   582	  Template.player.events({
+   583	    'click': function () {
+   584	      Session.set("selected_player", this._id);
+   585	    }
+   586	  });
+   587	}
+   588	
+   589	
+   590	
+   591	
+   592	
+   593	
+   594	
+   595	
+   596	
+   597	
+   598	
+   599	
+   600	
+   601	
+   602	// On server startup, create some players if the database is empty.
+   603	if (Meteor.isServer) {
+   604	  Meteor.startup(function () {
+   605	    if (Players.find().count() === 0) {
+   606	      var names = ["Ada Lovelace",
+   607	                   "Grace Hopper",
+   608	                   "Marie Curie",
+   609	                   "Carl Friedrich Gauss",
+   610	                   "Nikola Tesla",
+   611	                   "Claude Shannon"];
+   612	      for (var i = 0; i < names.length; i++)
+   613	        Players.insert({name: names[i], 
+   614	                        score: Math.floor(Math.random() * 10) * 5});
+   615	    }
+   616	  });
+   617	}
+   618	;;;
+   619	
+   620	-- The app can be deployed to the "cloud" (that is, their demo web server)
+   621	and then run. Here's the source HTML:
+   622	
+   623	;;;
+   624	<!DOCTYPE html>
+   625	<html>
+   626	<head>
+   627	  <link rel="stylesheet" href="/b151d9f6c43b3462a5574b21ad90803de0a478f7.css">
+   628	<script type="text/javascript">
+   629	__meteor_runtime_config__ = 
+   630	   {"ROOT_URL":"http://truly-wicked-leaderboard-duplicate.meteor.com",
+   631	    "DEFAULT_DDP_ENDPOINT": 
+   632	    "https://truly--wicked--leaderboard--duplicate-meteor-com-ddp.meteor.com/"};
+   633	</script>
+   634	  <script type="text/javascript" src="/1272794aebc4c4da5c58b16ba4df9da73ba8c6d9.js">
+   635	  </script>
+   636	<title>Leaderboard</title>
+   637	</head>
+   638	<body>
+   639	</body>
+   640	</html>
+   641	;;;
