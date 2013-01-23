@@ -1,0 +1,24 @@
+Code examples for First Steps with Ajax
+=======================================
+
+There are four Java classes in two packages, under src:
+
+developerworks.ajax.store:
+  Cart.java - A simple shopping cart representation, with a toXml() method.
+  Catalog.java - Has details of the products available in the store
+  Item.java - Represents an item in the product catalog
+
+developerworks.ajax.servlet:
+  CartServlet.java -  Updates a session-held Cart object, and outputs its XML
+                      representation
+
+The web directory contains three files:
+
+  index.jsp - Renders the initial page, including an empty cart, and a list of
+              items in the catalog.
+
+  ajax1.js  - Contains the general-purpose Ajax functions shown in the article.
+
+  cart.js   - Javascript functions specific to the shopping-cart example.
+
+web.xml contains deployment information for the web-app.
