@@ -1,0 +1,4 @@
+<programlisting>Roses are <replaceable>red</replaceable>,
+   Violets are <replaceable>blue</replaceable>. <lineannotation>This is a line annotation</lineannotation>
+Some poems rhyme;
+   This one <userinput>doesn't</userinput>.</programlisting>

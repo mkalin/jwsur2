@@ -1,0 +1,13 @@
+<programlisting>Roses are <replaceable>red</replaceable>,
+   Violets are <replaceable>blue</replaceable>. <co id="violets-co" linkends="violets"/>
+Some poems rhyme;
+   This one doesn't. <co id="poem-co" linkends="poem"/></programlisting>
+
+<calloutlist>
+  <callout id="violets" arearefs="violets-co">
+    <para>Violets actually have a color value of +#9933cc+.</para>
+  </callout>
+  <callout id="poem" arearefs="poem-co">
+    <para>This poem uses the literary device known as a &ldquo;surprise ending.&rdquo;</para>
+  </callout>
+</calloutlist>

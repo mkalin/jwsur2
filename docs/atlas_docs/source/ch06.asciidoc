@@ -1,0 +1,299 @@
+[[using_git_with_atlas]]
+== Using Git with Atlas
+
+While Atlas hides a lot of the complexity of using git(((git))), there are still times when you may want to use it, such as:
+
+* You hate editing in a web browser and would prefer a text editor, such as TextMate, Emacs, or BBEdit.
+* You want to write when you're offline--during a flight, for example.
+* You've got a bunch of images to upload in bulk.
+
+If this sounds like you, then using git directly may be an attractive option. This is a quick introduction to using git with Atlas. If you want to know more about git and all the things you can do with it, check out these resources:
+
+* http://help.github.com/git-cheat-sheets/[Git Cheat Sheet (GitHub)]. A great reference to the key commands.
+* http://hoth.entp.com/output/git_for_designers.html[Git for Designers]. A nice introduction to git for non-programmers.
+* http://progit.org/book/[Pro Git]. The online version of Scott Chacon's excellent book, _Pro Git_.
+* http://www.youtube.com/watch?v=OFkgSjRnay4[O'Reilly Webcast: Git in One Hour]. A nice video from Scott Chacon that introduces all the key parts of using git.
+
+[[git_terminology]]
+=== Git Terminology and Command Reference
+
+Here are some of the key terms you'll need to understand to use git:
+
+Local repository::
+   A git repository that is on your local drive. You can make any changes you want to this copy without affecting other files.
+Branch::
+   A named version set of files within a git repository. The default name is ``master.'' We won't be doing much with branches, but they're a very handy tool that you can lean more in the http://book.git-scm.com/3_basic_branching_and_merging.html[Basic Branching and Merging] chapter of the http://book.git-scm.com/[git community book].
+Remote repository::
+   A named link to a git repository on another machine. You can have as many
+remote repositories as you want. ``Origin'' is the default name, but you can
+choose any name you like when you add new ``remotes'' (links to other
+repositories on different servers). 
+Push and pull::
+   git lingo for sending the changes made in a local repository to a remote repository, or vice versa.
+Cloning::
+   Downloading a remote git repository onto your own machine so that you can edit it locally.
+Forking::
+   GitHub lingo for cloning a repo from someone else's GitHub account into your own so that you can modify and change without touching the original copy. Forking a repo is often the first step when you want to start working on a project.
+Commit::
+   A commit saves all your changes under version control.   
+
+[WARNING]
+====
+One major difference between editing in the Atlas wiki and editing locally is that, in the wiki, all changes are committed for you automatically. This is _not_ the case when you're editing locally: you can make and save changes, but until you commit, you cannot push changes to Atlas. Why? The reason is a reflection of git's history as a software development tools.
+
+Git was designed to allow developers to experiment with their code by changing lots of files. Assuming everything works, the programmer can then commit the changes into the master branch of the code. If the changes don't work, he or she can simply roll back the changes to the last version that worked and start over. So a commit is an affirmative statement that the changes are acceptable.
+====
+
+<<command_reference>> summarizes some commonly used commands.
+ 
+[[command_reference]]
+.Command quick reference
+|===================================================
+|`git init`|Creates a new blank repo 
+|`git commit -a -m"Your helpful commit message"`|Commits changes to the repo 
+|`git status`|Returns the commit status of the current repo
+|`git add *`|Adds all files to the repo
+|`git remote add _remote_name_ _remote_URL_`|Adds a remote repository to which you can push or pull changes
+|`git remote -v`|Lists the remotes in your repo
+|`git push _remote_name_ _branch_name_`| Pushes changes from the specified local branch specified to a remote repo. We'll mostly use "git push origin master"
+|===================================================
+
+[[faqs_git_atlas]]
+=== Frequently Asked Questions About Using Git with Atlas
+
+[[where_get_git]]
+==== Where Do I Get Git?
+
+You can download git from http://git-scm.com/[the git-scm site]. Just follow the instructions for your platform.
+
+[[how_clone_atlas]]
+==== How Do I Clone My Project from Atlas?
+
+To pull down your project from Atlas:
+
+. Go to the Metadata tab and copy the Git URL (it's the first field)
+. Drop into a command line and use `git clone _<your_git_url>_` to pull down the repo. By default, using this command as is will pull the repo into a directory name based on the ISBN. You can override this by putting a new directory name at the end of the command.
+. You'll be prompted for a password--enter the password you use to log into Atlas
+
+Here's a log:
+
+[source,console]
+----
+$ cd ~/Desktop
+$ git clone https://odewahn%40oreilly.com@atlas-admin.oreilly.com/
+  git/1230000000189.git
+Cloning into 1230000000189...
+Password: 
+remote: Counting objects: 68, done.
+remote: Compressing objects: 100% (63/63), done.
+remote: Total 68 (delta 16), reused 0 (delta 0)
+Unpacking objects: 100% (68/68), done.
+$ cd 1230000000189
+----
+
+[[how_write_locally]]
+==== How Do I Write Locally Using TextMate?
+
+You can use any text editor you want to edit Atlas projects. If you're on a Mac, here's how you'd use the popular TextMate editor, 
+
+. Install the editor. You can download it from the http://macromates.com/[TextMate] site.
+. Install and configure the AsciiDoc bundle.
+. Enable command-line usage.
+. Edit your files.
+
+More details on the bundle and configuring AsciiDoc for the command line follows.
+
+Once you've installed TextMate, go grab the https://github.com/zuckschwerdt/asciidoc.tmbundle[AsciiDoc bundle] to make it much easier to work with AsciiDoc. It will give you features like automatic previews, source highlighting, and so forth. Here's what you do for this:
+
+[source,console]
+----
+$ mkdir -p /Library/Application\ Support/TextMate/Bundles   
+$ cd ~/"Library/Application Support/TextMate/Bundles/"
+$ git clone git://github.com/zuckschwerdt/asciidoc.tmbundle.git "AsciiDoc.tmbundle"
+$ osascript -e 'tell app "TextMate" to reload bundles'
+----
+
+Now the the bundle is installed, your AsciiDoc markup will have all the color-coded goodness you've come to expect in a text editors.
+
+[NOTE]
+====
+You have to give the files an extension of _.asciidoc_ for the syntax highlighting to work. 
+====
+
+Change into the directory where you installed the sample repository and type the following command:
+
+----
+$ mate .
+----
+
+This command will open the editor and display the _project drawer_, which is a
+navigation tree that you can use to move between files. Use the project drawer
+to open the file called _sec_environments.asc_, as shown in <<textmate-fig>>.
+
+[[textmate-fig]]
+.Using TextMate and the AsciiDoc Bundle
+image::images/textmate_editor.png["A screenshot of AsciiDoc text in TextMate with colored syntax highlighting"]
+
+If you've worked in a wiki before, this markup should look pretty familiar. Also, note how the various AsciiDoc elements are all nicely color coded because of the AsciiDoc bundle that you installed earlier.
+
+To run TextMate from the command line, you must configure your system so that it ``knows'' where TextMate is installed. The simplest way to do this is to use the ``Terminal Usage'' feature right in TextMate's control bar. Just click ``Help -> Terminal Usage...'' and then click ``Create Link.'' <<textmate_cmd_line>> shows how this works.
+
+[[textmate_cmd_line]]
+.Setting Up TextMate for the Command Line
+image::images/textmate_cmd_line.png["A screenshot showing how to enable Terminal Usage in TextMate"]
+
+[[edited_now_what]]
+==== I've Edited My Files. Now What?
+
+Once you've made your edits, you use two commands to add any new files and commit your changes:
+
+* Add any new files so that git can start tracking them. Use `git add _<filename>_` to add an individual file. Use `git add .` to add all files in the current directory and all subdirectories.
+*  Commit the changes using `git commit -a -m'_commit message_'`. Try to use the commit message to leave yourself a note about what you were doing. For example, if you were just adding a big section on the _foo_ method, you'd use a message like ``Added section covering foo.''
+*  Push the changes back up to Atlas using `git push origin master`.
+
+Here's an example:
+
+[source,console]
+----
+$ git add .
+$ git commit -a -m"Made some changes while on the plane"
+$ git push origin master
+----
+
+[[push_some_changes]]
+==== I Am Trying to Push Some Changes to Atlas, but It Keeps Reporting That Everything Is Up to Date. What's Up?
+
+You probably forgot to either add any new files, or you forgot to commit your changes. (Or both!) You can check if you have any changes using `git status`, like this:
+
+[source,console]
+----
+$ git status
+# On branch master
+# Changes not staged for commit:
+#   (use "git add <file>..." to update what will be committed)
+#   (use "git checkout -- <file>..." to discard changes in working directory)
+#
+#	modified:   git_quick_start.asciidoc
+#
+no changes added to commit (use "git add" and/or "git commit -a")
+----
+
+When you commit the changes, you'll get something like this:
+
+[source,console]
+----
+$ git commit -a -m"Minor edits"
+[master 955189b] Minor edits
+ 1 files changed, 47 insertions(+), 6 deletions(-)
+new-host:1230000000197 odewahn$ git status
+# On branch master
+# Your branch is ahead of 'origin/master' by 1 commit.
+#
+nothing to commit (working directory clean)
+new-host:1230000000197 odewahn$ 
+----
+
+[[push_rejected]]
+==== Hey, My Push to Atlas Keeps Getting Rejected. What's Up with That?
+
+If you're getting a message that your changes are rejected, it's most likely because someone has changed the files on Atlas since you started working locally. To fix this, you'll need to commit your current changes and then use `git pull origin master` to pull in the changes from Atlas. Once you've synced the changes, you'll be able to push your work back up.
+
+Here's the rejection notice:
+
+[source,console]
+----
+$ git push origin master
+Password: 
+To https://odewahn%40oreilly.com@atlas-admin.oreilly.com/git/1230000000197.git
+ ! [rejected]        master -> master (non-fast-forward)
+error: failed to push some refs to 'https://odewahn%40oreilly.com@atlas-
+admin.oreilly.com/git/1230000000197.git'
+To prevent you from losing history, non-fast-forward updates were rejected
+Merge the remote changes (e.g. 'git pull') before pushing again. See the
+'Note about fast-forwards' section of 'git push --help' for details.
+----
+
+To fix this, you need to pull in the new changes, like so:
+
+[source,console]
+----
+$ git pull origin master
+Password: 
+remote: Counting objects: 5, done.
+remote: Compressing objects: 100% (3/3), done.
+remote: Total 3 (delta 2), reused 0 (delta 0)
+Unpacking objects: 100% (3/3), done.
+From https://atlas-admin.oreilly.com/git/1230000000197
+ * branch            master     -> FETCH_HEAD
+Updating e26e9b6..fd7c13d
+Fast-forward
+ book.asciidoc |    2 --
+ 1 files changed, 0 insertions(+), 2 deletions(-)
+----
+
+.HTTP Error When Pushing to Atlas
+**** 
+When pushing large batches of files to Atlas (e.g., a set of figure images), you may encounter an error like the following:
+
+[source,console]
+----
+$ git push origin master
+Password for 'atlas-admin.oreilly.com': 
+Counting objects: 39, done.
+Delta compression using up to 2 threads.
+Compressing objects: 100% (35/35), done.
+Writing objects: 100% (35/35), 83.19 MiB | 604 KiB/s, done.
+Total 35 (delta 2), reused 0 (delta 0)
+error: RPC failed; result=22, HTTP code = 502
+fatal: The remote end hung up unexpectedly
+fatal: The remote end hung up unexpectedly
+----
+
+This usually indicates that your HTTP POST buffer is too small to handle the files being posted. Try increasing the buffer size by running the following command:
+
+[source,console]
+----
+$ git config http.postBuffer 524288000
+----
+
+And then try your +git push+ again.
+
+For more details/context on Git and the HTTP post buffer, see http://stackoverflow.com/questions/2702731/git-fails-when-pushing-commit-to-github[this Stack Overflow post].
+****
+
+[[get_a_diff]]
+==== How Do I Get a diff Between the Files I Have Locally and the Files That Are on Atlas (Regardless of the Number of Commits)?
+
+Rather than using `git pull`, use `git fetch`, like this:
+
+[source,console]
+----
+$ git fetch origin
+Password: 
+remote: Counting objects: 5, done.
+remote: Compressing objects: 100% (3/3), done.
+remote: Total 3 (delta 2), reused 0 (delta 0)
+Unpacking objects: 100% (3/3), done.
+From https://atlas-admin.oreilly.com/git/1230000000065
+   92d4f99..e9fbbe2  master     -> origin/master
+----
+
+This fetches the changes into a local branch, but does not merge them in automatically, which is what `pull` does. (In fact, as Mark Longair argues in link:http://longair.net/blog/2009/04/16/git-fetch-and-merge/[git: fetch and merge, don't pull], this workflow is much better than just blindly pulling in remote changes without review.)
+
+Once you've fetched, you can use this command to see the files that have changed between your local copy and the remote copy:
+
+[source,console]
+----
+$ git diff --name-only master..origin/master
+----
+
+This command will just give you the list of files. (If you want to see the actual differences, just leave off the "--name-only" flag). Once you're satisfied that nothing nefarious is in there, you can then merge in the changes you just fetched using the command `git merge origin/master`, like this:
+
+[source,console]
+----
+$ git merge origin/master
+Updating 92d4f99..e9fbbe2
+Fast-forward
+ ch01.asciidoc |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
+----
