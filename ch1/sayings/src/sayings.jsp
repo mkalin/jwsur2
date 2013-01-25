@@ -12,6 +12,7 @@
        response.sendError(response.SC_METHOD_NOT_ALLOWED,
                           "GET requests only are allowed.");
      }
+     // If it's a GET request, return the predictions.
      else {
        // Object reference application has the value 
        // pageContext.getServletContext()
