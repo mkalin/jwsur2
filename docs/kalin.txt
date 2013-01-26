@@ -1,0 +1,97 @@
+Title (unchanged)
+
+   Java Web Services: Up and Running
+
+Table of Contents (minor reorganization)
+
+   Preface
+
+   Chapter 1: Java Web Services Overview
+
+   Chapter 2: RESTful Web Services
+
+   Chapter 3: Consuming RESTful Web Services: XML and JSON
+
+   Chapter 4: SOAP-Based Web Services
+
+   Chapter 5: The WSDL Contract and SOAP
+
+   Chapter 6: Web Services Security
+
+   Chapter 7: Looking Forward (hoping for a better title later)
+;;;
+
+What's changed significantly since my book was published in 2009 is not the importance
+or popularity of web services but, rather, the balance between the flavors: SOAP-based 
+services, as one flavor, and REST-style services, as the other. Consider, for example, 
+dominant web presences such as Amazon, EBay, Facebook, Google, Tumblr, and Twitter. All 
+of these deliver resources over the web but in two distinct ways: through web sites 
+that browsers or equivalents hit; through web services that non-browser clients hit.
+Only Amazon delivers its resources as both SOAP-based and REST-style services; the 
+others support only REST-style services. (It's worth noting that Google was an early 
+source of SOAP-based services but gave these up in the mid-2000s.) Further, web 
+frameworks such as Rails (and its unending imitators) have pushed hard to blur the 
+distinction between web sites and web services, underscoring that either can deliver 
+the same resource but with different representations: HTML for web sites but XML or 
+JSON for web services. In a Rails program, for example, the very same server-side code 
+can deliver a resource (e.g., a list of a company's products) as either HTML, or JSON, 
+or XML depending on whether the request URI is /products (HTML), /products.json (JSON), 
+or /products.xml (XML). 
+
+There is another sign of how REST has eclipsed SOAP. Of the major programming systems,
+only Java and DotNet have anything approaching full support of SOAP-based services.
+Languages such as C/C++, JavaScript, Perl, Python, and Ruby have limited, uneven 
+support for SOAP. (On the SOAP side, I'd stick with JAX-WS as the main framework but 
+also provide a short section on the Axis2 framework.)
+
+A related, significant issue is how RESTful web services are consumed. In the 
+beginning, the most popular format for a RESTful service's response was XML. This is 
+changing fast because the consuming programs are increasingly in JavaScript, 
+typically embedded in an HTML document and executing in a browser. JavaScript 
+frameworks such as jQuery make it particularly easy to make "ajaxy" calls against web 
+services; and the preferred format for any JavaScript client is, of course, JSON 
+because a well-formed JSON document represents a native JavaScript object (e.g., an 
+array of company products, each of which is a JavaScript object with attributes such 
+as name, price, description, and the like). In short, a JavaScript client would have 
+to parse an XML payload but can treat a JSON payload as a native object.
+
+Any revision of my book should reflect these changes. Here's a quick dump of the
+changes I see:
+
+   -- After the mandatory overview of SOAP-based versus REST-style services, jump
+      first into RESTful examples. SOAP would come later. Indeed, SOAP-based
+      services can be viewed as a special case of REST-style services.
+
+   -- For RESTful services, cover both XML and JSON formats, underscoring the
+      growing popularity of the latter. (For the record, Java support for JSON is
+      not good but, of course, anything worth doing is worth hacking.)
+
+   -- Present web services in a literal way, that is, as services delivered over 
+      HTTP(S). Java does support W3C efforts (in the so-called WS-Interoperabilty
+      profiles) to make SOAP-based services transport neutral; but the resulting 
+      complexity has played a key role in popularizing REST-style over
+      SOAP-based services -- and almost all SOAP-based services are delivered over
+      HTTP in any case. Cover the W3C extensions beyond the "basic profile" only
+      sparingly, which also means scaled-back coverage of web services under 
+      Java EE.
+
+   -- For RESTful services, give more coverage to JAX-B, which allows a consumer to
+      transform an XML document into a native Java object. In effect, JAX-B applied
+      to XML can provide the same benefit to a Java consumer as JSON does to a 
+      JavaScript consumer. A good grasp of JAX-B also clarifies how SOAP-based
+      services work under the hood.
+
+I would keep the hands-on, example-driven approach but make my code samples easier to 
+use by providing Ant scripts for the main examples. Also, I'd be more forthright in 
+assessing the Java technologies. For example, there are three obvious ways that a Java 
+programmer might deliver a RESTful service: as a standard Java servlet (published in 
+the usual way with a web server such as Tomcat), as a JAX-WS WebServiceProvider, or as 
+a JAX-RS resource. I'd rank order these as follows:
+
+   1. servlet (Why fix it if it ain't broken and, moreover, if it's darn good already?)
+  
+   2. JAX-RS resource (Nice but not compelling)
+
+   3. JAX-WS WebServiceProvider (Must be presented but not with a smile)
+
+
