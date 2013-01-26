@@ -92,8 +92,8 @@ Figure 1.2 is the JSP script.
 </jsp:useBean>  
 ;;;
 
-The JSP script first checks the HTTP and, if this is GET, returns an XML representation of
-the predictor/prediction list. If the verb is not GET, the script returns an
+The JSP script first checks the HTTP method and, if this is GET, returns an XML 
+representation of the predictor/prediction list. If the verb is not GET, the script returns an
 error message together with the HTTP status code. Recall that JSP scripts have
 implicit object references such as request, response, and out; each of these is a 
 field or a parameter in the servlet code into which the web server, in this case Tomcat,
