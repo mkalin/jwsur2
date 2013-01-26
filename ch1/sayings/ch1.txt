@@ -104,7 +104,7 @@ On a successful request, the JSP script invokes the back-end bean method
 setServletContext (the implicit object reference is named application) because
 the back-end bean needs access to the servlet context in order to read data from a
 text file embedded in the deployed WAR file. The call to setServletContext sets up
-the subsequent call to getPrecitions, which returns the XML representation shown in
+the subsequent call to getPredictions, which returns the XML representation shown in
 Figure 1.1.
 
 Figure 1.3 is the class for the back-end bean cliches.Prediction and Figure 1.4 is 
@@ -232,11 +232,17 @@ XMLEncoder. In this example, an array of Prediction objects is encoded in XML,
 which requires that each Prediction be Serializable; hence, the Prediction
 class implements the empty Serializable interface and defines the
 get/set methods that define the properties who (the predictor) and what (the
-prediction). The Predictions class contains two utility methods: populate 
-reads the data from a text file embedded in the WAR and toXML serializes the
-array of in-memory Prediction objects into XML format.
+prediction). The Predictions class contains properties so that the JSP script
+can set the servlet context and subsequently read the predictions from the
+data file. (The predictions need to be read only once from the file into the
+array; thereafter, the data in the array are used.) The Predictions class also 
+has two utility methods to support the properties: the populate method
+reads the data from a text file embedded in the WAR and the toXML method 
+serializes the array of in-memory Prediction objects into XML format. For now,
+the XML representation is generated on each request; a more efficient
+implementation is left for later.
 
-The service can be deployed to Tomcat using the provided Ant script
+The predictions service can be deployed under Tomcat using the provided Ant script
 
    % ant -Dwar.name=preds deploy
 
