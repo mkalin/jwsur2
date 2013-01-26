@@ -320,3 +320,16 @@ service:
      must process in some appropriate way. This first example merely
      displays the XML without any processing.
 
+What is Next?
+
+Chapter 2 focuses on the service side by exploring options for implementing
+and publishing RESTful services. The options include 
+
+   * explicit servlets (rather than JSP scripts) published with a 
+     web server such as Tomcat
+
+   * JAX-WS WebServiceProviders published either with a web server such
+     as Tomcat or with the convenient Java Endpoint publishing class
+
+   * JAX-RS annotated resources published either with a web server such
+     as Tomcat or with ...
