@@ -1,0 +1,322 @@
+A First RESTful Example
+
+As befits a first example, the implementation is simple but sufficient to highlight key aspects of
+a RESTful web service. The implementation consists of a JSP script and a back-end bean that the 
+script accesses to get data. The data are sage corporate predictions. Here
+is a sample:
+
+   Decentralized 24/7 hub will target robust web-readiness.
+   Synergistic disintermediate policy will expedite back-end experiences.
+   Universal fault-tolerant architecture will synthesize bleeding-edge channels.
+
+Each prediction has an associated human predictor. The RESTful resource is thus a list of 
+predictor names (e.g., Hollis McCullough) and their predictions (Hollis is
+responsible for the third prediction shown above). The resource name or URI is /sayings; 
+and the only allowable HTTP verb is GET, which corresponds to read among the CRUD operations. 
+If the HTTP request is correct, the RESTful service returns an XML representation of the
+predictor/prediction list; otherwise, the service returns the appropriate HTTP 
+status code, e.g., 404 for "Not Found", if the an incorrect URI is given, or
+405 for "Method Not Allowed", if the verb is not GET. Figure 1.1 shows a slice of
+the returned XML on a successful request.
+
+;;;
+<?xml version="1.0" encoding="UTF-8"?> 
+<java version="1.7.0_35" class="java.beans.XMLDecoder"> 
+ <array class="cliches.Prediction" length="32"> 
+  <void index="0"> 
+   <object class="cliches.Prediction"> 
+    <void property="what"> 
+     <string>
+       Managed holistic contingency will grow killer action-items.
+     </string> 
+    </void> 
+    <void property="who"> 
+     <string>Cornelius Tillman</string> 
+    </void> 
+   </object> 
+  </void> 
+  ...
+  <void index="30"> 
+   <object class="cliches.Prediction"> 
+    <void property="what"> 
+     <string>
+       Balanced clear-thinking utilisation will expedite collaborative initiatives.
+     </string> 
+    </void> 
+    <void property="who"> 
+     <string>Deven Blanda</string> 
+    </void> 
+   </object> 
+  </void> 
+  <void index="31"> 
+   <object class="cliches.Prediction"> 
+    <void property="what"> 
+     <string>
+       Versatile tangible application will maximize rich e-business.
+     </string> 
+    </void> 
+    <void property="who"> 
+     <string>Hiram Gulgowski</string> 
+    </void> 
+   </object> 
+  </void> 
+ </array> 
+</java> 
+;;;
+
+Figure 1.2 is the JSP script.
+
+;;;
+<!-- Connect to the backend Predictions POJO and
+     set the ServletContext. -->
+<jsp:useBean id    = "preds" 
+	     type  = "cliches.Predictions" 
+	     class = "cliches.Predictions"> 
+
+  <% // Check the HTTP verb: if it's anything but GET,
+     // return a 405 (Method Not Allowed) status code.
+     String verb = request.getMethod();
+
+     if (!verb.equalsIgnoreCase("GET")) {
+       response.sendError(response.SC_METHOD_NOT_ALLOWED,
+                          "GET requests only are allowed.");
+     }
+     // If it's a GET request, return the predictions.
+     else {
+       // Object reference application has the value 
+       // pageContext.getServletContext()
+       preds.setServletContext(application);
+       out.println(preds.getPredictions());
+     }
+  %>
+</jsp:useBean>  
+;;;
+
+The JSP script first checks the HTTP and, if this is GET, returns an XML representation of
+the predictor/prediction list. If the verb is not GET, the script returns an
+error message together with the HTTP status code. Recall that JSP scripts have
+implicit object references such as request, response, and out; each of these is a 
+field or a parameter in the servlet code into which the web server, in this case Tomcat,
+translates the JSP script. Accordingly, the JSP script can make the same calls as an
+HttpServlet. 
+
+On a successful request, the JSP script invokes the back-end bean method
+setServletContext (the implicit object reference is named application) because
+the back-end bean needs access to the servlet context in order to read data from a
+text file embedded in the deployed WAR file. The call to setServletContext sets up
+the subsequent call to getPrecitions, which returns the XML representation shown in
+Figure 1.1.
+
+Figure 1.3 is the class for the back-end bean cliches.Prediction and Figure 1.4 is 
+the associated class cliches.Predictions.
+
+;;;
+
+package cliches;
+
+import java.io.Serializable;
+
+// An array of Predictions is to be serialized
+// into an XML document, which is returned to 
+// the consumer on a request. 
+public class Prediction implements Serializable {
+    private String who;   // person
+    private String what;  // his/her prediction
+    
+    public Prediction() { }
+
+    public void setWho(String who) {
+	this.who = who;
+    }
+    public String getWho() {
+	return this.who;
+    }
+
+    public void setWhat(String what) {
+	this.what = what;
+    }
+    public String getWhat() {
+	return this.what;
+    }
+}
+;;;
+
+;;;
+package cliches;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
+import java.beans.XMLEncoder; // simple and effective
+import javax.servlet.ServletContext;
+
+public class Predictions {
+    private int n = 32;
+    private Prediction[ ] predictions;
+    private ServletContext sctx;
+
+    public Predictions() { }
+
+    //** properties
+
+    // The ServletContext is required to read the data from
+    // a text file packaged inside the WAR file
+    public void setServletContext(ServletContext sctx) {
+	this.sctx = sctx;
+    }
+    public ServletContext getServletContext() { return this.sctx; }
+
+    // getPredictions returns an XML representation of
+    // the Predictions array
+    public void setPredictions(String ps) { } // no-op
+    public String getPredictions() {
+	// Has the ServletContext been set?
+	if (null == getServletContext()) 
+	    return null;      
+
+	// Have the data been read already?
+	if (null == predictions) 
+	    populate(); 
+
+	// Convert the Predictions array into an XML document
+	return toXML();
+    }
+
+    //** utilities
+    private void populate() {
+	String filename = "/WEB-INF/data/predictions.db";
+	InputStream in = sctx.getResourceAsStream(filename);
+
+	// Read the data into the array of Predictions. 
+	if (in != null) {
+	    try {
+		InputStreamReader isr = new InputStreamReader(in);
+		BufferedReader reader = new BufferedReader(isr);
+
+		predictions = new Prediction[n];
+		int i = 0;
+		String record = null;
+		while ((record = reader.readLine()) != null) {
+		    String[] parts = record.split("!");
+		    Prediction p = new Prediction();
+		    p.setWho(parts[0]);
+		    p.setWhat(parts[1]);
+
+		    predictions[i++] = p;
+		}
+	    }
+	    catch (IOException e) { }
+	}
+    }
+
+    private String toXML() {
+	String xml = null;
+	try {
+	    ByteArrayOutputStream out = new ByteArrayOutputStream();
+	    XMLEncoder encoder = new XMLEncoder(out);
+	    encoder.writeObject(predictions); // serialize to XML
+	    encoder.close();
+	    xml = out.toString(); // stringify
+	}
+	catch(Exception e) { }
+	return xml;
+    }
+}
+;;;
+
+The XML from the service is generated using the standard Java XMLEncoder class.
+Java provides other ways to generate XML but none quite as simple as 
+XMLEncoder. In this example, an array of Prediction objects is encoded in XML, 
+which requires that each Prediction be Serializable; hence, the Prediction
+class implements the empty Serializable interface and defines the
+get/set methods that define the properties who (the predictor) and what (the
+prediction). The Predictions class contains two utility methods: populate 
+reads the data from a text file embedded in the WAR and toXML serializes the
+array of in-memory Prediction objects into XML format.
+
+The service can be deployed to Tomcat using the provided Ant script
+
+   % ant -Dwar.name=preds deploy
+
+(For a review of the Ant script, see Note 1.) The deployed WAR file
+sayings.war includes a standard web deployment document, web.xml, so that
+the URI /preds/sayings.jsp can be shortened to /preds/. Later we will look 
+at RESTful clients in Java and other languages; but, for now, either a browser or a 
+utility such as curl is good enough. (The curl utility is available on Unixy
+systems and a port for Windows can be found at from http://curl.haxx.se/download.html.)
+Figure 1.5 is the output for the curl command. On a successful curl request
+
+   % curl -v http://localhost:8080/sayings/
+
+includes not only the XML shown in Figure 1.1 but also a trace (thanks to the -v flag) 
+of the HTTP request and response messages. The HTTP request is
+
+   GET /sayings/ HTTP/1.1
+   User-Agent: curl/7.19.7 
+   Host: localhost:8080
+   Accept: */*
+
+and the HTTP response start line and header are
+
+   HTTP/1.1 200 OK
+   Server: Apache-Coyote/1.1
+   Set-Cookie: JSESSIONID=96C78773C190884EDE76C714728164EC; Path=/test1/;
+   Content-Type: text/html;charset=ISO-8859-1
+   Transfer-Encoding: chunked
+
+Recall that an HTTP GET message has no body; hence, the entire message is the
+start line and the headers. The response shows the session identifier (a 128-bit
+statistically unique number, in hex, that Tomcat generates) in the header. In
+the JSP script, the session identifier could be disabled as it is not needed; but, 
+for now, the premium is on brevity and simplicity.
+
+If a POST request were sent to the RESTful predictions service
+
+   % curl -v --data "foo=bar" http://localhost:8080/sayings/
+
+the request message header becomes
+
+   POST /test1/ HTTP/1.1
+   User-Agent: curl/7.19.7 
+   Host: localhost:8080
+   Accept: */*
+   Content-Length: 7
+   Content-Type: application/x-www-form-urlencoded
+
+and the response header is
+
+   HTTP/1.1 405 Method Not Allowed
+   Server: Apache-Coyote/1.1
+   Set-Cookie: JSESSIONID=34A013CDC5A9F9F8995A28E30CF31332; Path=/test1/; 
+   Content-Type: text/html;charset=ISO-8859-1
+   Content-Length: 1037
+
+The error message 
+
+   GET requests only are allowed
+
+is in an HTML document that makes up the response message's body. By the way,
+the --data flag together with the key/value pair "foo=bar" signal curl that a
+POST rather than a GET request should be sent; and the body of this POST 
+request contains the key/value pair foo/bar. Java generates an HTML response
+because a JSP script, in normal use, generates HTML for a browser to consume.
+This first example thus illustrates how Java technologies such as JSP and
+HttpServlet are easily adapted to support web services in addition to
+web sites.
+
+In summary, the predictions example highlights key aspects of a RESTful 
+service:
+
+   * The service provides access to resource under a standard name, the
+     URI /preds/sayings.jsp or, in abbreviation, /preds/.
+
+   * The service provides or denies access depending on the HTTP request
+     verb. In this example, only GET requests are successful; any other
+     type of request generates a "bad method" error.
+
+   * The service responds with an XML payload, which the consumer now
+     must process in some appropriate way. This first example merely
+     displays the XML without any processing.
+
