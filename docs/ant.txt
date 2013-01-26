@@ -1,0 +1,108 @@
+;;;
+Many of the book's sample web services are meant to be published with a
+web server, in particular with Tomcat. This note explains an Ant script,
+included in the ZIP file with all of the sample code, that automates 
+deployment under Tomcat. The Ant utility, written in Java, is available
+on all platforms. My script requires Ant 1.6 or greater.
+
+To clarify the script basics, consider a web service that includes a
+JSP script, a back-end JavaBean, the Tomcat deployment file web.xml,
+and a JAR file that holds a Java library for processing JSON (JavaScript
+Object Notation). Suppose that the Unixy directory /users/me/service1 or
+Windows directory D:\service1 is the root directory for the service. For reference,
+this directory is the cwd (current working directory) and it holds the
+Ant script build.xml, depicted as follows:
+
+        cwd = service1: build.xml
+
+Under the cwd is a subdirectory named src
+
+        service1: build.xml
+           |
+          src
+
+that holds the JSP script, the JAR file, and the deployment file:
+
+        service1: build.xml
+           |
+          src: products.jsp, json.jar, web.xml
+
+Suppose that the back-end JavaBean is in a package named acme.org and
+that the bean's fully qualified name is acme.org.Products. The layout is
+now
+        service1: build.xml
+           |
+          src: products.jsp, json.jar, web.xml
+           |
+          acme
+           |
+          org: Products.java
+
+Recall that the Ant script, build.xml, resides in the cwd. From the
+cwd command-line, the command
+
+   % ant -Dwar.name=products.war deploy
+
+does the following:
+
+   * Creates the directory service1/build, which holds copies of 
+     files in directory src and src's descendants.
+
+   * Compiles any .java files, in this case acme.org.Products.java.
+
+   * Builds the WAR file, whose contents are:
+
+     META-INF/
+     META-INF/MANIFEST.MF
+     WEB-INF/
+     WEB-INF/web.xml
+     WEB-INF/classes/
+     WEB-INF/classes/acme
+     WEB-INF/classes/acme/org
+     WEB-INF/classes/acme/org/Products.class
+     acme/
+     acme/org
+     acme/org/Products.java
+     products.jsp
+
+   * Copies the WAR file to TOMCAT_HOME/webapps and thereby deploys the
+     web service.
+
+   * Leaves a copy of the WAR file in the cwd, in this case the
+     directory service1.
+
+The Ant script build.xml begins with extensive documentation, some of which
+is repeated here. The second executable line in the script 
+
+   <property name="tomcat.home" value="/home/mkalin/tomcat7"/>
+
+defines the property named tomcat.home, whose value is the install directory
+for Tomcat. This value must be edited for your system. For example, on my
+MacBook labtop, this line has been changed to
+
+   <property name="tomcat.home" value="/Users/kalin/tomcat7"/>
+
+The command
+
+   % ant
+
+produces the output
+
+   usage:
+        [echo] 
+        [echo] TomcatProject build file
+        [echo] 
+        [echo] ant build                   --> to build the application
+        [echo] ant deploy -Dwar.name=test1 --> to deploy test1.war
+        [echo] 
+
+In the last command, the -D flag sets an Ant property at the command line,
+in this case the property war.name that names the WAR file. Note that
+the .war extension is not included in the name; the Ant script adds the
+extension.
+
+The Ant script can be edited, of course, to meet special needs. 
+;;;
+
+
+

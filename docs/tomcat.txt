@@ -1,0 +1,47 @@
+Apache Tomcat (http://tomcat.apache.org/) is a commercial-grade yet lightweight web server 
+implemented in Java. Tomcat has various subsystems for administration, security, logging,
+and trouble-shooting but its central subsystem is Catalina, a container that executes servlets, 
+including JSP and other scripts (e.g., JSF scripts) that Tomcat translates into servlets. Tomcat 
+also includes a web console, tutorials, and sample code. This note focuses on installing 
+Tomcat and on basic post-installation tasks such as starting and stopping the web server.
+The current version is 7.x, which requires Java SE 6 or 7. Earlier Tomcat versions are
+still available.
+
+There are different ways to download Tomcat, including as a ZIP. Tomcat can be installed in
+any directory, for example, in /usr/local/tomcat on a Unixy system or in D:\tomcatWS on a 
+Windows system. For convenience, let TOMCAT_HOME be the install directory. The
+directory TOMCAT_HOME/bin has startup and showndown scripts for Unixy and Windows 
+systems. For instance, the startup script is startup.sh for Unix and startup.bat for
+Windows. Tomcat is written in Java but does not ship with Java; instead, Tomcat uses 
+the Java runtime on the host system. To that end, Tomcat requires that the
+environment variable JAVA_HOME be set to the Tomcat install directory (e.g., to
+/usr/local/tomcat or D:\tomcatWS). In summary, the key commands (with comments
+introduced with two semicolons) are:
+
+   % startup.sh   ;; or startup.bat on Windows to start Tomcat
+   % shutdown.sh  ;; or shutdown.bat on Windows to stop Tomcat
+
+The commands can be given at a command-line prompt. On startup, a message
+similar to
+
+   Using CATALINA_BASE:   /home/mkalin/tomcat7
+   Using CATALINA_HOME:   /home/mkalin/tomcat7
+   Using CATALINA_TMPDIR: /home/mkalin/tomcat7/temp
+   Using JRE_HOME:        /usr/local/java
+   Using CLASSPATH:       /home/mkalin/tomcat7/bin/bootstrap.jar:
+                          /home/mkalin/tomcat7/bin/tomcat-juli.jar
+
+show appear.
+
+Under TOMCAT_HOME there is directory named logs, which contains various log 
+files, and several other directories, some of which will be clarified later. A 
+important directory for now is TOMCAT_HOME/webapps, which holds JAR files with .war extension
+(hence the name WAR file). To deploy a web site or a web service under Tomcat, you
+copy the WAR file containing the site or service to TOMCAT_HOME/webapps; to undeploy
+the site or service, you remove the WAR file. Note 2 introduces an Ant script,
+included in the ZIP file with my code, that automates the deployement of a web
+site or service under Tomcat.
+
+Apache Tomcat is not the only game in town. There is the related TomEE, basically Tomcat 
+with support for Java EE beyond servlets. Another popular Java-centric web server is 
+Jetty (http://jetty.codehaus.org/jetty/).
