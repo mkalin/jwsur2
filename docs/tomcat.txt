@@ -14,8 +14,8 @@ directory TOMCAT_HOME/bin has startup and showndown scripts for Unixy and Window
 systems. For instance, the startup script is startup.sh for Unix and startup.bat for
 Windows. Tomcat is written in Java but does not ship with Java; instead, Tomcat uses 
 the Java runtime on the host system. To that end, Tomcat requires that the
-environment variable JAVA_HOME be set to the Tomcat install directory (e.g., to
-/usr/local/tomcat or D:\tomcatWS). In summary, the key commands (with comments
+environment variable JAVA_HOME be set to the Java install directory (e.g., to
+/usr/local/java7 or D:\java7). In summary, the key commands (with comments
 introduced with two semicolons) are:
 
    % startup.sh   ;; or startup.bat on Windows to start Tomcat
