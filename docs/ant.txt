@@ -59,6 +59,10 @@ does the following:
         acme/org/Products.java
         products.jsp
 
+     Any .xml file winds up in WEB-INF and any .jar file winds up
+     in WEB-INF/lib. JSP files such as products.jsp are at the WAR
+     file's top level.
+
    * Copies the WAR file to TOMCAT_HOME/webapps and thereby deploys the
      web service.
 
