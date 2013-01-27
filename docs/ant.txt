@@ -52,18 +52,12 @@ does the following:
 
    * Builds the WAR file, whose contents are:
 
-     META-INF/
-     META-INF/MANIFEST.MF
-     WEB-INF/
-     WEB-INF/web.xml
-     WEB-INF/classes/
-     WEB-INF/classes/acme
-     WEB-INF/classes/acme/org
-     WEB-INF/classes/acme/org/Products.class
-     acme/
-     acme/org
-     acme/org/Products.java
-     products.jsp
+        META-INF/MANIFEST.MF
+        WEB-INF/web.xml
+        WEB-INF/classes/acme/org/Products.class
+        WEB-INF/lib/json.jar
+        acme/org/Products.java
+        products.jsp
 
    * Copies the WAR file to TOMCAT_HOME/webapps and thereby deploys the
      web service.
