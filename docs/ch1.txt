@@ -1,7 +1,7 @@
 A First RESTful Example
 
 As befits a first example, the implementation is simple but sufficient to highlight key aspects of
-a RESTful web service. The implementation consists of a JSP script and a back-end bean that the 
+a RESTful web service. The implementation consists of a JSP script and a back-end JavaBean that the 
 script accesses to get data. The data are sage corporate predictions. Here
 is a sample:
 
@@ -15,7 +15,7 @@ responsible for the third prediction shown above). The resource name or URI is /
 and the only allowable HTTP verb is GET, which corresponds to read among the CRUD operations. 
 If the HTTP request is correct, the RESTful service returns an XML representation of the
 predictor/prediction list; otherwise, the service returns the appropriate HTTP 
-status code, e.g., 404 for "Not Found", if the an incorrect URI is given, or
+status code, e.g., 404 for "Not Found", if the URI is incorrect, or
 405 for "Method Not Allowed", if the verb is not GET. Figure 1.1 shows a slice of
 the returned XML on a successful request.
 
@@ -92,7 +92,7 @@ Figure 1.2 is the JSP script.
 </jsp:useBean>  
 ;;;
 
-The JSP script first checks the HTTP method and, if this is GET, returns an XML 
+The JSP script first checks the request's HTTP method and, if this is GET, returns an XML 
 representation of the predictor/prediction list. If the verb is not GET, the script returns an
 error message together with the HTTP status code. Recall that JSP scripts have
 implicit object references such as request, response, and out; each of these is a 
@@ -101,7 +101,7 @@ translates the JSP script. Accordingly, the JSP script can make the same calls a
 HttpServlet. 
 
 On a successful request, the JSP script invokes the back-end bean method
-setServletContext (the implicit object reference is named application) because
+setServletContext (the implicit object reference is application) because
 the back-end bean needs access to the servlet context in order to read data from a
 text file embedded in the deployed WAR file. The call to setServletContext sets up
 the subsequent call to getPredictions, which returns the XML representation shown in

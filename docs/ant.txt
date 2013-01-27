@@ -38,6 +38,8 @@ now
            |
           org: Products.java
 
+Finally, assume that the src directory also holds the data file new_products.db.
+
 Recall that the Ant script, build.xml, resides in the cwd. From the
 cwd command-line, the command
 
@@ -55,13 +57,14 @@ does the following:
         META-INF/MANIFEST.MF
         WEB-INF/web.xml
         WEB-INF/classes/acme/org/Products.class
+        WEB-INF/data/new_products.db
         WEB-INF/lib/json.jar
         acme/org/Products.java
         products.jsp
 
-     Any .xml file winds up in WEB-INF and any .jar file winds up
-     in WEB-INF/lib. JSP files such as products.jsp are at the WAR
-     file's top level.
+     Any .xml file winds up in WEB-INF; any .jar file winds up
+     in WEB-INF/lib; and any .db file winds up in WEB-INF/data. JSP files 
+     such as products.jsp are at the WAR file's top level.
 
    * Copies the WAR file to TOMCAT_HOME/webapps and thereby deploys the
      web service.
