@@ -1,9 +1,9 @@
 Apache Tomcat (http://tomcat.apache.org/) is a commercial-grade yet lightweight web server 
 implemented in Java. Tomcat has various subsystems for administration, security, logging,
 and trouble-shooting but its central subsystem is Catalina, a container that executes servlets, 
-including JSP and other scripts (e.g., JSF scripts) that Tomcat translates into servlets. Tomcat 
-also includes a web console, tutorials, and sample code. This note focuses on installing 
-Tomcat and on basic post-installation tasks such as starting and stopping the web server.
+including JSP and other scripts (e.g., JSF scripts) that Tomcat automatically translates into 
+servlets. Tomcat also includes a web console, tutorials, and sample code. This note focuses on 
+installing Tomcat and on basic post-installation tasks such as starting and stopping the web server.
 The current version is 7.x, which requires Java SE 6 or 7. Earlier Tomcat versions are
 still available.
 
