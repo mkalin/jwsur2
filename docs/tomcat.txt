@@ -31,17 +31,18 @@ similar to
    Using CLASSPATH:       /home/mkalin/tomcat7/bin/bootstrap.jar:
                           /home/mkalin/tomcat7/bin/tomcat-juli.jar
 
-show appear.
+should appear.
 
 Under TOMCAT_HOME there is directory named logs, which contains various log 
 files, and several other directories, some of which will be clarified later. A 
 important directory for now is TOMCAT_HOME/webapps, which holds JAR files with .war extension
-(hence the name WAR file). To deploy a web site or a web service under Tomcat, you
+(hence the name WAR file). Subdirectories under TOMCAT_HOME/webapps can be added as
+needed. To deploy a web site or a web service under Tomcat, you
 copy the WAR file containing the site or service to TOMCAT_HOME/webapps; to undeploy
 the site or service, you remove the WAR file. Note 2 introduces an Ant script,
 included in the ZIP file with my code, that automates the deployement of a web
 site or service under Tomcat.
 
-Apache Tomcat is not the only game in town. There is the related TomEE, basically Tomcat 
-with support for Java EE beyond servlets. Another popular Java-centric web server is 
-Jetty (http://jetty.codehaus.org/jetty/).
+Apache Tomcat is not the only game in town. There is the related TomEE web server, 
+basically Tomcat with support for Java EE beyond servlets. Another popular Java-centric 
+web server is Jetty (http://jetty.codehaus.org/jetty/).
