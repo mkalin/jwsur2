@@ -3,8 +3,8 @@ Web Services and Service-Oriented Architecture
 Web services and service-oriented architecture (hereafter, SOA) are related but not identical.
 SOA, like REST itself, is more a style--indeed, a mindset--than a set of well-defined rules
 for the design and implementation of distributed systems; and web services are a natural, important 
-part of any SOA system. Perhaps the best way to clarify SOA is to contrast this approach to 
-distributed systems with a preceding approach.
+way to implement the services delivered in an SOA system. Perhaps the best way to clarify SOA is to 
+contrast this approach to distributed systems with a preceding approach.
 
 components in the form...p. 287
 
