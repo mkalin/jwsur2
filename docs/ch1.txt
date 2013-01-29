@@ -496,12 +496,12 @@ Review of HTTP Requests and Responses
 
 The next section has a REST-style service whose URL is
 
-   http://localhost:8080/cliches/sayings.jsp
+   http://localhost:8080/preds/sayings.jsp
 
 If this URL were typed into a brower's window, the browser 
 would generate an HTTP request similar to
 
-   GET /cliches/sayings.jsp HTTP/1.1
+   GET /preds/sayings.jsp HTTP/1.1
    User-Agent: Mozilla/5.0 (X11; Linux x86_64) Chrome/24.0.1312.56
    Host: localhost:8080
    Accept: text/html
@@ -509,10 +509,10 @@ would generate an HTTP request similar to
 The browers parses the entered URL into these parts, with clarifications
 below:
 
-   Start line: GET /cliches/sayings.jsp HTTP/1.1
+   Start line: GET /preds/sayings.jsp HTTP/1.1
 
      GET is the HTTP method (verb)
-     /cliches/sayings.jsp is the URI (resource's name)
+     /preds/sayings.jsp is the URI (resource's name)
      HTTP/1.1 is the HTTP version that the requester is using
 
    User-Agent: Mozilla/5.0 (X11; Linux x86_64) Chrome/24.0
@@ -565,13 +565,13 @@ HTTP body as part of the so-called HTML form.
 
 If all goes well, sending an HTTP request to the URL
 
-   http://localhost:8080/cliches/sayings.jsp
+   http://localhost:8080/preds/sayings.jsp
 
 leads to an HTTP response, which is similar to
 
 HTTP/1.1 200 OK
 Server: Apache-Coyote/1.1
-Set-Cookie: JSESSIONID=35B1E3AA21EB7242FD2FC50044D2166A; Path=/cliches/; 
+Set-Cookie: JSESSIONID=35B1E3AA21EB7242FD2FC50044D2166A; Path=/preds/; 
 Content-Type: text/html;charset=ISO-8859-1
 Transfer-Encoding: chunked
 Date: Tue, 29 Jan 2013 17:40:15 GMT 
@@ -612,93 +612,34 @@ together with their predictors.
    
 HTTP as an API
 
-HTTP can be viewed as an API (Application Programming Interface). Among frameworks for
-developing web sites and RESTful web services, Rails has pioneered this view. In
-particular, tries to blur the distinction between web sites that deliver HTML and web 
-services that deliver XML or JSON; Rails does so by emphasizing what it characterizes as 
-RESTful routes to resources. For example, 
-in a Rails application a GET request against the URI /products would be equivalent to
-/products.html, a request for a list of products in HTML format. A GET request against
-/products.json or /products.xml would be a request for the very same list but in JSON format
-or XML format, respectively. Rails encourages the use of standard URI patterns and verbs. 
-Below is a summary of these patterns. A term that starts with a colon such as :id indicates
-a placeholder or parameter, in this case a placehold for a database ID such as 27.
+HTTP can be viewed as an API. Among frameworks for developing web sites and RESTful web services, 
+Rails has pioneered this view of HTTP, which blurs the distinction between web sites that deliver HTML 
+and web services that deliver XML or JSON. In a well-designed Rails application, a GET request 
+against a URI such as /products is equivalent to the same request for /products.html; and an HTML
+list of products is returned in resonse. A GET request against /products.json or
+/products.xml would return the same list but in JSON or XML, respectively. Rails as a scheme of
+URI naming patterns and the HTTP verbs that highlight the elegant yet practical use of HTTP
+as an API. Below is a summary of the Rails approach. In a URI, a coloned term such as :id
+indicates a placehold or parameter, in this case a placeholder whose intended value is a
+numerical identifier such as 27.
 
-  Verb   URI                  Meaning
+  HTTP Verb  URI                  Meaning
 
-  GET    /products            Read all resources
+  GET        /products            Read a list of products
 
-  POST   /products            Create a new product from the information
-                              provided in the HTTP body
+  POST       /products            Create a new product from the information
+                                  provided in the HTTP body
   
-  GET    /products/new        Read the form to create a new product
+  GET        /products/new        Read the form to create a new product
 
-  GET    /products/:id/edit   Read the form to edit an existing product
-                              with the specified ID
+  GET        /products/:id/edit   Read the form to edit an existing product
 
-  GET    /products/:id        Read the specified product
+  GET        /products/:id        Read the specified product
 
-  PUT    /products/:id        Update, with information in the POST body,
-                              the product with the specified ID
+  PUT        /products/:id        Update a specified product with information 
+                                  in the POST body
 
-  DELETE /products:id         Delete the product with the specified ID
-
-
-
-
-
-
-
-
-
-
-
-  
-
-  POST   /products       Create a new product from the information
-                         provided in the HTTP body
-
-  PUT    /products:id    Edit an existing product with the information
-                         provided in the HTTP body
-
-  DELETE /products:id    Delete the product with the specified ID
-
-
-
-            </row>
-
-            <row>
-              <entry>GET emps?id=27</entry>
-
-              <entry>Read a singleton list of employee 27</entry>
-            </row>
-
-            <row>
-              <entry>POST emps</entry>
-
-              <entry>Create a new employee from the request data</entry>
-            </row>
-
-            <row>
-              <entry>PUT emps</entry>
-
-              <entry>Update the employee list with the request data</entry>
-            </row>
-
-            <row>
-              <entry>DELETE emps</entry>
-
-              <entry>Delete the employee list</entry>
-            </row>
-
-            <row>
-              <entry>DELETE emps?id=27</entry>
-
-              <entry>Delete employee 27</entry>
-            </row>
-          </tbody>
-        </tgroup>
-      </table>
+  DELETE     /products:id         Delete the specified product
 
 These verb/URI pairs are terse, precise, and uniform in style. The
 pairs illustrate that RESTful conventions can yield simple, clear
@@ -708,18 +649,18 @@ hence, the request data are housed in the HTTP message body. The GET and
 DELETE verbs are used in requests that have no body; hence, the request
 data are sent as query string entries.
 
-For the record, RESTful Web services are Turing complete; that is,
+For the record, RESTful web services are Turing complete; that is,
 these services are equal in power to any computational system, including
 a system that consists of SOAP-based web services. Yet the decision
 about whether to be RESTful in a particular application depends, as
-always, on practical matters. This first section has looked at REST from
+always, on practical matters. This section has looked at REST from
 on high; it is now time to descend into details through examples.
 
 A First RESTful Example
 
 As befits a first example, the implementation is simple but sufficient to highlight key aspects of
-a RESTful web service. The implementation consists of a JSP script and a back-end JavaBean that the 
-script accesses to get data. The data are sage corporate predictions. Here
+a RESTful web service. The implementation consists of a JSP (Java Server Pages) script and a back-end 
+JavaBean that the script accesses to get data. The data are sage corporate predictions. Here
 is a sample:
 
    Decentralized 24/7 hub will target robust web-readiness.
@@ -728,7 +669,7 @@ is a sample:
 
 Each prediction has an associated human predictor. The RESTful resource is thus a list of 
 predictor names (e.g., Hollis McCullough) and their predictions (Hollis is
-responsible for the third prediction shown above). The resource name or URI is /sayings; 
+responsible for the third prediction shown above). The resource name or URI is /preds/; 
 and the only allowable HTTP verb is GET, which corresponds to read among the CRUD operations. 
 If the HTTP request is correct, the RESTful service returns an XML representation of the
 predictor/prediction list; otherwise, the service returns the appropriate HTTP 
@@ -809,9 +750,15 @@ Figure 1.2 is the JSP script.
 </jsp:useBean>  
 ;;;
 
+This section first clarifies the details of the service and then discusses options for
+consuming the service. Afterwards the section explains why servlets and JSP scripts are
+a very good choice for implementing RESTful services in Java.
+
+How the Service Works
+
 The JSP script first checks the request's HTTP method and, if this is GET, returns an XML 
 representation of the predictor/prediction list. If the verb is not GET, the script returns an
-error message together with the HTTP status code. Recall that JSP scripts have
+error message together with the HTTP status code. JSP scripts have
 implicit object references such as request, response, and out; each of these is a 
 field or a parameter in the servlet code into which the web server, in this case Tomcat,
 translates the JSP script. Accordingly, the JSP script can make the same calls as an
@@ -957,13 +904,16 @@ has two utility methods to support the properties: the populate method
 reads the data from a text file embedded in the WAR and the toXML method 
 serializes the array of in-memory Prediction objects into XML format. For now,
 the XML representation is generated on each request; a more efficient
-implementation is left for later.
+implementation is explained later.
 
-The predictions service can be deployed under Tomcat using the provided Ant script
+The predictions service can be deployed under the Tomcat web server using a provided 
+Ant script
 
    % ant -Dwar.name=preds deploy
 
-(For a review of the Ant script, see Note 1.) The deployed WAR file
+Note 1 elaborates on the Apache Tomcat server and explains how to install and use
+this server. Note 2 clarifies the Ant script, which is packaged with the book's
+code examples. The deployed WAR file
 sayings.war includes a standard web deployment document, web.xml, so that
 the URI /preds/sayings.jsp can be shortened to /preds/. Later we will look 
 at RESTful clients in Java and other languages; but, for now, either a browser or a 
@@ -971,7 +921,7 @@ utility such as curl is good enough. (The curl utility is available on Unixy
 systems and a port for Windows can be found at from http://curl.haxx.se/download.html.)
 Figure 1.5 is the output for the curl command. On a successful curl request
 
-   % curl -v http://localhost:8080/sayings/
+   % curl -v http://localhost:8080/preds/
 
 includes not only the XML shown in Figure 1.1 but also a trace (thanks to the -v flag) 
 of the HTTP request and response messages. The HTTP request is
@@ -993,7 +943,7 @@ Recall that an HTTP GET message has no body; hence, the entire message is the
 start line and the headers. The response shows the session identifier (a 128-bit
 statistically unique number, in hex, that Tomcat generates) in the header. In
 the JSP script, the session identifier could be disabled as it is not needed; but, 
-for now, the premium is on brevity and simplicity.
+for now, the goal is brevity and simplicity.
 
 If a POST request were sent to the RESTful predictions service
 
@@ -1025,9 +975,11 @@ the --data flag together with the key/value pair "foo=bar" signal curl that a
 POST rather than a GET request should be sent; and the body of this POST 
 request contains the key/value pair foo/bar. Java generates an HTML response
 because a JSP script, in normal use, generates HTML for a browser to consume.
+
 This first example thus illustrates how Java technologies such as JSP and
 HttpServlet are easily adapted to support web services in addition to
-web sites.
+web sites. The next section goes into more detail on servlets and JSP
+scripts, encouraging their use for RESTful web services in Java.
 
 In summary, the predictions example highlights key aspects of a RESTful 
 service:
@@ -1042,6 +994,77 @@ service:
    * The service responds with an XML payload, which the consumer now
      must process in some appropriate way. This first example merely
      displays the XML without any processing.
+
+Why Servlets and JSP Scripts for RESTful Web Services?
+
+Chapter 2 explores various ways in which to code and publish RESTful services. This
+section introduces my preferred way to do both: code the service as a servlet and
+publish it with a Java-based web server such as Apache Tomcat (see Note 1 about
+installing and running Tomcat and Note 2 about an Ant script to deploy web
+services and sites under Tomcat).
+
+HttpServlets are a natural, convenient way to implement RESTful web services for two 
+main reasons. First, such servlets are close to the HTTP metal. For example,
+an HttpServlet provides methods such as doGet, doPost, doPut, and
+doDelete that match up with the HTTP verbs aligned with the CRUD operations. These
+servlet methods execute as callbacks that the servlet container, explained shortly, invokes 
+as needed. The HttpServlet class also provides symbolic constants for HTTP status codes, for 
+example, SC_NOT_FOUND for status code 404 and SC_METHOD_NOT_ALLOWED for status
+code 405. Each of the HttpServlet do methods take the same two arguments:
+an HttpServletRequest and an HttpServletResponse. The servlet request contains, as
+key/value pairs, all of the appropriate information encapsulated in the HTTP request.
+The HttpServletRequest is easy to read and, if needed, to update and forward.
+The HttpServletResponse has methods to adjust the HTTP response message as needed
+and this class encapsulates an output stream to communicate back with the
+requester.
+
+A second major advantage of servlets is that they execute in a servlet container,
+middleware software that mediates between the application code of the servlet and
+the web server that provides the usual types of support: wire-level security in the
+form of HTTPS transport, user authentication and authorization, logging and
+troubleshooting support, server configuration, application deployment and
+administration, and so on. In the Tomcat web server, the servlet container is named
+Catalina. Because the servlet container is such an integral part of a Java-based
+web server, it is common to conflate the container name (Catalina) and the server
+name (Tomcat), a practice followed here. In any case, a Java-centric web server 
+such as Tomcat is the natural way to publish real-world web services, including
+RESTful ones. Figure x.x depicts a servlet container with several instances of
+executing servlets, each awaiting client requests.
+
+Here is a short, fuller review of servlets with emphasis on their use to
+deliver RESTful services. The class HttpServlet extends
+the class GenericServlet , which in turn implements the
+Servlet  interface. All three are in the package
+javax.servlet , which is not included in core Java. The
+Servlet  interface declares five methods, the most
+important of which is the  service  method that a Web
+container invokes on every request to a servlet. The
+service  method has a  ServletRequest and a  ServletResponse  parameter. The request 
+is a map that contains the request information from a client and the response
+provides a network connection back to the client. The
+GenericServlet class implements the Service  methods in a transport-neutral fashion, whereas
+its  HttpServlet  subclass implements these methods in an
+HTTP-specific way. Accordingly, the service parameters in the
+HttpServlet  have the types HttpServletRequest  and
+HttpServletResponse. The  HttpServlet also provides request filtering: the service method dispatches a incoming
+GET request to the method  doGet , an incoming POST
+request to the method  doPost, and so on.
+
+In the  HttpServlet  class, the do methods are no-ops (that is, methods with empty
+bodies) that can be overridden as needed in a programmer-derived subclass.
+For example, if the class  MyServlet  extends HttpServlet  and overrides  doGet  but
+not  doPost , then  doPost remains a no-op in MyServlet  instances.
+
+JSP scripts are an arbitrary mix of HTML and code. In the case of web services, of course,
+these scripts would consist predominantly and, for the most part, exclusively of code. The
+advantage of a JSP script over an HttpServlet is that the programmer does not need to 
+compile a JSP script. The web container assumes this responsibility. A JSP script is deployed
+as a text file but executes as a servlet because the web container automatically 
+translates the script into an HttpServlet before loading one or more instances of the
+resulting servlet into the container. For short examples and for the kind of experimentation
+typical of code development, JSP scripts are attractive. For deployment to production, the
+straight Java code of a servlet would be best practice. My examples use a mix of JSP scripts
+and servlets.
 
 What is Next?
 
