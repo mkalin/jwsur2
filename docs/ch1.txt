@@ -1,3 +1,314 @@
+An Overview of Web Services and Java
+
+What Are Web Services?
+
+Although the term web service has various, imprecise, and evolving meanings, 
+a working definition should be enough background for a first coding example, which consists
+of a service and a client, also known as a consumer or requester. As the name suggests, 
+a web service is a kind of webified application, that is, an application typically 
+delivered over HTTP (HyperText Transport Protocol). A web service needs to be published,
+typically with a web server; and a web service consumer needs to execute a machine that
+has network access, usually through HTTP, to the web server. In slightly more technical 
+terms, a web service is a distributed
+application whose components can be deployed and executed on physically
+distinct devices. Figure 1 depicts such a service, with host1 (e.g., a desktop server) and 
+host2 (e.g., a mobile phone) as two distinct physical devices. Web services can be
+arbitrarily complex. For instance, a stock-picking web service might consist of several code components, 
+each hosted on a separate business-grade  server; and the web service might be consumed on PCs, handhelds, 
+and other devices.
+
+Web services come in two popular flavors: SOAP based and REST style. SOAP is an XML dialect with
+a grammar that specifies the structure that a document must have in order to count as SOAP. In a
+typical SOAP-based service, the client sends SOAP messages to the service and the service 
+responds in kind, that is, with SOAP messages. REST-style services are hard to characterize in a 
+sentence or two; hence, the next section goes into detail. For now, a REST-style service is one that treats HTTP
+not only as a transport proctol also but as a set of guidelines for structuring service requests 
+and service responses. SOAP has standards, toolkits, and bountiful software libraries. REST has no 
+official standards, few toolkits, and uneven software libraries across programming languages. 
+The REST style can be viewed as an antidote to the creeping complexity of SOAP-based web services. 
+This book covers SOAP-based and REST-style Web services, starting with REST-style ones. This chapter
+ends with a sample REST-style service.
+
+The distinction between the two flavors of web service is not sharp because a SOAP-based service delivered over 
+HTTP can be seen as a special case of a REST-style service. SOAP originally stood for Simple Object 
+Access Protocol and then, by serendipity but not officially, might have stood for Service
+Oriented Architecture (SOA) Protocol. (SOA is discussed later in Section 3 of this chapter.) Deconstructing SOA is
+non-trivial but one point is indisputable: whatever SOA may be, web services play a central role in the 
+SOA approach to software design and development. The World Wide Web Consoritium (hereafter, W3C) currently
+oversees the SOAP standard; and SOAP officially is no longer an acronym.
+
+Web Service Development
+
+Except in test mode, the client of either a SOAP-based or REST-style
+service is rarely a web browser but usually an application without a
+graphical user-interface. The client may be written in any language with
+the appropriate support libraries. Indeed, a major appeal of web services
+is language transparency: the service and its clients need not be written
+in the same language. Language transparency is the key to web service
+interoperability, that is, the ability of web
+services and requesters to interact seamlessly despite differences in
+programming languages, support libraries, operating systems, and hardware platforms. 
+To underscore this appeal, my examples use a mix of languages besides Java: C#, Go,
+Perl, and Ruby. Sample clients in Java consume services written in languages other
+than Java, indeed, sometimes in languages unknown. 
+
+There is no magic in language transparency, of course. If a
+web service written in Java can have a Perl or a Ruby consumer,
+there must be an intermediary that handles the differences in data types
+between the service and the requester languages. XML technologies, which
+support structured document interchange and processing, act as one such
+intermediary. Another intermediary is JSON (JavaScript Object Notation)
+because web service clients are increasing in JavaScript code embedded in
+HTML and executed in a browser's JavaScript run-time; and a JSON document represents 
+a native object to a JavaScript consumer.
+In SOAP-based services, XML remains dominant, although the DotNet framework is
+especially good at giving JSON equal status. In REST-style services, JSON is
+ever more popular as the representation of choice for a consumer.
+
+Several features distinguish Web services from other distributed
+software systems. Here are three:
+
+        Open infrastructure
+
+          Web services are deployed using industry-standard,
+          vendor-independent protocols such as HTTP, XML, and JSON, 
+          all of which are ubiquitous and well understood. Web services can 
+          piggyback on
+          networking, data formatting, security, and other infrastructures
+          already in place, which lowers entry costs and promotes
+          interoperability among services.
+
+        Platform and language transparency
+
+          Web services and their clients can interoperate even if
+          written in different programming languages. Languages such as C/C++,
+          C#, Gom Java, JavaScript, Perl, Python, Ruby, and others provide libraries,
+          utilities, and even frameworks in support of Web services. Web services
+          can be published and consumed on various hardware platforms and under
+          different operating systems.
+
+        Modular design
+
+          Web services are meant to be modular in design so that new
+          services can be composed out of existing ones.
+          Imagine, for example, an inventory-tracking
+          service integrated with an on-line ordering service to yield a
+          service that automatically orders the appropriate products in
+          response to inventory levels.
+
+ What Good are Web Services?
+
+This obvious question has no simple, single answer. Nonetheless,
+the chief benefits and promises of web services are clear. Modern
+software systems are written in a variety of languages, a variety that
+seems likely to increase. These software systems will continue to be
+hosted on a variety of platforms. Institutions large and small have
+significant investment in legacy software systems whose functionality is
+useful and perhaps mission critical; and few of these institutions have
+the will and the resources, human or financial, to rewrite their legacy
+systems. 
+
+It is rare that a software system gets to run in splendid
+isolation. The typical software system must interoperate with others,
+which may reside on different hosts and be written in different
+languages. Interoperability is not just a long-term challenge but also a
+current requirement of production software. Web services provide a
+relatively simple answer to question of how diverse software systems,
+written in many languages and executing on various platforms under
+different operating systems, can interoperate. In short, web services are
+an excellent way to integrate software systems.
+
+Web services address the problem of interoperability directly because such services
+are, first and foremost, language and platform neutral. If a legacy
+COBOL system is exposed through a web service, the system is thereby
+interoperable with service clients written in other, currently more
+widely used languages.
+
+Web services are inherently distributed systems that communicate mostly over HTTP but 
+can communicate over other popular transports as well. The communication payloads of web services
+are structured text (usually XML or JSON documents), which can be inspected,
+transformed, persisted, and otherwise processed with widely and even
+freely available tools. When efficiency demands it, however, Web
+services also can deliver compact binary payloads. Finally, web services are a
+work in progress with real-world distributed systems as their test bed.
+For all of these reasons, web services are an essential tool in any
+modern programmer's toolbox.
+
+The examples that follow, in this chapter and the others, are
+simple enough to isolate critical features of Web services
+but also realistic enough to illustrate the power and flexibility that
+such services bring to software development. The next section clarifies
+the relationship between SOAP and SOA -- and then the code examples begin.
+
+Web Services and Service Oriented Architecture
+
+Web services and service-oriented architecture (hereafter, SOA) are related but distinct.
+SOA, like REST itself, is more an architectural style--indeed, a mindset--than a body of 
+well-defined rules for the design and implementation of distributed systems; and web services are a 
+natural, important way to provide the services at the core of any SOA system. A fundamental idea in
+SOA is that an application results from integrating network-accessible services, which are 
+interoperable because each has an interface that clearly defines the operations encapsulated in the
+service: per operation, the interface specifies the number and type of each argument
+passed to the service operation together with the number and type of values returned from each service
+operation. At the implementation level, a service operation is thus a function call. 
+The simplicity of service operations promotes code reuse through the composition of new services out of 
+existing ones and enables relatively straightforward troubleshooting because services reduce to
+primitive function calls. Perhaps the best way to clarify SOA is to contrast this approach to distributed 
+systems with a preceding approach.
+
+A Very Short History of Web Services
+
+Web services evolved from the RPC (Remote Procedure Call) mechanism in
+DCE (Distributed Computing Environment), a framework for software development
+that emerged in the early 1990s. DCE includes a distributed file system
+DCE/DFS) and a Kerberos-based authentication system. Although DCE has its
+origins in the Unix world, Microsoft quickly did its own implementation
+known as MSRPC, which in turn served as the infrastructure for interprocess communication in Windows. 
+Microsoft's COM/OLE (Common Object Model/Object Linking and Embedding) technologies and services 
+were built on a DCE/RPC foundation. The first-generation frameworks for distributed-object systems, 
+CORBA (Common Object Request Broker Architecture) and Microsoft's DCOM (Distributed COM), are anchored 
+in the DCE/RPC procedural framework. Java RMI (Remote Method Invocation) also derives from DCE/RPC; and the 
+method calls in Java EE (Enterprise Editition), specially in Session and Entity EJBs (Enterprise Java Bean), 
+are Java RMI calls. Java EE (formerly J2EE) and Microsoft's DotNet are second-generation frameworks for 
+distributed-object systems; and these frameworks, like CORBA and DCOM before them, trace
+their ancestry back to DCE/RPC. By the way, DCE/RPC is not dead. Various popular system utilities (for 
+instance, the Samba file and print service for Windows clients) are DCE/RPC.
+
+DCE/RPC has the familiar client/server architecture in which a
+client invokes a procedure that executes on the server. Arguments can be
+passed from the client to the server and return values can be passed from
+the server to the client. The framework is platform and language neutral in principle,
+although strongly biased towards C/C++ in practice. DCE/RPC includes
+utilities for generating client and server artifacts (stubs and skeletons,
+respectively) and software libraries that hide the transport details. Of
+interest now is the IDL (Interface Definition Language) document that acts as the 
+service contract and is an input to utilities that generate artifacts in support
+of the DCE/RPC calls. Here is a simple IDL file:
+
+/* echo.idl */
+[uuid(2d6ead46-05e3-11ca-7dd1-426909beabcd), version(1.0)]
+interface echo {
+    const long int ECHO_SIZE = 512;
+    void echo(
+        [in]             handle_t h,
+        [in,  string]    idl_char from_client[ ],
+        [out, string]    idl_char from_server[ECHO_SIZE]
+    );
+}
+
+The interface, identified with a machine-generated UUID (Universally Unique IDentifier), 
+declares a single function of three arguments, two of which are
+in parameters (that is, inputs to the remote procedure) and one of which is an out parameter (that
+is, an output from the remote procedure). The first argument, of defined
+type handle_t, is required and points to an RPC data structure. The function echo could but does
+not return a value because the echoed string is returned instead as an out parameter. The IDL specifies 
+the invocation syntax for the echo function, which is the one and only operation in the service.
+
+In the late 1990s, Dave Winer of UserLand Software developed XML-RPC, a technology often cited
+as the birth of web services. XML-RPC is a very lightweight RPC system with support for
+elementary data types (basically, the built-in C types together with a
+boolean and a datetime type) and a few simple commands. The original specification is about seven 
+pages in length. The two key features are the use of XML marshaling/unmarshaling
+to achieve language neutrality and reliance on HTTP (and, later, SMTP)
+for transport. Marshaling refers to the conversion of an in-memory object (for instance, an
+Employee object in Java) to some other format, for instance, an XML document; and unmarshaling
+references to the inverse process of generating an in-memory object from, in this example,
+an XML document. The O'Reilly open-wire Meerkat service is an XML-RPC application.
+
+As an RPC technology, XML-RPC supports the request/response pattern. Here is the XML request from 
+an invocation of the Fibonacci function with an argument of 11, which is passed as a four-byte
+integer.
+
+<?xml version="1.0">
+<methodCall>
+   <methodName>fib<methodName>
+   <params>
+     <param><value><i4>11</i4></value></param>
+   </params>
+</methodCall>
+
+XML-RPC is deliberately low fuss and lightweight. SOAP, an XML dialect derived from XML-RPC, is 
+considerably heavier in weight. From inception, XML-RPC faced competition from DOA-based systems 
+such as Java EE (J2EE) and AspNet.
+
+Distributed Object Architecture: The Java Example
+
+Java RMI, including the Session and Entity EJB constructs built on
+it, and DotNet Remoting are examples of second-generation distributed
+object systems. Consider what a Java RMI client requires to invoke a
+method declared in a service interface such as this:
+
+package doa; // distributed object architecture
+import java.util.List;
+
+public interface BenefitsService extends java.rmi.Remote {
+   public List<EmpBenefits> getBenefits(Emp emp) throws RemoteException;
+}
+
+A client against this service needs a Java RMI stub, an instance
+of a class that implements the BenefitsService
+interface. The stub is downloaded automatically to the client through
+serialization over the socket that connects the client and the service.
+The stub class requires the programmer-defined Emp and
+EmpBenefits types, which in turn may nest other
+programmer-defined types, for instance, Department,
+BusinessCertification, and ClientAccount:
+
+public class Emp {
+   private Department                   department;
+   private List<BusinessCertification>  certifications;
+   private List<ClientAccount>          accounts;
+   ...
+}
+
+The standard Java types such as List already are available on the client side as 
+the client is, by assumption, a Java application. The challenge involves the 
+programmer-defined types such as Emp and EmpBenefits that are needed
+to support the client-side invocation of a remotely executed method, as
+this code segment illustrates:
+
+   List<EmpBenefit> fredBenefits = remote_object.getBenefits(fred);  
+
+Under Java RMI, programmer-defined types required on the client side
+are loaded remotely and automatically. Yet the remote loading of Java
+classes is inherently complicated and, of course, the format of Java’s
+.class files is proprietary. Lots of bytes need to come down from the server 
+to the client before the client can invoke a method remotely. The arguments passed 
+to the Java RMI service (in this example, the Emp instance to which
+fred refers) are serialized on the client side and
+deserialized on the service side. The returned value, in this case a list
+of EmpBenefits, is serialized by the service and
+deserialized by the client. The client and service communicate through
+binary rather than text streams and the structure of the binary streams is
+Java specific.
+
+Web services, as a foundational code base in an SOA system, simplify matters. 
+For one thing, the client and service typically exchange XML or equivalent documents,
+that is, text. If needed, non-text bytes can be exchanged
+instead but the preferred payloads are text. The exchanged text can be inspected, validated, 
+transformed, persisted, and otherwise processed using readily available,
+non-proprietary, and often free tools. Each side, client and service,
+simply needs a local software library that binds language-specific types
+such as the Java String to XML Schema (or comparable)
+types, in this case xsd:string. (In the qualified name xsd:string, xsd is a namespace
+and string is a local name. Of interest here is that xsd:string is an XML type rather
+than a Java type.) Given these bindings, relatively simple library modules can 
+serialize and deserialize. Processing on the client side, as on the service side,
+requires only locally available libraries and
+utilities. The complexities, therefore, can be isolated at the endpoints and need not
+seep into the exchanged messages. Finally, web services are available over HTTP, a 
+non-propriety protocol whose implementation is ubiquitous.
+
+In a web service, the requesting client and the service need not be coded in
+the same language or even in the same style of language. Clients and
+services can be implemented in object-oriented, procedural, functional,
+and other language styles. The languages on either end may be statically
+typed (for instance, Java and Go) or dynamically typed (for example, JavaScript
+and Ruby). The complexities of stubs and skeletons, the serializating and
+deserializing of objects encoded in some proprietary format, gives way to relatively
+simple text-based representations of request and response messages.
+
+
 A First RESTful Example
 
 As befits a first example, the implementation is simple but sufficient to highlight key aspects of
