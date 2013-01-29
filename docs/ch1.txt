@@ -477,30 +477,31 @@ For a thorough coverage of REST-style Web services, see
 
 Verbs and Opaque Nouns
 
-      <para>A URI is meant to be <emphasis>opaque</emphasis>, which means that
-      the URI</para>
+A URI is meant to be opaque, which means that the URI
 
-      <programlisting>http://bedrock/citizens/fred</programlisting>
+   http://bedrock/citizens/fred
 
-      <para>has no inherent connection to the URI</para>
+ has no inherent connection to the URI
 
-      <programlisting>http://bedrock/citizens</programlisting>
+   http://bedrock/citizens
 
-      <para>although Fred happens to be a citizen of Bedrock. These are simply
-      two different, independent identifiers. Of course, a good URI designer
-      will come up with URIs that are suggestive about what they are meant to
-      identify. The point is that URIs have no intrinsic hierarchical
-      structure. URIs can and should be interpreted but these interpretations
-      are imposed on URIs, not inherent in them. Although URI syntax looks
-      like the syntax used to navigate a hierarchical file system, this
-      resemblance is misleading. A URI is an opaque identifier, a logically
-      proper name that denotes exactly one resource.</para>
+although Fred happens to be a citizen of Bedrock. These are simply
+two different, independent identifiers. Of course, a good URI designer
+will come up with URIs that are suggestive about what they are meant to
+identify. The point is that URIs have no intrinsic hierarchical
+structure. URIs can and should be interpreted but these interpretations
+are imposed on URIs, not inherent in them. Although URI syntax looks
+like the syntax used to navigate a hierarchical file system, this
+resemblance is misleading. A URI is an opaque identifier, a logically
+proper name that denotes exactly one resource.</para>
 
-      <para>In RESTful services, then, URIs act as identifying nouns and HTTP
-      methods act as verbs that specify operations on the resources identified
-      by these nouns. For reference, here is the HTTP start line from a
-      client's request against the <literal>TimeServer</literal> service in
-      Chapter 1.</para>
+In RESTful services, then, URIs act as identifying nouns and HTTP
+methods act as verbs that specify operations on the resources identified
+by these nouns. For reference, here is the HTTP start line that someone might
+type into a browser:
+from a
+client's request against the <literal>TimeServer</literal> service in
+Chapter 1.</para>
 
       <programlisting>POST http://127.0.0.1:9876/ts HTTP/ 1.1      </programlisting>
 
