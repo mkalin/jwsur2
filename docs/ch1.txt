@@ -308,6 +308,319 @@ and Ruby). The complexities of stubs and skeletons, the serializating and
 deserializing of objects encoded in some proprietary format, gives way to relatively
 simple text-based representations of request and response messages.
 
+What is REST?
+
+Roy Fielding (http://roy.gbiv.com) coined the acronym REST in his PhD dissertation. 
+Chapter 5 of the dissertation lays out the guiding principles for what have come to be 
+known as REST-style or RESTful web services. Fielding has an impressive resume. He is, among
+other things, a principal author of the HTTP 1.1 specification and a
+co-founder of the Apache Software Foundation.
+
+REST and SOAP are quite different. SOAP is a messaging protocol in which the messages
+are XML documents,
+whereas REST is a style of software architecture for distributed
+hypermedia systems, that is, systems in which text, graphics, audio, and
+other media are stored across a network and interconnected through
+hyperlinks. The World Wide Web is the obvious example of such a system. As
+our focus is web services, the World Wide Web is the
+distributed hypermedia system of interest. In the Web, HTTP is both a
+transport protocol and a messaging system because HTTP requests and
+responses are messages. The payloads of HTTP messages can be typed using
+the MIME (Multipurpose Internet Mail Extension) type system. MIME has 
+familiar types as text/html or application/octet-stream together with
+more specicialed types such as 
+application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, the
+type of a Microsoft Excel document.
+HTTP also provides response status codes to inform
+the requester about whether a request succeeded and, if not, why.</para>
+
+    <para>REST stands for <emphasis role="bold">RE</emphasis>presentation
+    <emphasis role="bold">S</emphasis>tate <emphasis
+    role="bold">T</emphasis>ransfer, which requires clarification because the
+    central abstraction in REST—the <firstterm>resource</firstterm>—does not
+    occur in the acronym. A resource in the RESTful sense is anything that has
+    an URI, that is, an identifier that satisfies formatting requirements. The
+    formatting requirements are what make URIs <emphasis>uniform</emphasis>.
+    Recall, too, that URI stands for Uniform <emphasis>Resource</emphasis>
+    Identifier; hence, the notions of <emphasis>URI</emphasis> and
+    <emphasis>resource</emphasis> are intertwined.</para>
+
+    <para>In practical terms, a resource is an informational item that has
+    hyperlinks to it. Hyperlinks use URIs to do the linking. Examples of
+    resources are plentiful but likewise misleading in suggesting that
+    resources must have something in common other than identifiability through
+    URIs. The gross national product of Lithuania in 2001 is a resource as is
+    the Modern Jazz Quartet. Ernie Bank’s baseball accomplishments count as a
+    resource as does the maximum flow algorithm. The concept of a resource is
+    remarkably broad but, at the same time, impressively simple and
+    precise.</para>
+
+    <para>As Web-based informational items, resources are pointless unless
+    they have at least one representation. In the Web, representations are
+    MIME typed. The most common type of resource representation is probably
+    still <literal>text/html</literal> but nowadays resources tend to have
+    multiple representations. For example, there are various interlinked HTML
+    pages that represent the Modern Jazz Quartet but there are also audio and
+    audiovisual representations of this resource.</para>
+
+    <para>Resources have state. For example, Ernie Bank’s baseball
+    accomplishments changed during his career with the Chicago Cubs from 1953
+    through 1971 and culminated in his 1977 induction into the Baseball Hall
+    of Fame. A useful representation must capture a resource’s state. For
+    example, the current HTML pages on Ernie at the Baseball Reference Web
+    site (<emphasis>http://www.baseball-reference.com</emphasis>) need to
+    represent all of his major league accomplishments, from his rookie year in
+    1953 through his induction into the Hall of Fame.</para>
+
+    <para>In a RESTful request targeted at a resource, the resource itself
+    remains on the service machine. The requester typically receives a
+    <emphasis>representation</emphasis> of the resource if the request
+    succeeds. It is the representation that transfers from the service machine
+    to the requester machine. In different terms, a RESTful client issues a
+    request that involves a resource, for instance, a request to
+    <emphasis>read</emphasis> the resource. If this read request succeeds, a
+    typed representation (for instance, <literal>text/html</literal>) of the
+    resource is transferred from the server that hosts the resource to the
+    client that issued the request. The representation is a good one only if
+    it captures the resource’s state in some appropriate way.</para>
+
+    <para>In summary, RESTful Web services require not just resources to
+    represent but also client-invoked operations on such resources. At the
+    core of the RESTful approach is the insight that HTTP, despite the
+    occurrence of <emphasis>Transport</emphasis> in its name, is an API and
+    not simply a transport protocol. HTTP has its well-know
+    <firstterm>verbs</firstterm>, officially known as
+    <firstterm>methods</firstterm>. Here are the HTTP verbs that correspond to
+    the <firstterm>CRUD</firstterm> (<emphasis role="bold">C</emphasis>reate,
+    <emphasis role="bold">R</emphasis>ead, <emphasis
+    role="bold">U</emphasis>pdate, <emphasis role="bold">D</emphasis>elete)
+    operations so familiar throughout computing:</para>
+
+    <table>
+      <title></title>
+
+      <tgroup cols="2">
+        <thead>
+          <row>
+            <entry align="center">HTTP Verb</entry>
+
+            <entry align="center">Meaning in CRUD Terms</entry>
+          </row>
+        </thead>
+
+        <tbody>
+          <row>
+            <entry>GET</entry>
+
+            <entry><emphasis>Read</emphasis> a resource</entry>
+          </row>
+
+          <row>
+            <entry>POST</entry>
+
+            <entry><emphasis>Create</emphasis> a new resource from the request
+            data</entry>
+          </row>
+
+          <row>
+            <entry>PUT</entry>
+
+            <entry><emphasis>Update</emphasis> a resource from the request
+            data</entry>
+          </row>
+
+          <row>
+            <entry>DELETE</entry>
+
+            <entry><emphasis>Delete</emphasis> a resource</entry>
+          </row>
+        </tbody>
+      </tgroup>
+    </table>
+
+    <para>Although HTTP is not case sensitive, the HTTP verbs are
+    traditionally written in uppercase. There are additional verbs. For
+    example, the verb HEAD is a variation on GET that requests only the HTTP
+    headers that would be sent to fulfill a GET request. There are also TRACE
+    and INFO verbs.</para>
+
+    <para><xref linkend="fig_ch3_rest" /> is a whimsical depiction of a
+    resource with its identifying URI together with a RESTful client and some
+    typed representations sent as responses to HTTP requests for the resource.
+    Each HTTP request includes a verb to indicate which CRUD operation should
+    be performed on the resource. A good representation is precisely one that
+    matches the requested operation and captures the resource's state in some
+    appropriate way. For example, in this depiction a GET request could return
+    my biography as a hacker as either an HTML document or a short video
+    summary. The video would fail to capture the state of the resource if it
+    depicted, say, only the major disasters in my brother's career rather than
+    those in my own. A typical HTML representation of the resource would
+    include hyperlinks to other resources, which in turn could be the target
+    of HTTP requests with the appropriate CRUD verbs.</para>
+
+    <figure id="fig_ch3_rest">
+      <title>A small slice of a RESTful system</title>
+
+      <mediaobject>
+        <imageobject>
+          <imagedata fileref="figs/restful.png" />
+        </imageobject>
+      </mediaobject>
+    </figure>
+
+    <para>HTTP also has standard response codes such as 404 to signal that the
+    requested resource could not be found and 200 to signal that the request
+    was handled successfully. In short, HTTP provides request verbs and MIME
+    types for client requests and status codes (and MIME types) for service
+    responses.</para>
+
+    <para>Modern browsers generate only GET and POST requests. Moreover, many
+    applications treat these two types of requests interchangeably. For
+    example, Java <literal>HttpServlet</literal>s have callback methods such
+    as <literal>doGet</literal> and <literal>doPost</literal> that handle GET
+    and POST requests, respectively. Each callback has the same parameter
+    types, <literal>HttpServletRequest</literal> (the key/value pairs from the
+    requester) and <literal>HttpServletResponse</literal> (a typed response to
+    the requester). It is common to have the two callbacks execute the same
+    code (for instance, by having one invoke the other), thereby conflating
+    the original HTTP distinction between <emphasis>read</emphasis> and
+    <emphasis>create</emphasis>. A key guiding principle of the RESTful style
+    is to respect the original meanings of the HTTP verbs. In particular, any
+    GET request should be side-effect free (or, in jargon,
+    <firstterm>idempotent</firstterm>) because a GET is a
+    <emphasis>read</emphasis> rather than a <emphasis>create</emphasis>,
+    <emphasis>update</emphasis>, or <emphasis>delete</emphasis> operation. A
+    GET as a <emphasis>read</emphasis> with no side effects is called a
+    <emphasis>safe</emphasis> GET.</para>
+
+    <para>The REST approach does not imply that either resources or the
+    processing needed to generate adequate representations of them are simple.
+    A REST-style Web service might be every bit as subtle and complicated as a
+    SOAP-based service. The RESTful approach tries to simplify matters by
+    taking what HTTP, with its MIME type system, already offers: built-in CRUD
+    operations, uniformly identifiable resources, and typed representations
+    that can capture a resource’s state. REST as a design philosophy tries to
+    isolate application complexity at the endpoints, that is, at the client
+    and at the service. A service may require lots of logic and computation to
+    maintain resources and to generate adequate representation of resources,
+    for instance, large and subtly formatted XML documents; and a client may
+    require significant XML processing to extract the desired information from
+    the XML representations transferred from the service to the client. Yet
+    the RESTful approach keeps the complexity out of the transport level, as a
+    resource representation is transferred to the client as the body of an
+    HTTP response message. By contrast, a SOAP-based service inevitably
+    complicates the transport level because a SOAP
+    <emphasis>message</emphasis> is encapsulated as the body of a transport
+    message, for instance, an HTTP or SMTP message. SOAP requires messages
+    within messages, whereas REST does not.<footnote>
+        <para>For a thorough coverage of REST-style Web services, see
+        Richardson and Ruby’s book <emphasis>RESTful Web Services</emphasis>
+        (O'Reilly, 2007).</para>
+      </footnote></para>
+
+    <sect2>
+      <title>Verbs and Opaque Nouns</title>
+
+      <para>A URI is meant to be <emphasis>opaque</emphasis>, which means that
+      the URI</para>
+
+      <programlisting>http://bedrock/citizens/fred</programlisting>
+
+      <para>has no inherent connection to the URI</para>
+
+      <programlisting>http://bedrock/citizens</programlisting>
+
+      <para>although Fred happens to be a citizen of Bedrock. These are simply
+      two different, independent identifiers. Of course, a good URI designer
+      will come up with URIs that are suggestive about what they are meant to
+      identify. The point is that URIs have no intrinsic hierarchical
+      structure. URIs can and should be interpreted but these interpretations
+      are imposed on URIs, not inherent in them. Although URI syntax looks
+      like the syntax used to navigate a hierarchical file system, this
+      resemblance is misleading. A URI is an opaque identifier, a logically
+      proper name that denotes exactly one resource.</para>
+
+      <para>In RESTful services, then, URIs act as identifying nouns and HTTP
+      methods act as verbs that specify operations on the resources identified
+      by these nouns. For reference, here is the HTTP start line from a
+      client's request against the <literal>TimeServer</literal> service in
+      Chapter 1.</para>
+
+      <programlisting>POST http://127.0.0.1:9876/ts HTTP/ 1.1      </programlisting>
+
+      <para>The HTTP verb comes first, then the URI, and finally the
+      requester's version of HTTP. This URI is, of course, a URL that locates
+      the Web service. The table below uses simplified URIs to summarize the
+      intended meanings of HTTP/URI combinations:</para>
+
+      <table>
+        <title></title>
+
+        <tgroup cols="2">
+          <thead>
+            <row>
+              <entry align="center">HTTP Verb/URI</entry>
+
+              <entry align="center">Intended CRUD Meaning</entry>
+            </row>
+          </thead>
+
+          <tbody>
+            <row>
+              <entry>GET emps</entry>
+
+              <entry>Read a list of all employees</entry>
+            </row>
+
+            <row>
+              <entry>GET emps?id=27</entry>
+
+              <entry>Read a singleton list of employee 27</entry>
+            </row>
+
+            <row>
+              <entry>POST emps</entry>
+
+              <entry>Create a new employee from the request data</entry>
+            </row>
+
+            <row>
+              <entry>PUT emps</entry>
+
+              <entry>Update the employee list with the request data</entry>
+            </row>
+
+            <row>
+              <entry>DELETE emps</entry>
+
+              <entry>Delete the employee list</entry>
+            </row>
+
+            <row>
+              <entry>DELETE emps?id=27</entry>
+
+              <entry>Delete employee 27</entry>
+            </row>
+          </tbody>
+        </tgroup>
+      </table>
+
+      <para>These verb/URI pairs are terse, precise, and uniform in style. The
+      pairs illustrate that RESTful conventions can yield simple, clear
+      expressions about which operation should be performed on which resource.
+      The POST and PUT verbs are used in requests that have an HTTP body;
+      hence, the request data are housed in the HTTP message body. The GET and
+      DELETE verbs are used in requests that have no body; hence, the request
+      data are sent as query string entries.</para>
+
+      <para>For the record, RESTful Web services are Turing complete; that is,
+      these services are equal in power to any computational system, including
+      a system that consists of SOAP-based Web services. Yet the decision
+      about whether to be RESTful in a particular application depends, as
+      always, on practical matters. This first section has looked at REST from
+      on high; it is now time to descend into details through examples.</para>
+    </sect2>
+  </sect1>
 
 A First RESTful Example
 
