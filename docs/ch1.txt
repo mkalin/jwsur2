@@ -1022,7 +1022,8 @@ A second major advantage of servlets is that they execute in a servlet container
 middleware software that mediates between the application code of the servlet and
 the web server that provides the usual types of support: wire-level security in the
 form of HTTPS transport, user authentication and authorization, logging and
-troubleshooting support, server configuration, application deployment and
+troubleshooting support, server configuration, local or remote database access,
+naming services, application deployment and
 administration, and so on. In the Tomcat web server, the servlet container is named
 Catalina. Because the servlet container is such an integral part of a Java-based
 web server, it is common to conflate the container name (Catalina) and the server
@@ -1046,7 +1047,8 @@ GenericServlet class implements the Service  methods in a transport-neutral fash
 its  HttpServlet  subclass implements these methods in an
 HTTP-specific way. Accordingly, the service parameters in the
 HttpServlet  have the types HttpServletRequest  and
-HttpServletResponse. The  HttpServlet also provides request filtering: the service method dispatches a incoming
+HttpServletResponse. The HttpServlet also provides request filtering that naturally
+supports a REST-style service: the service method dispatches a incoming
 GET request to the method  doGet , an incoming POST
 request to the method  doPost, and so on.
 
