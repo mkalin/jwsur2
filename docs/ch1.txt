@@ -7,14 +7,13 @@ a working definition should be enough background for a first coding example, whi
 of a service and a client, also known as a consumer or requester. As the name suggests, 
 a web service is a kind of webified application, that is, an application typically 
 delivered over HTTP (HyperText Transport Protocol). A web service needs to be published,
-typically with a web server; and a web service consumer needs to execute a machine that
-has network access, usually through HTTP, to the web server. In slightly more technical 
-terms, a web service is a distributed
-application whose components can be deployed and executed on physically
+typically with a web server such as Apache or Nginx; and a web service consumer needs to execute 
+a machine that has network access, usually through HTTP, to the web server. In slightly more technical 
+terms, a web service is a distributed application whose components can be deployed and executed on physically
 distinct devices. Figure 1 depicts such a service, with host1 (e.g., a desktop server) and 
 host2 (e.g., a mobile phone) as two distinct physical devices. Web services can be
 arbitrarily complex. For instance, a stock-picking web service might consist of several code components, 
-each hosted on a separate business-grade  server; and the web service might be consumed on PCs, handhelds, 
+each hosted on a separate commerical-grade web server; and the web service might be consumed on PCs, handhelds, 
 and other devices.
 
 Web services come in two popular flavors: SOAP based and REST style. SOAP is an XML dialect with
@@ -32,12 +31,12 @@ ends with a sample REST-style service.
 The distinction between the two flavors of web service is not sharp because a SOAP-based service delivered over 
 HTTP can be seen as a special case of a REST-style service. SOAP originally stood for Simple Object 
 Access Protocol and then, by serendipity but not officially, might have stood for Service
-Oriented Architecture (SOA) Protocol. (SOA is discussed later in Section 3 of this chapter.) Deconstructing SOA is
+Oriented Architecture (SOA) Protocol. (SOA is discussed in Section 3 of this chapter.) Deconstructing SOA is
 non-trivial but one point is indisputable: whatever SOA may be, web services play a central role in the 
 SOA approach to software design and development. The World Wide Web Consoritium (hereafter, W3C) currently
 oversees the SOAP standard; and SOAP officially is no longer an acronym.
 
-Web Service Development
+Web Service Miscellany
 
 Except in test mode, the client of either a SOAP-based or REST-style
 service is rarely a web browser but usually an application without a
@@ -46,24 +45,24 @@ the appropriate support libraries. Indeed, a major appeal of web services
 is language transparency: the service and its clients need not be written
 in the same language. Language transparency is the key to web service
 interoperability, that is, the ability of web
-services and requesters to interact seamlessly despite differences in
+services and their consumers to interact seamlessly despite differences in
 programming languages, support libraries, operating systems, and hardware platforms. 
-To underscore this appeal, my examples use a mix of languages besides Java: C#, Go,
-Perl, and Ruby. Sample clients in Java consume services written in languages other
+To underscore this appeal, my examples use a mix of languages besides Java, among them 
+C#, Go, Perl, and Ruby. Sample clients in Java consume services written in languages other
 than Java, indeed, sometimes in languages unknown. 
 
 There is no magic in language transparency, of course. If a
 web service written in Java can have a Perl or a Ruby consumer,
-there must be an intermediary that handles the differences in data types
-between the service and the requester languages. XML technologies, which
+there must be an intermediary layer that handles the differences in data types
+between the service and the client languages. XML technologies, which
 support structured document interchange and processing, act as one such
-intermediary. Another intermediary is JSON (JavaScript Object Notation)
-because web service clients are increasing in JavaScript code embedded in
-HTML and executed in a browser's JavaScript run-time; and a JSON document represents 
-a native object to a JavaScript consumer.
-In SOAP-based services, XML remains dominant, although the DotNet framework is
-especially good at giving JSON equal status. In REST-style services, JSON is
-ever more popular as the representation of choice for a consumer.
+intermediary level. Another intermediary level is JSON (JavaScript Object Notation)
+because web service clients are increasing JavaScript programs embedded in
+HTML documents and executing in a browser's JavaScript run-time.  For a JavaScript
+consumer of a web service, JSON has obvious appeal because a JSON document represents 
+a native JavaScript object. Chapter 3 focuses on XML and JSON payloads from
+RESTful web services. In SOAP-based services, XML remains the dominant format, although 
+the DotNet framework is especially good at giving JSON equal status. 
 
 Several features distinguish Web services from other distributed
 software systems. Here are three:
@@ -83,7 +82,7 @@ software systems. Here are three:
           Web services and their clients can interoperate even if
           written in different programming languages. Languages such as C/C++,
           C#, Gom Java, JavaScript, Perl, Python, Ruby, and others provide libraries,
-          utilities, and even frameworks in support of Web services. Web services
+          utilities, and even frameworks in support of web services. Web services
           can be published and consumed on various hardware platforms and under
           different operating systems.
 
@@ -134,11 +133,11 @@ work in progress with real-world distributed systems as their test bed.
 For all of these reasons, web services are an essential tool in any
 modern programmer's toolbox.
 
-The examples that follow, in this chapter and the others, are
-simple enough to isolate critical features of Web services
+The examples that follow, in this and later chapters, are
+simple enough to isolate critical features of web services
 but also realistic enough to illustrate the power and flexibility that
 such services bring to software development. The next section clarifies
-the relationship between SOAP and SOA -- and then the code examples begin.
+the relationship between SOAP and SOA.
 
 Web Services and Service Oriented Architecture
 
@@ -161,18 +160,18 @@ A Very Short History of Web Services
 Web services evolved from the RPC (Remote Procedure Call) mechanism in
 DCE (Distributed Computing Environment), a framework for software development
 that emerged in the early 1990s. DCE includes a distributed file system
-DCE/DFS) and a Kerberos-based authentication system. Although DCE has its
+(DCE/DFS) and a Kerberos-based authentication system. Although DCE has its
 origins in the Unix world, Microsoft quickly did its own implementation
 known as MSRPC, which in turn served as the infrastructure for interprocess communication in Windows. 
 Microsoft's COM/OLE (Common Object Model/Object Linking and Embedding) technologies and services 
 were built on a DCE/RPC foundation. The first-generation frameworks for distributed-object systems, 
 CORBA (Common Object Request Broker Architecture) and Microsoft's DCOM (Distributed COM), are anchored 
 in the DCE/RPC procedural framework. Java RMI (Remote Method Invocation) also derives from DCE/RPC; and the 
-method calls in Java EE (Enterprise Editition), specially in Session and Entity EJBs (Enterprise Java Bean), 
+method calls in Java EE (Enterprise Editition), specifically in Session and Entity EJBs (Enterprise Java Bean), 
 are Java RMI calls. Java EE (formerly J2EE) and Microsoft's DotNet are second-generation frameworks for 
 distributed-object systems; and these frameworks, like CORBA and DCOM before them, trace
 their ancestry back to DCE/RPC. By the way, DCE/RPC is not dead. Various popular system utilities (for 
-instance, the Samba file and print service for Windows clients) are DCE/RPC.
+instance, the Samba file and print service for Windows clients) use DCE/RPC.
 
 DCE/RPC has the familiar client/server architecture in which a
 client invokes a procedure that executes on the server. Arguments can be
@@ -215,9 +214,9 @@ Employee object in Java) to some other format, for instance, an XML document; an
 references to the inverse process of generating an in-memory object from, in this example,
 an XML document. The O'Reilly open-wire Meerkat service is an XML-RPC application.
 
-As an RPC technology, XML-RPC supports the request/response pattern. Here is the XML request from 
-an invocation of the Fibonacci function with an argument of 11, which is passed as a four-byte
-integer.
+As an RPC technology, XML-RPC supports the request/response pattern. Here is the XML request to
+invoke, presumably on a remote machine, the Fibonacci function with an argument of 11. This
+argument is passed as a four-byte integer, as the start tag <i4> indicates:
 
 <?xml version="1.0">
 <methodCall>
@@ -227,11 +226,11 @@ integer.
    </params>
 </methodCall>
 
-XML-RPC is deliberately low fuss and lightweight. SOAP, an XML dialect derived from XML-RPC, is 
-considerably heavier in weight. From inception, XML-RPC faced competition from DOA-based systems 
-such as Java EE (J2EE) and AspNet.
+XML-RPC is deliberately low fuss and lightweight. SOAP, an XML dialect derived 
+straight from XML-RPC, is considerably heavier in weight. From inception, XML-RPC faced 
+competition from second-generation DOA systems such as Java EE (J2EE) and AspNet.
 
-Distributed Object Architecture: The Java Example
+Distributed Object Architecture: A Java Example
 
 Java RMI, including the Session and Entity EJB constructs built on
 it, and DotNet Remoting are examples of second-generation distributed
@@ -248,7 +247,8 @@ public interface BenefitsService extends java.rmi.Remote {
 A client against this service needs a Java RMI stub, an instance
 of a class that implements the BenefitsService
 interface. The stub is downloaded automatically to the client through
-serialization over the socket that connects the client and the service.
+serialization over the socket (network connection) that connects the 
+client and the service.
 The stub class requires the programmer-defined Emp and
 EmpBenefits types, which in turn may nest other
 programmer-defined types, for instance, Department,
@@ -297,7 +297,7 @@ serialize and deserialize. Processing on the client side, as on the service side
 requires only locally available libraries and
 utilities. The complexities, therefore, can be isolated at the endpoints and need not
 seep into the exchanged messages. Finally, web services are available over HTTP, a 
-non-propriety protocol whose implementation is ubiquitous.
+non-propriety protocol that has become standard, ubiquitous infrastructure.
 
 In a web service, the requesting client and the service need not be coded in
 the same language or even in the same style of language. Clients and
@@ -357,15 +357,13 @@ resource as does the maximum flow algorithm. The concept of a resource is
 remarkably broad but, at the same time, impressively simple and
 precise.
 
-As Web-based informational items, resources are pointless unless
-they have at least one representation. In the Web, representations are
+As web-based informational items, resources are pointless unless
+they have at least one representation. In the web, representations are
 MIME typed. The most common type of resource representation is probably
 still text/html but nowadays resources tend to have
 multiple representations. For example, there are various interlinked HTML
 pages that represent the Modern Jazz Quartet but there are also audio and
 audiovisual representations of this resource.
-
-
 
 Resources have state. For example, Ernie Bank’s baseball
 accomplishments changed during his career with the Chicago Cubs from 1953
@@ -376,7 +374,7 @@ site (http://www.baseball-reference.com) need to
 represent all of his major league accomplishments, from his rookie year in
 1953 through his induction into the Hall of Fame.
 
-A RESTful request targets a resource but the resource itself
+A RESTful request targets a resource but the resource itself typically
 remains or is created on the service machine. In the usual case, the requester receives a
 representation of the resource if the request
 succeeds. It is the representation that transfers from the service machine
@@ -391,7 +389,8 @@ it captures the resource’s state in some appropriate way.
 In summary, RESTful Web services require not just resources to
 represent but also client-invoked operations on such resources. At the
 core of the RESTful approach is the insight that HTTP, despite the
-occurrence of Transport in its name, is an API and
+occurrence of Transport in its name, is an API (Application Programming 
+Interface) and
 not simply a transport protocol. HTTP has its well-know
 verbs, officially known as methods. Here are the HTTP verbs that correspond to
 the CRUD (Create, Read, Update, Delete)
@@ -408,7 +407,6 @@ operations so familiar throughout computing:
  example, the verb HEAD is a variation on GET that requests only the HTTP
  headers that would be sent to fulfill a GET request. There are also TRACE
  and INFO verbs.
-
 
 Figure (restful.png) is a whimsical depiction of a
 resource with its identifying URI together with a RESTful client and some
@@ -431,13 +429,13 @@ types for client requests and status codes (and MIME types) for service
 responses.
 
  Modern browsers generate only GET and POST requests. Moreover, many
- applications treat these two types of requests interchangeably. For
+ applications unfortunately treat these two types of requests interchangeably. For
  example, Java HttpServlets have callback methods such
  as doGet and doPost that handle GET
  and POST requests, respectively. Each callback has the same parameter
  types, HttpServletRequest (the key/value pairs from the
  requester) and HttpServletResponse (a typed response to
- the requester). It is common to have the two callbacks execute the same
+ the requester). It is not unknown to have the two callbacks execute the same
  code (for instance, by having one invoke the other), thereby conflating
  the original HTTP distinction between read and
  create. A key guiding principle of the RESTful style
@@ -453,7 +451,7 @@ The REST approach does not imply that either resources or the
 processing needed to generate adequate representations of them are simple.
 A REST-style Web service might be every bit as subtle and complicated as a
 SOAP-based service. The RESTful approach tries to simplify matters by
-taking what HTTP, with its MIME type system, already offers: built-in CRUD
+taking what HTTP and the MIME type system already offer: built-in CRUD
 operations, uniformly identifiable resources, and typed representations
 that can capture a resource’s state. REST as a design philosophy tries to
 isolate application complexity at the endpoints, that is, at the client
@@ -467,8 +465,7 @@ resource representation is transferred to the client as the body of an
 HTTP response message. By contrast, a SOAP-based service inevitably
 complicates the transport level because a SOAP
 message is encapsulated as the body of a transport message, for instance, an HTTP or 
-SMTP message. SOAP requires messages
-within messages, whereas REST does not. 
+SMTP message. SOAP requires messages within messages, whereas REST does not. 
 
 Footnote:
 For a thorough coverage of REST-style Web services, see
@@ -477,7 +474,7 @@ For a thorough coverage of REST-style Web services, see
 
 Verbs and Opaque Nouns
 
-A URI is meant to be opaque, which means that the URI
+In HTTP a URI is meant to be opaque, which means that the URI
 
    http://bedrock/citizens/fred
 
@@ -495,7 +492,7 @@ like the syntax used to navigate a hierarchical file system, this
 resemblance is misleading. A URI is an opaque identifier, a logically
 proper name that denotes exactly one resource.
 
-HTTP Requests and Responses
+Review of HTTP Requests and Responses
 
 The next section has a REST-style service whose URL is
 
@@ -518,10 +515,12 @@ below:
      /cliches/sayings.jsp is the URI (resource's name)
      HTTP/1.1 is the HTTP version that the requester is using
 
-   User-Agent: Chrome/24.0
+   User-Agent: Mozilla/5.0 (X11; Linux x86_64) Chrome/24.0
  
-     Chrome is browser used in this request. The User-Agent information goes
-     beyond what is shown here. Of interest now is that term user agent captures
+     Chrome is browser used in this request and Mozilla/5.0 specifies
+     a browser-compatibility type. The User-Agent information also
+     includes the operating system in use, 64-bit Linux.
+     Of interest here is that term user agent captures
      the intended meaning: it is the application (agent) that a user employs
      to make a request.
 
@@ -553,8 +552,8 @@ Two newlines terminate the headers section. A GET request has no body; hence, a 
 consists only of the start line and the headers. A POST request always has a body, which may
 be empty. In a POST request, two newlines also mark the end of the headers.
 
-A GET request can include, in the URI, a so-called query string that consists of key/value
-pairs. For example, this GET request
+Because a GET request has no body, such a request often includes, in the URI, a 
+query string that consists of key/value pairs. For example, this GET request
 
    http://.../products?id=27&category=boots
 
@@ -562,11 +561,62 @@ includes a query-string with two key/value pairs: id is the first key and 27 is 
 category is the second key and boots is the value. As a RESTful GET request, the URI
 presumably is asking to read the boot product with database identifier 27. POST requests
 usually include key/value pairs as well but these typically are encapsulated in the
-HTTP body as the so-called HTML form.
+HTTP body as part of the so-called HTML form.
 
-HTTP is an expressive API. The Rails web framework tries to blur the distinction
-between web sites that deliver HTML and web services that deliver XML or JSON; Rails does
-so by emphasizing what it characterizes as RESTful routes to resources. For example, 
+If all goes well, sending an HTTP request to the URL
+
+   http://localhost:8080/cliches/sayings.jsp
+
+leads to an HTTP response, which is similar to
+
+HTTP/1.1 200 OK
+Server: Apache-Coyote/1.1
+Set-Cookie: JSESSIONID=35B1E3AA21EB7242FD2FC50044D2166A; Path=/cliches/; 
+Content-Type: text/html;charset=ISO-8859-1
+Transfer-Encoding: chunked
+Date: Tue, 29 Jan 2013 17:40:15 GMT 
+
+<?xml version="1.0" encoding="UTF-8"?> 
+<java version="1.7.0_35" class="java.beans.XMLDecoder"> 
+ <array class="cliches.Prediction" length="32"> 
+  <void index="0"> 
+   <object class="cliches.Prediction"> 
+    <void property="what"> 
+     <string>
+        Managed holistic contingency will grow killer action-items.
+     </string> 
+    </void> 
+    <void property="who"> 
+     <string>
+        Cornelius Tillman
+     </string> 
+    </void> 
+   </object> 
+  </void> 
+  ...
+
+The start line 
+
+   HTTP/1.1 200 OK
+
+begins with the HTTP version in use. Next comes the HTTP status code (SC for short) as
+a number, 200, and in English, OK. Status codes in the 200-range signal success. Five
+header elements follow, including the name of the web server that sends the
+response and the content type of the response. Note that the response type is given
+as text/html rather than as what it should be: text/xml. The reason is that the
+back-end code that generates the response does not bother to set the content type;
+hence, the Apache-Coyote web server assumes the default type of text/html. Two
+newline characters again separate the headers from the HTTP body, which can be 
+empty. In this case, the body is an XML document that lists corporate predictions
+together with their predictors.
+   
+HTTP as an API
+
+HTTP can be viewed as an API (Application Programming Interface). Among frameworks for
+developing web sites and RESTful web services, Rails has pioneered this view. In
+particular, tries to blur the distinction between web sites that deliver HTML and web 
+services that deliver XML or JSON; Rails does so by emphasizing what it characterizes as 
+RESTful routes to resources. For example, 
 in a Rails application a GET request against the URI /products would be equivalent to
 /products.html, a request for a list of products in HTML format. A GET request against
 /products.json or /products.xml would be a request for the very same list but in JSON format
