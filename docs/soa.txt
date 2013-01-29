@@ -1,9 +1,9 @@
 Web Services and Service-Oriented Architecture
 
-Web services and service-oriented architecture (hereafter, SOA) are related but separate.
+Web services and service-oriented architecture (hereafter, SOA) are related but distinct.
 SOA, like REST itself, is more an architectural style--indeed, a mindset--than a body of 
 well-defined rules for the design and implementation of distributed systems; and web services are a 
-natural, important way to implement the services at the core of any SOA system. A fundamental idea in
+natural, important way to provide the services at the core of any SOA system. A fundamental idea in
 SOA is that an application results from integrating network-accessible services, which are 
 interoperable because each has an interface that clearly defines the operations encapsulated in the
 service: per operation, the interface specifies the number and type of each argument
@@ -25,16 +25,17 @@ known as MSRPC, which in turn served as the infrastructure for interprocess comm
 Microsoft's COM/OLE (Common Object Model/Object Linking and Embedding) technologies and services 
 were built on a DCE/RPC foundation. The first-generation frameworks for distributed-object systems, 
 CORBA (Common Object Request Broker Architecture) and Microsoft's DCOM (Distributed COM), are anchored 
-in the DCE/RPC procedural framework. Java RMI (Remote Method Invocation also derives from DCE/RPC; and the 
-method calls in the original EJB (Enterprise Java Bean) types, Session and Entity, are Java RMI calls. 
-Java EE and Microsoft's DotNet, the second-generation frameworks for distributed-object systems, likewise trace 
-their ancestry back to DCE/RPC. Various popular system utilities (for instance, the Samba file and print service 
-for Windows clients) use DCE/RPC.
+in the DCE/RPC procedural framework. Java RMI (Remote Method Invocation) also derives from DCE/RPC; and the 
+method calls in Java EE (Enterprise Editition), specially in Session and Entity EJBs (Enterprise Java Bean), 
+are Java RMI calls. Java EE (formerly J2EE) and Microsoft's DotNet are second-generation frameworks for 
+distributed-object systems; and these frameworks, like CORBA and DCOM before them, trace
+their ancestry back to DCE/RPC. By the way, DCE/RPC is not dead. Various popular system utilities (for 
+instance, the Samba file and print service for Windows clients) are DCE/RPC.
 
 DCE/RPC has the familiar client/server architecture in which a
 client invokes a procedure that executes on the server. Arguments can be
 passed from the client to the server and return values can be passed from
-the server to the client. The framework is language neutral in principle,
+the server to the client. The framework is platform and language neutral in principle,
 although strongly biased towards C/C++ in practice. DCE/RPC includes
 utilities for generating client and server artifacts (stubs and skeletons,
 respectively) and software libraries that hide the transport details. Of
@@ -57,15 +58,12 @@ The interface, identified with a machine-generated UUID (Universally Unique IDen
 declares a single function of three arguments, two of which are
 in parameters (that is, inputs to the remote procedure) and one of which is an out parameter (that
 is, an output from the remote procedure). The first argument, of defined
-type handle_t, is required and points to an RPC
-data structure. The function echo could but does
-not return a value because the echoed string is returned instead as an
-out parameter. The IDL specifies the invocation syntax for the echo function, which is
-the one and only operation in the service.
+type handle_t, is required and points to an RPC data structure. The function echo could but does
+not return a value because the echoed string is returned instead as an out parameter. The IDL specifies 
+the invocation syntax for the echo function, which is the one and only operation in the service.
 
 In the late 1990s, Dave Winer of UserLand Software developed XML-RPC, a technology often cited
-as the birth of web services.
-XML-RPC is a very lightweight RPC system with support for
+as the birth of web services. XML-RPC is a very lightweight RPC system with support for
 elementary data types (basically, the built-in C types together with a
 boolean and a datetime type) and a few simple commands. The original specification is about seven 
 pages in length. The two key features are the use of XML marshaling/unmarshaling
@@ -73,32 +71,32 @@ to achieve language neutrality and reliance on HTTP (and, later, SMTP)
 for transport. Marshaling refers to the conversion of an in-memory object (for instance, an
 Employee object in Java) to some other format, for instance, an XML document; and unmarshaling
 references to the inverse process of generating an in-memory object from, in this example,
-an XML document. By the way, the O'Reilly open-wire Meerkat service is an XML-RPC application.
+an XML document. The O'Reilly open-wire Meerkat service is an XML-RPC application.
 
-As an RPC technology, XML-RPC follows the request/response
-pattern. Here is the XML request from an invocation of the Fibonacci
-function with an argument of 11, which is passed as a four-byte
+As an RPC technology, XML-RPC supports the request/response pattern. Here is the XML request from 
+an invocation of the Fibonacci function with an argument of 11, which is passed as a four-byte
 integer.
 
 <?xml version="1.0">
 <methodCall>
    <methodName>fib<methodName>
-   <params><param><value><i4>11</i4></value></param></params>
+   <params>
+     <param><value><i4>11</i4></value></param>
+   </params>
 </methodCall>
 
-XML-RPC is deliberately low fuss and lightweight. SOAP, an XML
-dialect derived from XML-RPC, is considerably heavier in weight. From inception, XML-RPC
-faced competition from DOA-based systems such as Java EE (Enterprise Edition), then known
-as J2EE, and AspNet.
+XML-RPC is deliberately low fuss and lightweight. SOAP, an XML dialect derived from XML-RPC, is 
+considerably heavier in weight. From inception, XML-RPC faced competition from DOA-based systems 
+such as Java EE (J2EE) and AspNet.
 
 Distributed Object Architecture: The Java Example
 
-Java RMI (Remote Method Invocation), including the Session and Entity EJB constructs built on
+Java RMI, including the Session and Entity EJB constructs built on
 it, and DotNet Remoting are examples of second-generation distributed
 object systems. Consider what a Java RMI client requires to invoke a
 method declared in a service interface such as this:
 
-package doa;  // distributed object architecture
+package doa; // distributed object architecture
 import java.util.List;
 
 public interface BenefitsService extends java.rmi.Remote {
@@ -121,22 +119,20 @@ public class Emp {
    ...
 }
 
-The standard Java types such as List already are
-available on the client side as the client is, by assumption, a Java
-application. The challenge involves the programmer-defined types such as
-Emp and EmpBenefits that are needed
+The standard Java types such as List already are available on the client side as 
+the client is, by assumption, a Java application. The challenge involves the 
+programmer-defined types such as Emp and EmpBenefits that are needed
 to support the client-side invocation of a remotely executed method, as
 this code segment illustrates:
 
-   List<EmpBenefit> fred_benefits = remote_object.getBenefits(fred);  
+   List<EmpBenefit> fredBenefits = remote_object.getBenefits(fred);  
 
 Under Java RMI, programmer-defined types required on the client side
 are loaded remotely and automatically. Yet the remote loading of Java
 classes is inherently complicated and, of course, the format of Java’s
-.class files is proprietary. The point is that lots
-of bytes need to come down from the server to the client before the
-client can invoke a method remotely. The arguments passed to the Java RMI
-service (in this example, the Emp instance to which
+.class files is proprietary. Lots of bytes need to come down from the server 
+to the client before the client can invoke a method remotely. The arguments passed 
+to the Java RMI service (in this example, the Emp instance to which
 fred refers) are serialized on the client side and
 deserialized on the service side. The returned value, in this case a list
 of EmpBenefits, is serialized by the service and
@@ -146,18 +142,18 @@ Java specific.
 
 Web services, as a foundational code base in an SOA system, simplify matters. 
 For one thing, the client and service typically exchange XML or equivalent documents,
-that is, text. If needed, of course, non-text bytes can be exchanged
-instead. The exchanged text can be inspected, validated, transformed,
-persisted, and otherwise processed using readily available,
+that is, text. If needed, non-text bytes can be exchanged
+instead but the preferred payloads are text. The exchanged text can be inspected, validated, 
+transformed, persisted, and otherwise processed using readily available,
 non-proprietary, and often free tools. Each side, client and service,
 simply needs a local software library that binds language-specific types
 such as the Java String to XML Schema (or comparable)
 types, in this case xsd:string. (In the qualified name xsd:string, xsd is a namespace
 and string is a local name. Of interest here is that xsd:string is an XML type rather
-than a Java or a C++ type.) Given these bindings, relatively simple library modules can 
+than a Java type.) Given these bindings, relatively simple library modules can 
 serialize and deserialize. Processing on the client side, as on the service side,
 requires only locally available libraries and
-utilities. The complexities can be isolated at the endpoints and need not
+utilities. The complexities, therefore, can be isolated at the endpoints and need not
 seep into the exchanged messages. Finally, web services are available over HTTP, a 
 non-propriety protocol whose implementation is ubiquitous.
 
@@ -169,6 +165,7 @@ typed (for instance, Java and Go) or dynamically typed (for example, JavaScript
 and Ruby). The complexities of stubs and skeletons, the serializating and
 deserializing of objects encoded in some proprietary format, gives way to relatively
 simple text-based representations of request and response messages.
+
 
 
 
