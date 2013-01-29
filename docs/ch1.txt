@@ -308,6 +308,10 @@ and Ruby). The complexities of stubs and skeletons, the serializating and
 deserializing of objects encoded in some proprietary format, gives way to relatively
 simple text-based representations of request and response messages.
 
+The first code example in this chapter, and all of the code examples in Chapter 2 and
+Chapter 3, involve REST-style services. Accordingly, the next section takes a quick
+look at what REST means.
+
 What is REST?
 
 Roy Fielding (http://roy.gbiv.com) coined the acronym REST in his PhD dissertation. 
@@ -317,8 +321,7 @@ other things, a principal author of the HTTP 1.1 specification and a
 co-founder of the Apache Software Foundation.
 
 REST and SOAP are quite different. SOAP is a messaging protocol in which the messages
-are XML documents,
-whereas REST is a style of software architecture for distributed
+are officially XML documents, whereas REST is a style of software architecture for distributed
 hypermedia systems, that is, systems in which text, graphics, audio, and
 other media are stored across a network and interconnected through
 hyperlinks. The World Wide Web is the obvious example of such a system. As
@@ -328,49 +331,50 @@ transport protocol and a messaging system because HTTP requests and
 responses are messages. The payloads of HTTP messages can be typed using
 the MIME (Multipurpose Internet Mail Extension) type system. MIME has 
 familiar types as text/html or application/octet-stream together with
-more specicialed types such as 
+highly specicialed types such as 
 application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, the
 type of a Microsoft Excel document.
 HTTP also provides response status codes to inform
-the requester about whether a request succeeded and, if not, why.</para>
+the requester about whether a request succeeded and, if not, why.
 
-    <para>REST stands for <emphasis role="bold">RE</emphasis>presentation
-    <emphasis role="bold">S</emphasis>tate <emphasis
-    role="bold">T</emphasis>ransfer, which requires clarification because the
-    central abstraction in REST—the <firstterm>resource</firstterm>—does not
-    occur in the acronym. A resource in the RESTful sense is anything that has
-    an URI, that is, an identifier that satisfies formatting requirements. The
-    formatting requirements are what make URIs <emphasis>uniform</emphasis>.
-    Recall, too, that URI stands for Uniform <emphasis>Resource</emphasis>
-    Identifier; hence, the notions of <emphasis>URI</emphasis> and
-    <emphasis>resource</emphasis> are intertwined.</para>
+REST stands for REpresentational State Transfer, which requires clarification because the
+central abstraction in REST—the resource—does not
+occur in the acronym. A resource in the RESTful sense is an HTTP resource: 
+anything that has an URI, that is, an identifier that satisfies formatting requirements. The
+formatting requirements are what make URIs uniform.
+Recall, too, that URI stands for Uniform Resource
+Identifier; hence, the notions of URI and
+resource are intertwined. In plain language, a URI names a resource and, therefore, acts as
+a noun.
 
-    <para>In practical terms, a resource is an informational item that has
-    hyperlinks to it. Hyperlinks use URIs to do the linking. Examples of
-    resources are plentiful but likewise misleading in suggesting that
-    resources must have something in common other than identifiability through
-    URIs. The gross national product of Lithuania in 2001 is a resource as is
-    the Modern Jazz Quartet. Ernie Bank’s baseball accomplishments count as a
-    resource as does the maximum flow algorithm. The concept of a resource is
-    remarkably broad but, at the same time, impressively simple and
-    precise.</para>
+In practical terms, a resource is an informational item that has
+hyperlinks to it. Hyperlinks use URIs to do the linking. Examples of
+resources are plentiful but likewise misleading in suggesting that
+resources must have something in common other than identifiability through
+URIs. The gross national product of Lithuania in 2014 is a resource as is
+the Modern Jazz Quartet. Ernie Bank’s baseball accomplishments count as a
+resource as does the maximum flow algorithm. The concept of a resource is
+remarkably broad but, at the same time, impressively simple and
+precise.
 
-    <para>As Web-based informational items, resources are pointless unless
-    they have at least one representation. In the Web, representations are
-    MIME typed. The most common type of resource representation is probably
-    still <literal>text/html</literal> but nowadays resources tend to have
-    multiple representations. For example, there are various interlinked HTML
-    pages that represent the Modern Jazz Quartet but there are also audio and
-    audiovisual representations of this resource.</para>
+As Web-based informational items, resources are pointless unless
+they have at least one representation. In the Web, representations are
+MIME typed. The most common type of resource representation is probably
+still text/html but nowadays resources tend to have
+multiple representations. For example, there are various interlinked HTML
+pages that represent the Modern Jazz Quartet but there are also audio and
+audiovisual representations of this resource.
 
-    <para>Resources have state. For example, Ernie Bank’s baseball
-    accomplishments changed during his career with the Chicago Cubs from 1953
-    through 1971 and culminated in his 1977 induction into the Baseball Hall
-    of Fame. A useful representation must capture a resource’s state. For
-    example, the current HTML pages on Ernie at the Baseball Reference Web
-    site (<emphasis>http://www.baseball-reference.com</emphasis>) need to
-    represent all of his major league accomplishments, from his rookie year in
-    1953 through his induction into the Hall of Fame.</para>
+
+
+Resources have state. For example, Ernie Bank’s baseball
+accomplishments changed during his career with the Chicago Cubs from 1953
+through 1971 and culminated in his 1977 induction into the Baseball Hall
+of Fame. A useful representation must capture a resource’s state. For
+example, the current HTML pages on Ernie at the Baseball Reference Web
+site (http://www.baseball-reference.com) need to
+represent all of his major league accomplishments, from his rookie year in
+1953 through his induction into the Hall of Fame.
 
     <para>In a RESTful request targeted at a resource, the resource itself
     remains on the service machine. The requester typically receives a
