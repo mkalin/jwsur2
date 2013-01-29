@@ -1076,6 +1076,8 @@ and publishing RESTful services. The options include
    * explicit servlets (rather than JSP scripts) published with a 
      web server such as Tomcat
 
+   * JSP scripts
+
    * JAX-WS WebServiceProviders published either with a web server such
      as Tomcat or with the convenient Java Endpoint publishing class
 
