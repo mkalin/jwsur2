@@ -564,10 +564,15 @@ presumably is asking to read the boot product with database identifier 27. POST 
 usually include key/value pairs as well but these typically are encapsulated in the
 HTTP body as the so-called HTML form.
 
-HTTP is an expressive API. Consider, for example, a web service that provides access to
-a products resource and supports the four CRUD operations against this resource. Here are
-some URIs together with an interpretation of each. The example illustrates the Rails 
-approach to REST-style routes to resources:
+HTTP is an expressive API. The Rails web framework tries to blur the distinction
+between web sites that deliver HTML and web services that deliver XML or JSON; Rails does
+so by emphasizing what it characterizes as RESTful routes to resources. For example, 
+in a Rails application a GET request against the URI /products would be equivalent to
+/products.html, a request for a list of products in HTML format. A GET request against
+/products.json or /products.xml would be a request for the very same list but in JSON format
+or XML format, respectively. Rails encourages the use of standard URI patterns and verbs. 
+Below is a summary of these patterns. A term that starts with a colon such as :id indicates
+a placeholder or parameter, in this case a placehold for a database ID such as 27.
 
   Verb   URI                  Meaning
 
