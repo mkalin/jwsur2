@@ -553,42 +553,63 @@ Two newlines terminate the headers section. A GET request has no body; hence, a 
 consists only of the start line and the headers. A POST request always has a body, which may
 be empty. In a POST request, two newlines also mark the end of the headers.
 
+A GET request can include, in the URI, a so-called query string that consists of key/value
+pairs. For example, this GET request
+
+   http://.../products?id=27&category=boots
+
+includes a query-string with two key/value pairs: id is the first key and 27 is the value;
+category is the second key and boots is the value. As a RESTful GET request, the URI
+presumably is asking to read the boot product with database identifier 27. POST requests
+usually include key/value pairs as well but these typically are encapsulated in the
+HTTP body as the so-called HTML form.
+
+HTTP is an expressive API. Consider, for example, a web service that provides access to
+a products resource and supports the four CRUD operations against this resource. Here are
+some URIs together with an interpretation of each. The example illustrates the Rails 
+approach to REST-style routes to resources:
+
+  Verb   URI                  Meaning
+
+  GET    /products            Read all resources
+
+  POST   /products            Create a new product from the information
+                              provided in the HTTP body
+  
+  GET    /products/new        Read the form to create a new product
+
+  GET    /products/:id/edit   Read the form to edit an existing product
+                              with the specified ID
+
+  GET    /products/:id        Read the specified product
+
+  PUT    /products/:id        Update, with information in the POST body,
+                              the product with the specified ID
+
+  DELETE /products:id         Delete the product with the specified ID
 
 
-;;;
 
-In RESTful services, then, URIs act as identifying nouns and HTTP
-methods act as verbs that specify operations on the resources identified
-by these nouns. For reference, here is the HTTP start line that someone might
-type into a browser:
-from a
-client's request against the <literal>TimeServer</literal> service in
-Chapter 1.</para>
 
-      <programlisting>POST http://127.0.0.1:9876/ts HTTP/ 1.1      </programlisting>
 
-      <para>The HTTP verb comes first, then the URI, and finally the
-      requester's version of HTTP. This URI is, of course, a URL that locates
-      the Web service. The table below uses simplified URIs to summarize the
-      intended meanings of HTTP/URI combinations:</para>
 
-      <table>
-        <title></title>
 
-        <tgroup cols="2">
-          <thead>
-            <row>
-              <entry align="center">HTTP Verb/URI</entry>
 
-              <entry align="center">Intended CRUD Meaning</entry>
-            </row>
-          </thead>
 
-          <tbody>
-            <row>
-              <entry>GET emps</entry>
 
-              <entry>Read a list of all employees</entry>
+
+  
+
+  POST   /products       Create a new product from the information
+                         provided in the HTTP body
+
+  PUT    /products:id    Edit an existing product with the information
+                         provided in the HTTP body
+
+  DELETE /products:id    Delete the product with the specified ID
+
+
+
             </row>
 
             <row>
