@@ -493,7 +493,69 @@ structure. URIs can and should be interpreted but these interpretations
 are imposed on URIs, not inherent in them. Although URI syntax looks
 like the syntax used to navigate a hierarchical file system, this
 resemblance is misleading. A URI is an opaque identifier, a logically
-proper name that denotes exactly one resource.</para>
+proper name that denotes exactly one resource.
+
+HTTP Requests and Responses
+
+The next section has a REST-style service whose URL is
+
+   http://localhost:8080/cliches/sayings.jsp
+
+If this URL were typed into a brower's window, the browser 
+would generate an HTTP request similar to
+
+   GET /cliches/sayings.jsp HTTP/1.1
+   User-Agent: Mozilla/5.0 (X11; Linux x86_64) Chrome/24.0.1312.56
+   Host: localhost:8080
+   Accept: text/html
+
+The browers parses the entered URL into these parts, with clarifications
+below:
+
+   Start line: GET /cliches/sayings.jsp HTTP/1.1
+
+     GET is the HTTP method (verb)
+     /cliches/sayings.jsp is the URI (resource's name)
+     HTTP/1.1 is the HTTP version that the requester is using
+
+   User-Agent: Chrome/24.0
+ 
+     Chrome is browser used in this request. The User-Agent information goes
+     beyond what is shown here. Of interest now is that term user agent captures
+     the intended meaning: it is the application (agent) that a user employs
+     to make a request.
+
+   Host: localhost:8080
+
+     To left of the colon is the network address of the machine that hosts
+     the resource, in this case localhost. Accordingly, the web server and
+     the web server are the same machine in this case, which is typical of
+     a development environment. In a production envirnonment, this information
+     might change to
+
+         dcequip.cti.depaul.edu:8080
+
+     To the right of the colon is the port number, 8080, on which the web
+     server awaits requests. Port numbers range from 0 to roughly 65,000, with
+     port numbers from 0 through 1023 typically reserved for standard applications 
+     such as web servers (port 80 for HTTP and 443 for HTTPS), SMTP (email, port 25), 
+     SSH (secure shell, port 22), and so on.
+
+   Accept: text/html
+
+     This is the MIME type (text) and subtype (html), which the browser 
+     is ready to accept. The application running on web server may not honor the requested 
+     type and respond instead with, for example, text/plain or text/xml.
+
+The key/value pairs such as Accept: text/html make up the HTTP request headers. These pairs
+may occur in any order and only the Host: <network address> pair is mandatory under HTTP 1.1.
+Two newlines terminate the headers section. A GET request has no body; hence, a GET request
+consists only of the start line and the headers. A POST request always has a body, which may
+be empty. In a POST request, two newlines also mark the end of the headers.
+
+
+
+;;;
 
 In RESTful services, then, URIs act as identifying nouns and HTTP
 methods act as verbs that specify operations on the resources identified
