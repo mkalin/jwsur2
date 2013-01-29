@@ -3,15 +3,16 @@ An Overview of Web Services and Java
 What Are Web Services?
 
 Although the term web service has various, imprecise, and evolving meanings, 
-a working definition should be enough background for a first coding example, which consists
+a working definition should be enough for the upcoming code example, which consists
 of a service and a client, also known as a consumer or requester. As the name suggests, 
 a web service is a kind of webified application, that is, an application typically 
-delivered over HTTP (HyperText Transport Protocol). A web service needs to be published,
-typically with a web server such as Apache or Nginx; and a web service consumer needs to execute 
-a machine that has network access, usually through HTTP, to the web server. In slightly more technical 
+delivered over HTTP (HyperText Transport Protocol). The obvious way to publish a 
+web service is with a web server; and a web service 
+client needs to execute on a machine that has network access, usually through HTTP, to the 
+web server. In slightly more technical 
 terms, a web service is a distributed application whose components can be deployed and executed on physically
-distinct devices. Figure 1 depicts such a service, with host1 (e.g., a desktop server) and 
-host2 (e.g., a mobile phone) as two distinct physical devices. Web services can be
+distinct devices. Figure 1 depicts such a service, with host1 as a web server machine and 
+host2 as a mobile device. Web services can be
 arbitrarily complex. For instance, a stock-picking web service might consist of several code components, 
 each hosted on a separate commerical-grade web server; and the web service might be consumed on PCs, handhelds, 
 and other devices.
@@ -125,7 +126,7 @@ widely used languages.
 
 Web services are inherently distributed systems that communicate mostly over HTTP but 
 can communicate over other popular transports as well. The communication payloads of web services
-are structured text (usually XML or JSON documents), which can be inspected,
+are structured text, usually XML or JSON documents, which can be inspected,
 transformed, persisted, and otherwise processed with widely and even
 freely available tools. When efficiency demands it, however, Web
 services also can deliver compact binary payloads. Finally, web services are a
@@ -167,11 +168,13 @@ Microsoft's COM/OLE (Common Object Model/Object Linking and Embedding) technolog
 were built on a DCE/RPC foundation. The first-generation frameworks for distributed-object systems, 
 CORBA (Common Object Request Broker Architecture) and Microsoft's DCOM (Distributed COM), are anchored 
 in the DCE/RPC procedural framework. Java RMI (Remote Method Invocation) also derives from DCE/RPC; and the 
-method calls in Java EE (Enterprise Editition), specifically in Session and Entity EJBs (Enterprise Java Bean), 
+method calls in Java EE (Enterprise Edition), specifically in Session and Entity EJBs (Enterprise Java Bean), 
 are Java RMI calls. Java EE (formerly J2EE) and Microsoft's DotNet are second-generation frameworks for 
 distributed-object systems; and these frameworks, like CORBA and DCOM before them, trace
 their ancestry back to DCE/RPC. By the way, DCE/RPC is not dead. Various popular system utilities (for 
 instance, the Samba file and print service for Windows clients) use DCE/RPC.
+
+From DCE/RPC to XML-RPC
 
 DCE/RPC has the familiar client/server architecture in which a
 client invokes a procedure that executes on the server. Arguments can be
