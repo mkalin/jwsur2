@@ -1073,10 +1073,8 @@ What is Next?
 Chapter 2 focuses on the service side by exploring options for implementing
 and publishing RESTful services. The options include 
 
-   * explicit servlets (rather than JSP scripts) published with a 
+   * explicit servlets and JSP scripts published with a 
      web server such as Tomcat
-
-   * JSP scripts
 
    * JAX-WS WebServiceProviders published either with a web server such
      as Tomcat or with the convenient Java Endpoint publishing class
