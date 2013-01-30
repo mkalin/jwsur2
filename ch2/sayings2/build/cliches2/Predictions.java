@@ -40,6 +40,7 @@ public class Predictions {
 	// Have the data been read already?
 	if (null == predictions) populate(); 
 
+	System.err.println("### Size is :" + predictions.size());
 	return this.predictions;
     }
 

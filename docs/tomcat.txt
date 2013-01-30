@@ -43,6 +43,14 @@ the site or service, you remove the WAR file. Note 2 introduces an Ant script,
 included in the ZIP file with my code, that automates the deployement of a web
 site or service under Tomcat.
 
+Tomcat maintains various log files in TOMCAT_HOME/logs, one of which is especially
+convenient for ad hoc debugging. Tomcat automatically redirects output to 
+System.err to TOMCAT_HOME/logs/catalina.out. Accordingly, if a servlet executes
+
+   System.err.println("Goodbye, cruel world!");
+
+the message would appear in the catalina.out log file.
+
 Apache Tomcat is not the only game in town. There is the related TomEE web server, 
 basically Tomcat with support for Java EE beyond servlets. Another popular Java-centric 
 web server is Jetty (http://jetty.codehaus.org/jetty/).
