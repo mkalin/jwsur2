@@ -8,7 +8,6 @@ import java.io.Serializable;
 public class Prediction implements Serializable {
     private String who;   // person
     private String what;  // his/her prediction
-    private int    id;    // lookup-key in Predictions map
 
     public Prediction() { }
 
@@ -24,12 +23,5 @@ public class Prediction implements Serializable {
     }
     public String getWhat() {
 	return this.what;
-    }
-
-    public void setId(int id) {
-	this.id = id;
-    }
-    public int getId() {
-	return this.id;
     }
 }

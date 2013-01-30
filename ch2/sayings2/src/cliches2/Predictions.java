@@ -38,7 +38,7 @@ public class Predictions {
 	if (null == getServletContext()) return null;      
 
 	// Have the data been read already?
-	if (null == predictions) populate(); 
+	if (predictions.size() < 1) populate(); 
 
 	return this.predictions;
     }
@@ -54,6 +54,11 @@ public class Predictions {
 	}
 	catch(Exception e) { }
 	return xml;
+    }
+
+    public String addPrediction(Prediction p) {
+	predictions.put(String.valueOf(mapKey), p);
+	return mapKey++;
     }
 
     //** utility
