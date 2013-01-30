@@ -49,7 +49,7 @@ System.err to TOMCAT_HOME/logs/catalina.out. Accordingly, if a servlet executes
 
    System.err.println("Goodbye, cruel world!");
 
-the message would appear in the catalina.out log file.
+the farewell message would appear in the catalina.out log file.
 
 Apache Tomcat is not the only game in town. There is the related TomEE web server, 
 basically Tomcat with support for Java EE beyond servlets. Another popular Java-centric 
