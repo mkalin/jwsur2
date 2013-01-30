@@ -249,13 +249,17 @@ public interface BenefitsService extends java.rmi.Remote {
 
 A client against this service needs a Java RMI stub, an instance
 of a class that implements the BenefitsService
-interface. The stub is downloaded automatically to the client through
-serialization over the socket (network connection) that connects the 
-client and the service.
-The stub class requires the programmer-defined Emp and
-EmpBenefits types, which in turn may nest other
-programmer-defined types, for instance, Department,
-BusinessCertification, and ClientAccount:
+interface. The stub is an object, that is, an instance of the
+implementing class; hence, the implementing class as well must be
+downloaded to the client. The problem is not so much the actual
+downloading, as this is handled automatically through a network
+connection, a socket, that connects the client machine and the 
+service machine. Instead, the problem is that so that bytes need to
+be downloaded in order to distribute an object--the stub--to the client
+machine. The reason for the complication is that an interface type such as 
+BenefitsService declares methods whose arguments and return types also may be 
+programmer-defined types such as Emp, Department, BusinessCertification, and 
+ClientAccount:
 
 public class Emp {
    private Department                   department;
@@ -272,18 +276,12 @@ this code segment illustrates:
 
    List<EmpBenefit> fredBenefits = remote_object.getBenefits(fred);  
 
-Under Java RMI, programmer-defined types required on the client side
-are loaded remotely and automatically. Yet the remote loading of Java
-classes is inherently complicated and, of course, the format of Java’s
-.class files is proprietary. Lots of bytes need to come down from the server 
-to the client before the client can invoke a method remotely. The arguments passed 
-to the Java RMI service (in this example, the Emp instance to which
-fred refers) are serialized on the client side and
-deserialized on the service side. The returned value, in this case a list
-of EmpBenefits, is serialized by the service and
-deserialized by the client. The client and service communicate through
-binary rather than text streams and the structure of the binary streams is
-Java specific.
+Java RMI, like DotNet Remoting, requires lots of bytes to move from
+the server to the client in order to support the remote method invocation.
+The setup is inherently complicated and, therefore, prone to error. Finally,
+the client and the server communicate through binary rather than text streams;
+and the structure of the byte streams is proprietary. All of this further
+complicates troubleshooting.
 
 Web services, as a foundational code base in an SOA system, simplify matters. 
 For one thing, the client and service typically exchange XML or equivalent documents,
