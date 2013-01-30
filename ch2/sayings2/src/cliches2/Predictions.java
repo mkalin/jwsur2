@@ -43,12 +43,12 @@ public class Predictions {
 	return this.predictions;
     }
 
-    public String toXML() {
+    public String toXML(Object obj) {
 	String xml = null;
 	try {
 	    ByteArrayOutputStream out = new ByteArrayOutputStream();
 	    XMLEncoder encoder = new XMLEncoder(out);
-	    encoder.writeObject(predictions.values().toArray()); // serialize to XML
+	    encoder.writeObject(obj); // serialize to XML
 	    encoder.close();
 	    xml = out.toString(); // stringify
 	}

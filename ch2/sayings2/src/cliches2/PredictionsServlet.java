@@ -9,6 +9,7 @@ import javax.xml.ws.http.HTTPException;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
+import java.io.IOException;
 import java.beans.XMLEncoder;
 
 public class PredictionsServlet extends HttpServlet {
@@ -27,13 +28,21 @@ public class PredictionsServlet extends HttpServlet {
 	
         // If no query string, assume client wants the full list.
         if (key == null) {
-	   
+	    Map<String, Prediction> map = predictions.getMap();
+	    String xml = predictions.toXML(map.values().toArray());
+	    sendResponse(response, xml);
 	}
 	// Otherwise, return the specified Prediction.
 	else {
 	    Prediction pred = predictions.getMap().get(key.trim());
-	    if (null == pred) ;
-	    else ;
+
+	    if (null == pred) { // no such Prediction
+		String msg = key + " does not map to a prediction.";
+		sendResponse(response, predictions.toXML(msg));
+	    }
+	    else {
+		sendResponse(response, predictions.toXML(pred));
+	    }
 	}
     }
 
@@ -88,5 +97,16 @@ public class PredictionsServlet extends HttpServlet {
 
     public void doOptions(HttpServletRequest req, HttpServletResponse res) {
         throw new HTTPException(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
+    }
+
+    private void sendResponse(HttpServletResponse res, String payload) {
+	try {
+	    OutputStream out = res.getOutputStream();
+	    out.write(payload.getBytes());
+	    out.flush();
+	}
+	catch(IOException e) {
+	    throw new HTTPException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+	}
     }
 }     
