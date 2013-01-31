@@ -44,19 +44,21 @@ public class PredictionsServlet extends HttpServlet {
 	}
 	// Otherwise, return the specified Prediction.
 	else {
-	    Prediction pred = predictions.getMap().get(key.trim());
+	    Prediction pred = predictions.getMap().get(key);
 
 	    if (null == pred) { // no such Prediction
 		String msg = key + " does not map to a prediction.";
 		sendResponse(response, predictions.toXML(msg), false);
 	    }
-	    else {
+	    else { // requested Prediction found
 		sendResponse(response, predictions.toXML(pred), json);
 	    }
 	}
     }
 
     // POST /cliches2
+    // HTTP body should contain two keys, one for the predictor ("who") and
+    // another for the prediction ("what").
     public void doPost(HttpServletRequest request, HttpServletResponse response) {
 	String who = request.getParameter("who");
 	String what = request.getParameter("what");
@@ -79,15 +81,31 @@ public class PredictionsServlet extends HttpServlet {
     }
 
     // PUT /cliches
+    // HTTP body should contain at least two keys: the id (which prediction is
+    // to be edited) must be present; the predictor or the prediction or both
+    // should be present.
     public void doPut(HttpServletRequest req, HttpServletResponse res) {
-  
+	String key = request.getParameter("id");
+	if (null == key)
+	    throw new HTTPException(HttpServletResponse.SC_BD_REQUEST);
+
+	Prediction p = predictons.getMap().get(key);
+	if (null == p) {
+	    String msg = key + " does not map to a Prediction.";
+	    sendResponse(response, msg, false);
+	}
+	else {
+	    // At least one of these must be present.
+	    String who = request.getParameter("who");
+	    String what = request.getParameter("what");
+	}
     }
 
     // DELETE /cliches2?id=1
     public void doDelete(HttpServletRequest request, HttpServletResponse response) {
-        String key = request.getParameter("num");
-        // Only one Fibonacci number may be deleted at a time.
-        if (key == null)
+        String key = request.getParameter("id");
+        // Only one Prediction can be deleted at a time.
+        if (null == key)
             throw new HTTPException(HttpServletResponse.SC_BAD_REQUEST);
         try {
             int n = Integer.parseInt(key.trim());
