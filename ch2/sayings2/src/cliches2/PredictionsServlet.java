@@ -129,7 +129,7 @@ public class PredictionsServlet extends HttpServlet {
 	    predictions.getMap().remove(key);
         }
         catch(Exception e) {
-            throw new HTTPException(HttpServletResponse.SC_BAD_REQUEST);
+            throw new HTTPException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         }
     }
 
