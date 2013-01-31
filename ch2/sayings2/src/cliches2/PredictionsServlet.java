@@ -128,7 +128,7 @@ public class PredictionsServlet extends HttpServlet {
         try {
 	    predictions.getMap().remove(key);
         }
-        catch(NumberFormatException e) {
+        catch(Exception e) {
             throw new HTTPException(HttpServletResponse.SC_BAD_REQUEST);
         }
     }
