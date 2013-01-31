@@ -45,6 +45,7 @@ public class Predictions {
 
     public String toXML(Object obj) {
 	String xml = null;
+
 	try {
 	    ByteArrayOutputStream out = new ByteArrayOutputStream();
 	    XMLEncoder encoder = new XMLEncoder(out);
@@ -56,9 +57,10 @@ public class Predictions {
 	return xml;
     }
 
-    public String addPrediction(Prediction p) {
+    public int addPrediction(Prediction p) {
+	p.setId(mapKey);
 	predictions.put(String.valueOf(mapKey), p);
-	return String.valueOf(mapKey++);
+	return mapKey++;
     }
 
     //** utility
@@ -79,7 +81,7 @@ public class Predictions {
 		    Prediction p = new Prediction();
 		    p.setWho(parts[0]);
 		    p.setWhat(parts[1]);
-		    p.setId(String.valueOf(mapKey));
+		    p.setId(mapKey);
 
 		    predictions.put(String.valueOf(mapKey++), p);
 		}

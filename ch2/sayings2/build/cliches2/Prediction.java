@@ -5,10 +5,10 @@ import java.io.Serializable;
 // An array of Predictions is to be serialized
 // into an XML document, which is returned to 
 // the consumer on a request. 
-public class Prediction implements Serializable {
+public class Prediction implements Serializable, Comparable<Prediction> {
     private String who;   // person
     private String what;  // his/her prediction
-    private String id;    // identifier used as lookup-key
+    private int    id;    // identifier used as lookup-key
 
     public Prediction() { }
 
@@ -26,10 +26,15 @@ public class Prediction implements Serializable {
 	return this.what;
     }
 
-    public void setId(String id) {
+    public void setId(int id) {
 	this.id = id;
     }
-    public String getId() {
+    public int getId() {
 	return this.id;
     }
+
+    // implementation of Comparable interface
+    public int compareTo(Prediction other) {
+	return this.id - other.id;
+    }	
 }

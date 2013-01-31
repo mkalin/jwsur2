@@ -1,335 +1,431 @@
-<?xml version="1.0" encoding="UTF-8"?> 
-<java version="1.6.0_21" class="java.beans.XMLDecoder"> 
- <array class="java.lang.Object" length="33"> 
-  <void index="0"> 
-   <object class="cliches2.Prediction"> 
-    <void property="what"> 
-     <string>Triple-buffered didactic emulation will visualize integrated channels.</string> 
-    </void> 
-    <void property="who"> 
-     <string>Bartholome Walsh</string> 
-    </void> 
-   </object> 
-  </void> 
-  <void index="1"> 
-   <object class="cliches2.Prediction"> 
-    <void property="what"> 
-     <string>Decentralized 24/7 hub will target robust web-readiness.</string> 
-    </void> 
-    <void property="who"> 
-     <string>River Friesen</string> 
-    </void> 
-   </object> 
-  </void> 
-  <void index="2"> 
-   <object class="cliches2.Prediction"> 
-    <void property="what"> 
-     <string>Synergistic disintermediate policy will expedite back-end experiences.</string> 
-    </void> 
-    <void property="who"> 
-     <string>Carmel Becker</string> 
-    </void> 
-   </object> 
-  </void> 
-  <void index="3"> 
-   <object class="cliches2.Prediction"> 
-    <void property="what"> 
-     <string>foos will bar and baz</string> 
-    </void> 
-    <void property="who"> 
-     <string>FooBar</string> 
-    </void> 
-   </object> 
-  </void> 
-  <void index="4"> 
-   <object class="cliches2.Prediction"> 
-    <void property="what"> 
-     <string>Universal fault-tolerant architecture will synthesize bleeding-edge channels.</string> 
-    </void> 
-    <void property="who"> 
-     <string>Hollis McCullough</string> 
-    </void> 
-   </object> 
-  </void> 
-  <void index="5"> 
-   <object class="cliches2.Prediction"> 
-    <void property="what"> 
-     <string>Cloned assymetric intranet will enable innovative functionalities.</string> 
-    </void> 
-    <void property="who"> 
-     <string>Mina Hayes</string> 
-    </void> 
-   </object> 
-  </void> 
-  <void index="6"> 
-   <object class="cliches2.Prediction"> 
-    <void property="what"> 
-     <string>Robust intermediate extranet will facilitate best-of-breed synergies.</string> 
-    </void> 
-    <void property="who"> 
-     <string>Craig Leuschke</string> 
-    </void> 
-   </object> 
-  </void> 
-  <void index="7"> 
-   <object class="cliches2.Prediction"> 
-    <void property="what"> 
-     <string>Digitized optimal conglomeration will exploit proactive relationships.</string> 
-    </void> 
-    <void property="who"> 
-     <string>Shayna Lehner</string> 
-    </void> 
-   </object> 
-  </void> 
-  <void index="8"> 
-   <object class="cliches2.Prediction"> 
-    <void property="what"> 
-     <string>Distributed dynamic moratorium will iterate magnetic e-commerce.</string> 
-    </void> 
-    <void property="who"> 
-     <string>Linnie Funk</string> 
-    </void> 
-   </object> 
-  </void> 
-  <void index="9"> 
-   <object class="cliches2.Prediction"> 
-    <void property="what"> 
-     <string>Synergistic demand-driven functionalities will visualize compelling vortals.</string> 
-    </void> 
-    <void property="who"> 
-     <string>Emery Ward</string> 
-    </void> 
-   </object> 
-  </void> 
-  <void index="10"> 
-   <object class="cliches2.Prediction"> 
-    <void property="what"> 
-     <string>Triple-buffered neutral collaboration will incubate B2B deliverables.</string> 
-    </void> 
-    <void property="who"> 
-     <string>Charlene Mertz</string> 
-    </void> 
-   </object> 
-  </void> 
-  <void index="11"> 
-   <object class="cliches2.Prediction"> 
-    <void property="what"> 
-     <string>Configurable intangible alliance will scale sexy ROI.</string> 
-    </void> 
-    <void property="who"> 
-     <string>Russel Robel</string> 
-    </void> 
-   </object> 
-  </void> 
-  <void index="12"> 
-   <object class="cliches2.Prediction"> 
-    <void property="what"> 
-     <string>User-centric multi-state success will transform proactive convergence.</string> 
-    </void> 
-    <void property="who"> 
-     <string>Letitia Pacocha</string> 
-    </void> 
-   </object> 
-  </void> 
-  <void index="13"> 
-   <object class="cliches2.Prediction"> 
-    <void property="what"> 
-     <string>Open-source multi-tasking time-frame will monetize rich partnerships.</string> 
-    </void> 
-    <void property="who"> 
-     <string>Lottie Marks</string> 
-    </void> 
-   </object> 
-  </void> 
-  <void index="14"> 
-   <object class="cliches2.Prediction"> 
-    <void property="what"> 
-     <string>Optional static definition will unleash dynamic e-tailers.</string> 
-    </void> 
-    <void property="who"> 
-     <string>Kaden Crona</string> 
-    </void> 
-   </object> 
-  </void> 
-  <void index="15"> 
-   <object class="cliches2.Prediction"> 
-    <void property="what"> 
-     <string>De-engineered systematic emulation will deploy out-of-the-box partnerships.</string> 
-    </void> 
-    <void property="who"> 
-     <string>Everardo Lind</string> 
-    </void> 
-   </object> 
-  </void> 
-  <void index="16"> 
-   <object class="cliches2.Prediction"> 
-    <void property="what"> 
-     <string>Synergistic 24/7 website will transition 24/7 methodologies.</string> 
-    </void> 
-    <void property="who"> 
-     <string>Lilyan Thompson</string> 
-    </void> 
-   </object> 
-  </void> 
-  <void index="17"> 
-   <object class="cliches2.Prediction"> 
-    <void property="what"> 
-     <string>Reactive value-added middleware will engineer next-generation partnerships.</string> 
-    </void> 
-    <void property="who"> 
-     <string>Alessia O&apos;Connell</string> 
-    </void> 
-   </object> 
-  </void> 
-  <void index="18"> 
-   <object class="cliches2.Prediction"> 
-    <void property="what"> 
-     <string>Self-enabling reciprocal synergy will generate seamless portals.</string> 
-    </void> 
-    <void property="who"> 
-     <string>Reymundo Champlin</string> 
-    </void> 
-   </object> 
-  </void> 
-  <void index="19"> 
-   <object class="cliches2.Prediction"> 
-    <void property="what"> 
-     <string>Assimilated intermediate superstructure will drive vertical methodologies.</string> 
-    </void> 
-    <void property="who"> 
-     <string>Immanuel Bergstrom</string> 
-    </void> 
-   </object> 
-  </void> 
-  <void index="20"> 
-   <object class="cliches2.Prediction"> 
-    <void property="what"> 
-     <string>Triple-buffered scalable function will productize visionary infomediaries.</string> 
-    </void> 
-    <void property="who"> 
-     <string>Loraine Ryan</string> 
-    </void> 
-   </object> 
-  </void> 
-  <void index="21"> 
-   <object class="cliches2.Prediction"> 
-    <void property="what"> 
-     <string>Vision-oriented zero administration time-frame will generate back-end interfaces.</string> 
-    </void> 
-    <void property="who"> 
-     <string>Conner Kulas</string> 
-    </void> 
-   </object> 
-  </void> 
-  <void index="22"> 
-   <object class="cliches2.Prediction"> 
-    <void property="what"> 
-     <string>Enhanced zero tolerance system engine will evolve turn-key deliverables.</string> 
-    </void> 
-    <void property="who"> 
-     <string>Tanner Dietrich</string> 
-    </void> 
-   </object> 
-  </void> 
-  <void index="23"> 
-   <object class="cliches2.Prediction"> 
-    <void property="what"> 
-     <string>Managed holistic contingency will grow killer action-items.</string> 
-    </void> 
-    <void property="who"> 
-     <string>Cornelius Tillman</string> 
-    </void> 
-   </object> 
-  </void> 
-  <void index="24"> 
-   <object class="cliches2.Prediction"> 
-    <void property="what"> 
-     <string>Proactive demand-driven open architecture will innovate impactful networks.</string> 
-    </void> 
-    <void property="who"> 
-     <string>Dahlia Robel</string> 
-    </void> 
-   </object> 
-  </void> 
-  <void index="25"> 
-   <object class="cliches2.Prediction"> 
-    <void property="what"> 
-     <string>Cross-group fresh-thinking encoding will reinvent dot-com systems.</string> 
-    </void> 
-    <void property="who"> 
-     <string>Emily Roob</string> 
-    </void> 
-   </object> 
-  </void> 
-  <void index="26"> 
-   <object class="cliches2.Prediction"> 
-    <void property="what"> 
-     <string>Future-proofed 5th generation protocol will strategize web-enabled networks.</string> 
-    </void> 
-    <void property="who"> 
-     <string>Jarred Wehner</string> 
-    </void> 
-   </object> 
-  </void> 
-  <void index="27"> 
-   <object class="cliches2.Prediction"> 
-    <void property="what"> 
-     <string>Versatile tangible application will maximize rich e-business.</string> 
-    </void> 
-    <void property="who"> 
-     <string>Hiram Gulgowski</string> 
-    </void> 
-   </object> 
-  </void> 
-  <void index="28"> 
-   <object class="cliches2.Prediction"> 
-    <void property="what"> 
-     <string>Face to face client-server pricing structure will whiteboard robust communities.</string> 
-    </void> 
-    <void property="who"> 
-     <string>River Wiza</string> 
-    </void> 
-   </object> 
-  </void> 
-  <void index="29"> 
-   <object class="cliches2.Prediction"> 
-    <void property="what"> 
-     <string>Balanced clear-thinking utilisation will expedite collaborative initiatives.</string> 
-    </void> 
-    <void property="who"> 
-     <string>Deven Blanda</string> 
-    </void> 
-   </object> 
-  </void> 
-  <void index="30"> 
-   <object class="cliches2.Prediction"> 
-    <void property="what"> 
-     <string>Reactive radical knowledge base will aggregate extensible vortals.</string> 
-    </void> 
-    <void property="who"> 
-     <string>Patricia Zulauf</string> 
-    </void> 
-   </object> 
-  </void> 
-  <void index="31"> 
-   <object class="cliches2.Prediction"> 
-    <void property="what"> 
-     <string>User-centric non-volatile open architecture will iterate world-class vortals.</string> 
-    </void> 
-    <void property="who"> 
-     <string>Kathryn Hilpert</string> 
-    </void> 
-   </object> 
-  </void> 
-  <void index="32"> 
-   <object class="cliches2.Prediction"> 
-    <void property="what"> 
-     <string>Customizable assymetric database will visualize virtual action-items.</string> 
-    </void> 
-    <void property="who"> 
-     <string>Elvis Ernser</string> 
-    </void> 
-   </object> 
-  </void> 
- </array> 
-</java> 
+<?xml version="1.0" encoding="UTF-8"?>
+<java version="1.7.0" class="java.beans.XMLDecoder">
+ <array class="java.lang.Object" length="33">
+  <void index="0">
+   <object class="cliches2.Prediction">
+    <void property="what">
+     <string>foobars will baz</string>
+    </void>
+    <void property="who">
+     <string>FooBar</string>
+    </void>
+   </object>
+  </void>
+  <void index="1">
+   <object class="cliches2.Prediction">
+    <void property="id">
+     <int>1</int>
+    </void>
+    <void property="what">
+     <string>Managed holistic contingency will grow killer action-items.</string>
+    </void>
+    <void property="who">
+     <string>Cornelius Tillman</string>
+    </void>
+   </object>
+  </void>
+  <void index="2">
+   <object class="cliches2.Prediction">
+    <void property="id">
+     <int>2</int>
+    </void>
+    <void property="what">
+     <string>Vision-oriented zero administration time-frame will generate back-end interfaces.</string>
+    </void>
+    <void property="who">
+     <string>Conner Kulas</string>
+    </void>
+   </object>
+  </void>
+  <void index="3">
+   <object class="cliches2.Prediction">
+    <void property="id">
+     <int>3</int>
+    </void>
+    <void property="what">
+     <string>Triple-buffered scalable function will productize visionary infomediaries.</string>
+    </void>
+    <void property="who">
+     <string>Loraine Ryan</string>
+    </void>
+   </object>
+  </void>
+  <void index="4">
+   <object class="cliches2.Prediction">
+    <void property="id">
+     <int>4</int>
+    </void>
+    <void property="what">
+     <string>Reactive radical knowledge base will aggregate extensible vortals.</string>
+    </void>
+    <void property="who">
+     <string>Patricia Zulauf</string>
+    </void>
+   </object>
+  </void>
+  <void index="5">
+   <object class="cliches2.Prediction">
+    <void property="id">
+     <int>5</int>
+    </void>
+    <void property="what">
+     <string>Face to face client-server pricing structure will whiteboard robust communities.</string>
+    </void>
+    <void property="who">
+     <string>River Wiza</string>
+    </void>
+   </object>
+  </void>
+  <void index="6">
+   <object class="cliches2.Prediction">
+    <void property="id">
+     <int>6</int>
+    </void>
+    <void property="what">
+     <string>Future-proofed 5th generation protocol will strategize web-enabled networks.</string>
+    </void>
+    <void property="who">
+     <string>Jarred Wehner</string>
+    </void>
+   </object>
+  </void>
+  <void index="7">
+   <object class="cliches2.Prediction">
+    <void property="id">
+     <int>7</int>
+    </void>
+    <void property="what">
+     <string>Cross-group fresh-thinking encoding will reinvent dot-com systems.</string>
+    </void>
+    <void property="who">
+     <string>Emily Roob</string>
+    </void>
+   </object>
+  </void>
+  <void index="8">
+   <object class="cliches2.Prediction">
+    <void property="id">
+     <int>8</int>
+    </void>
+    <void property="what">
+     <string>Customizable assymetric database will visualize virtual action-items.</string>
+    </void>
+    <void property="who">
+     <string>Elvis Ernser</string>
+    </void>
+   </object>
+  </void>
+  <void index="9">
+   <object class="cliches2.Prediction">
+    <void property="id">
+     <int>9</int>
+    </void>
+    <void property="what">
+     <string>User-centric non-volatile open architecture will iterate world-class vortals.</string>
+    </void>
+    <void property="who">
+     <string>Kathryn Hilpert</string>
+    </void>
+   </object>
+  </void>
+  <void index="10">
+   <object class="cliches2.Prediction">
+    <void property="id">
+     <int>10</int>
+    </void>
+    <void property="what">
+     <string>Enhanced zero tolerance system engine will evolve turn-key deliverables.</string>
+    </void>
+    <void property="who">
+     <string>Tanner Dietrich</string>
+    </void>
+   </object>
+  </void>
+  <void index="11">
+   <object class="cliches2.Prediction">
+    <void property="id">
+     <int>11</int>
+    </void>
+    <void property="what">
+     <string>Distributed dynamic moratorium will iterate magnetic e-commerce.</string>
+    </void>
+    <void property="who">
+     <string>Linnie Funk</string>
+    </void>
+   </object>
+  </void>
+  <void index="12">
+   <object class="cliches2.Prediction">
+    <void property="id">
+     <int>12</int>
+    </void>
+    <void property="what">
+     <string>Synergistic demand-driven functionalities will visualize compelling vortals.</string>
+    </void>
+    <void property="who">
+     <string>Emery Ward</string>
+    </void>
+   </object>
+  </void>
+  <void index="13">
+   <object class="cliches2.Prediction">
+    <void property="id">
+     <int>13</int>
+    </void>
+    <void property="what">
+     <string>Robust intermediate extranet will facilitate best-of-breed synergies.</string>
+    </void>
+    <void property="who">
+     <string>Craig Leuschke</string>
+    </void>
+   </object>
+  </void>
+  <void index="14">
+   <object class="cliches2.Prediction">
+    <void property="id">
+     <int>14</int>
+    </void>
+    <void property="what">
+     <string>Digitized optimal conglomeration will exploit proactive relationships.</string>
+    </void>
+    <void property="who">
+     <string>Shayna Lehner</string>
+    </void>
+   </object>
+  </void>
+  <void index="15">
+   <object class="cliches2.Prediction">
+    <void property="id">
+     <int>15</int>
+    </void>
+    <void property="what">
+     <string>Universal fault-tolerant architecture will synthesize bleeding-edge channels.</string>
+    </void>
+    <void property="who">
+     <string>Hollis McCullough</string>
+    </void>
+   </object>
+  </void>
+  <void index="16">
+   <object class="cliches2.Prediction">
+    <void property="id">
+     <int>16</int>
+    </void>
+    <void property="what">
+     <string>Cloned assymetric intranet will enable innovative functionalities.</string>
+    </void>
+    <void property="who">
+     <string>Mina Hayes</string>
+    </void>
+   </object>
+  </void>
+  <void index="17">
+   <object class="cliches2.Prediction">
+    <void property="id">
+     <int>17</int>
+    </void>
+    <void property="what">
+     <string>Decentralized 24/7 hub will target robust web-readiness.</string>
+    </void>
+    <void property="who">
+     <string>River Friesen</string>
+    </void>
+   </object>
+  </void>
+  <void index="18">
+   <object class="cliches2.Prediction">
+    <void property="id">
+     <int>18</int>
+    </void>
+    <void property="what">
+     <string>Synergistic disintermediate policy will expedite back-end experiences.</string>
+    </void>
+    <void property="who">
+     <string>Carmel Becker</string>
+    </void>
+   </object>
+  </void>
+  <void index="19">
+   <object class="cliches2.Prediction">
+    <void property="id">
+     <int>19</int>
+    </void>
+    <void property="what">
+     <string>Triple-buffered didactic emulation will visualize integrated channels.</string>
+    </void>
+    <void property="who">
+     <string>Bartholome Walsh</string>
+    </void>
+   </object>
+  </void>
+  <void index="20">
+   <object class="cliches2.Prediction">
+    <void property="id">
+     <int>20</int>
+    </void>
+    <void property="what">
+     <string>Configurable intangible alliance will scale sexy ROI.</string>
+    </void>
+    <void property="who">
+     <string>Russel Robel</string>
+    </void>
+   </object>
+  </void>
+  <void index="21">
+   <object class="cliches2.Prediction">
+    <void property="id">
+     <int>21</int>
+    </void>
+    <void property="what">
+     <string>Triple-buffered neutral collaboration will incubate B2B deliverables.</string>
+    </void>
+    <void property="who">
+     <string>Charlene Mertz</string>
+    </void>
+   </object>
+  </void>
+  <void index="22">
+   <object class="cliches2.Prediction">
+    <void property="id">
+     <int>22</int>
+    </void>
+    <void property="what">
+     <string>User-centric multi-state success will transform proactive convergence.</string>
+    </void>
+    <void property="who">
+     <string>Letitia Pacocha</string>
+    </void>
+   </object>
+  </void>
+  <void index="23">
+   <object class="cliches2.Prediction">
+    <void property="id">
+     <int>23</int>
+    </void>
+    <void property="what">
+     <string>Open-source multi-tasking time-frame will monetize rich partnerships.</string>
+    </void>
+    <void property="who">
+     <string>Lottie Marks</string>
+    </void>
+   </object>
+  </void>
+  <void index="24">
+   <object class="cliches2.Prediction">
+    <void property="id">
+     <int>24</int>
+    </void>
+    <void property="what">
+     <string>Optional static definition will unleash dynamic e-tailers.</string>
+    </void>
+    <void property="who">
+     <string>Kaden Crona</string>
+    </void>
+   </object>
+  </void>
+  <void index="25">
+   <object class="cliches2.Prediction">
+    <void property="id">
+     <int>25</int>
+    </void>
+    <void property="what">
+     <string>De-engineered systematic emulation will deploy out-of-the-box partnerships.</string>
+    </void>
+    <void property="who">
+     <string>Everardo Lind</string>
+    </void>
+   </object>
+  </void>
+  <void index="26">
+   <object class="cliches2.Prediction">
+    <void property="id">
+     <int>26</int>
+    </void>
+    <void property="what">
+     <string>Synergistic 24/7 website will transition 24/7 methodologies.</string>
+    </void>
+    <void property="who">
+     <string>Lilyan Thompson</string>
+    </void>
+   </object>
+  </void>
+  <void index="27">
+   <object class="cliches2.Prediction">
+    <void property="id">
+     <int>27</int>
+    </void>
+    <void property="what">
+     <string>Reactive value-added middleware will engineer next-generation partnerships.</string>
+    </void>
+    <void property="who">
+     <string>Alessia O&apos;Connell</string>
+    </void>
+   </object>
+  </void>
+  <void index="28">
+   <object class="cliches2.Prediction">
+    <void property="id">
+     <int>28</int>
+    </void>
+    <void property="what">
+     <string>Self-enabling reciprocal synergy will generate seamless portals.</string>
+    </void>
+    <void property="who">
+     <string>Reymundo Champlin</string>
+    </void>
+   </object>
+  </void>
+  <void index="29">
+   <object class="cliches2.Prediction">
+    <void property="id">
+     <int>29</int>
+    </void>
+    <void property="what">
+     <string>Assimilated intermediate superstructure will drive vertical methodologies.</string>
+    </void>
+    <void property="who">
+     <string>Immanuel Bergstrom</string>
+    </void>
+   </object>
+  </void>
+  <void index="30">
+   <object class="cliches2.Prediction">
+    <void property="id">
+     <int>30</int>
+    </void>
+    <void property="what">
+     <string>Proactive demand-driven open architecture will innovate impactful networks.</string>
+    </void>
+    <void property="who">
+     <string>Dahlia Robel</string>
+    </void>
+   </object>
+  </void>
+  <void index="31">
+   <object class="cliches2.Prediction">
+    <void property="id">
+     <int>31</int>
+    </void>
+    <void property="what">
+     <string>Balanced clear-thinking utilisation will expedite collaborative initiatives.</string>
+    </void>
+    <void property="who">
+     <string>Deven Blanda</string>
+    </void>
+   </object>
+  </void>
+  <void index="32">
+   <object class="cliches2.Prediction">
+    <void property="id">
+     <int>32</int>
+    </void>
+    <void property="what">
+     <string>Versatile tangible application will maximize rich e-business.</string>
+    </void>
+    <void property="who">
+     <string>Hiram Gulgowski</string>
+    </void>
+   </object>
+  </void>
+ </array>
+</java>

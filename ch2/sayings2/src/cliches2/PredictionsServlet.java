@@ -6,6 +6,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.ws.http.HTTPException;
+import java.util.Arrays;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
@@ -39,7 +40,12 @@ public class PredictionsServlet extends HttpServlet {
         // If no query string, assume client wants the full list.
         if (key == null) {
 	    Map<String, Prediction> map = predictions.getMap();
-	    String xml = predictions.toXML(map.values().toArray());
+
+	    // Sort the map's values for readability.
+	    Object[] list = map.values().toArray();
+	    Arrays.sort(list);
+
+	    String xml = predictions.toXML(list);
 	    sendResponse(response, xml, json);
 	}
 	// Otherwise, return the specified Prediction.
@@ -73,10 +79,10 @@ public class PredictionsServlet extends HttpServlet {
 	p.setWhat(what);
 
 	// Save the ID of the newly created Prediction.
-	String id = predictions.addPrediction(p);
+	int id = predictions.addPrediction(p);
 
 	// Generate the confirmation message.
-	String msg = "Prediction " + id + " created.";
+	String msg = "Prediction " + id + " created.\n";
 	sendResponse(response, msg, false);
     }
 
