@@ -9,8 +9,9 @@ import javax.xml.ws.http.HTTPException;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
-import java.io.IOException;
 import java.beans.XMLEncoder;
+import org.json.JSONObject;
+import org.json.XML;
 
 public class PredictionsServlet extends HttpServlet {
     private Predictions predictions; // back-end bean
@@ -23,14 +24,23 @@ public class PredictionsServlet extends HttpServlet {
 	predictions.setServletContext(this.getServletContext());
     }
 
+    // GET /cliches2
+    // GET /cliches2?id=1
+    // If the HTTP Accept header is set to application/json (or an equivalent
+    // such as text/x-json), the response is JSON and XML otherwise.
     public void doGet(HttpServletRequest request, HttpServletResponse response) {
         String key = request.getParameter("id");
+
+	// Check user preference for XML or JSON by inspecting
+	// the HTTP headers for the Accept key.
+	String accept = request.getHeader("accept");
+	boolean json = accept.contains("json") ? true : false;
 	
         // If no query string, assume client wants the full list.
         if (key == null) {
 	    Map<String, Prediction> map = predictions.getMap();
 	    String xml = predictions.toXML(map.values().toArray());
-	    sendResponse(response, xml);
+	    sendResponse(response, xml, json);
 	}
 	// Otherwise, return the specified Prediction.
 	else {
@@ -38,34 +48,42 @@ public class PredictionsServlet extends HttpServlet {
 
 	    if (null == pred) { // no such Prediction
 		String msg = key + " does not map to a prediction.";
-		sendResponse(response, predictions.toXML(msg));
+		sendResponse(response, predictions.toXML(msg), false);
 	    }
 	    else {
-		sendResponse(response, predictions.toXML(pred));
+		sendResponse(response, predictions.toXML(pred), json);
 	    }
 	}
     }
 
+    // POST /cliches2
     public void doPost(HttpServletRequest request, HttpServletResponse response) {
-        String nums = request.getParameter("nums");
-        if (nums == null)
+	String who = request.getParameter("who");
+	String what = request.getParameter("what");
+
+	// Are the data to create a new prediction present?
+        if (null == who || null == what)
             throw new HTTPException(HttpServletResponse.SC_BAD_REQUEST);
 
-        // Extract the integers from a string such as: "[1, 2, 3]"
-	/*
-        nums = nums.replace('[', '\0');
-        nums = nums.replace(']', '\0');
-        String[ ] parts = nums.split(", ");
-        List&lt;Integer&gt; list = new ArrayList&lt;Integer&gt;();
-        for (String next : parts) {
-            int n = Integer.parseInt(next.trim());
-            cache.put(n, countRabbits(n));
-            list.add(cache.get(n));
-        }
-        send_typed_response(request, response, list + " added.");
-	*/
+	// Create a Prediction.
+	Prediction p = new Prediction();
+	p.setWho(who);
+	p.setWhat(what);
+
+	// Save the ID of the newly created Prediction.
+	String id = predictions.addPrediction(p);
+
+	// Generate the confirmation message.
+	String msg = "Prediction " + id + " created.";
+	sendResponse(response, msg, false);
     }
 
+    // PUT /cliches
+    public void doPut(HttpServletRequest req, HttpServletResponse res) {
+  
+    }
+
+    // DELETE /cliches2?id=1
     public void doDelete(HttpServletRequest request, HttpServletResponse response) {
         String key = request.getParameter("num");
         // Only one Fibonacci number may be deleted at a time.
@@ -83,29 +101,34 @@ public class PredictionsServlet extends HttpServlet {
         }
     }
 
-    public void doPut(HttpServletRequest req, HttpServletResponse res) {
-        throw new HTTPException(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
-    }
-
+    // Method Not Allowed
     public void doInfo(HttpServletRequest req, HttpServletResponse res) {
         throw new HTTPException(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
     }
 
+    // Method Not Allowed
     public void doHead(HttpServletRequest req, HttpServletResponse res) {
         throw new HTTPException(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
     }
 
+    // Method Not Allowed
     public void doOptions(HttpServletRequest req, HttpServletResponse res) {
         throw new HTTPException(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
     }
 
-    private void sendResponse(HttpServletResponse res, String payload) {
+    private void sendResponse(HttpServletResponse res, String payload, boolean json) {
 	try {
+	    // Convert to JSON?
+	    if (json) {
+		JSONObject jobt = XML.toJSONObject(payload);
+		payload = jobt.toString(3); // 3 is the indentation level
+	    }
+
 	    OutputStream out = res.getOutputStream();
 	    out.write(payload.getBytes());
 	    out.flush();
 	}
-	catch(IOException e) {
+	catch(Exception e) {
 	    throw new HTTPException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 	}
     }

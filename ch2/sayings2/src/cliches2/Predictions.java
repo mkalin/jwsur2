@@ -58,7 +58,7 @@ public class Predictions {
 
     public String addPrediction(Prediction p) {
 	predictions.put(String.valueOf(mapKey), p);
-	return mapKey++;
+	return String.valueOf(mapKey++);
     }
 
     //** utility

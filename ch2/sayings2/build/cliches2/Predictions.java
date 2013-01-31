@@ -56,6 +56,11 @@ public class Predictions {
 	return xml;
     }
 
+    public String addPrediction(Prediction p) {
+	predictions.put(String.valueOf(mapKey), p);
+	return String.valueOf(mapKey++);
+    }
+
     //** utility
     private void populate() {
 	String filename = "/WEB-INF/data/predictions.db";
