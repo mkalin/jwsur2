@@ -3,7 +3,7 @@ package cliches2;
 import java.io.Serializable;
 
 // An array of Predictions is to be serialized
-// into an XML document, which is returned to 
+// into an XML or JSON document, which is returned to 
 // the consumer on a request. 
 public class Prediction implements Serializable, Comparable<Prediction> {
     private String who;   // person

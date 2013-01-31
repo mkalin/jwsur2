@@ -148,6 +148,7 @@ public class PredictionsServlet extends HttpServlet {
         throw new HTTPException(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
     }
 
+    // Send the response payload to the client.
     private void sendResponse(HttpServletResponse res, String payload, boolean json) {
 	try {
 	    // Convert to JSON?
