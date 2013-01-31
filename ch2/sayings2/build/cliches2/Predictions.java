@@ -35,7 +35,7 @@ public class Predictions {
     } 
     public Map<String, Prediction> getMap() {
 	// Has the ServletContext been set?
-	if (null == getServletContext()) return null;      
+	if (getServletContext() == null) return null;      
 
 	// Have the data been read already?
 	if (predictions.size() < 1) populate(); 
