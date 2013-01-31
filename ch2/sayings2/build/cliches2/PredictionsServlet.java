@@ -44,25 +44,27 @@ public class PredictionsServlet extends HttpServlet {
 	}
 	// Otherwise, return the specified Prediction.
 	else {
-	    Prediction pred = predictions.getMap().get(key.trim());
+	    Prediction pred = predictions.getMap().get(key);
 
-	    if (null == pred) { // no such Prediction
+	    if (pred == null) { // no such Prediction
 		String msg = key + " does not map to a prediction.";
 		sendResponse(response, predictions.toXML(msg), false);
 	    }
-	    else {
+	    else { // requested Prediction found
 		sendResponse(response, predictions.toXML(pred), json);
 	    }
 	}
     }
 
     // POST /cliches2
+    // HTTP body should contain two keys, one for the predictor ("who") and
+    // another for the prediction ("what").
     public void doPost(HttpServletRequest request, HttpServletResponse response) {
 	String who = request.getParameter("who");
 	String what = request.getParameter("what");
 
 	// Are the data to create a new prediction present?
-        if (null == who || null == what)
+        if (who == null || what == null)
             throw new HTTPException(HttpServletResponse.SC_BAD_REQUEST);
 
 	// Create a Prediction.
@@ -79,22 +81,46 @@ public class PredictionsServlet extends HttpServlet {
     }
 
     // PUT /cliches
+    // HTTP body should contain at least two keys: the id (which prediction is
+    // to be edited) must be present; the predictor or the prediction or both
+    // should be present.
     public void doPut(HttpServletRequest req, HttpServletResponse res) {
-  
+	String key = req.getParameter("id");
+	if (key == null)
+	    throw new HTTPException(HttpServletResponse.SC_BAD_REQUEST);
+
+	Prediction p = predictions.getMap().get(key);
+	if (p == null) {
+	    String msg = key + " does not map to a Prediction.";
+	    sendResponse(res, msg, false);
+	}
+	else {
+	    // At least one of these must be present.
+	    String who = req.getParameter("who");
+	    String what = req.getParameter("what");
+
+	    if (who == null && what == null) {
+		throw new HTTPException(HttpServletResponse.SC_BAD_REQUEST);
+	    }
+	    // Do the editing.
+	    else {
+		if (who != null) p.setWho(who);
+		if (what != null) p.setWhat(what);
+		
+		String msg = "Prediction " + key + " has been edited.";
+		sendResponse(res, msg, false);
+	    }
+	}
     }
 
     // DELETE /cliches2?id=1
-    public void doDelete(HttpServletRequest request, HttpServletResponse response) {
-        String key = request.getParameter("num");
-        // Only one Fibonacci number may be deleted at a time.
+    public void doDelete(HttpServletRequest req, HttpServletResponse res) {
+        String key = req.getParameter("id");
+        // Only one Prediction can be deleted at a time.
         if (key == null)
             throw new HTTPException(HttpServletResponse.SC_BAD_REQUEST);
         try {
-            int n = Integer.parseInt(key.trim());
-	    /*
-            cache.remove(n);
-            send_typed_response(request, response, n + " deleted.");
-	    */
+
         }
         catch(NumberFormatException e) {
             throw new HTTPException(HttpServletResponse.SC_BAD_REQUEST);
@@ -121,7 +147,7 @@ public class PredictionsServlet extends HttpServlet {
 	    // Convert to JSON?
 	    if (json) {
 		JSONObject jobt = XML.toJSONObject(payload);
-		payload = jobt.toString(3); // 3 is the indentation level
+		payload = jobt.toString(3); // 3 is indentation level for nice look
 	    }
 
 	    OutputStream out = res.getOutputStream();

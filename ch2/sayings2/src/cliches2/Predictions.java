@@ -79,6 +79,7 @@ public class Predictions {
 		    Prediction p = new Prediction();
 		    p.setWho(parts[0]);
 		    p.setWhat(parts[1]);
+		    p.setId(String.valueOf(mapKey));
 
 		    predictions.put(String.valueOf(mapKey++), p);
 		}

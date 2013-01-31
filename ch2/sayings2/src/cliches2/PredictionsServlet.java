@@ -46,7 +46,7 @@ public class PredictionsServlet extends HttpServlet {
 	else {
 	    Prediction pred = predictions.getMap().get(key);
 
-	    if (null == pred) { // no such Prediction
+	    if (pred == null) { // no such Prediction
 		String msg = key + " does not map to a prediction.";
 		sendResponse(response, predictions.toXML(msg), false);
 	    }
@@ -64,7 +64,7 @@ public class PredictionsServlet extends HttpServlet {
 	String what = request.getParameter("what");
 
 	// Are the data to create a new prediction present?
-        if (null == who || null == what)
+        if (who == null || what == null)
             throw new HTTPException(HttpServletResponse.SC_BAD_REQUEST);
 
 	// Create a Prediction.
@@ -85,34 +85,42 @@ public class PredictionsServlet extends HttpServlet {
     // to be edited) must be present; the predictor or the prediction or both
     // should be present.
     public void doPut(HttpServletRequest req, HttpServletResponse res) {
-	String key = request.getParameter("id");
-	if (null == key)
-	    throw new HTTPException(HttpServletResponse.SC_BD_REQUEST);
+	String key = req.getParameter("id");
+	if (key == null)
+	    throw new HTTPException(HttpServletResponse.SC_BAD_REQUEST);
 
-	Prediction p = predictons.getMap().get(key);
-	if (null == p) {
+	Prediction p = predictions.getMap().get(key);
+	if (p == null) {
 	    String msg = key + " does not map to a Prediction.";
-	    sendResponse(response, msg, false);
+	    sendResponse(res, msg, false);
 	}
 	else {
 	    // At least one of these must be present.
-	    String who = request.getParameter("who");
-	    String what = request.getParameter("what");
+	    String who = req.getParameter("who");
+	    String what = req.getParameter("what");
+
+	    if (who == null && what == null) {
+		throw new HTTPException(HttpServletResponse.SC_BAD_REQUEST);
+	    }
+	    // Do the editing.
+	    else {
+		if (who != null) p.setWho(who);
+		if (what != null) p.setWhat(what);
+		
+		String msg = "Prediction " + key + " has been edited.";
+		sendResponse(res, msg, false);
+	    }
 	}
     }
 
     // DELETE /cliches2?id=1
-    public void doDelete(HttpServletRequest request, HttpServletResponse response) {
-        String key = request.getParameter("id");
+    public void doDelete(HttpServletRequest req, HttpServletResponse res) {
+        String key = req.getParameter("id");
         // Only one Prediction can be deleted at a time.
-        if (null == key)
+        if (key == null)
             throw new HTTPException(HttpServletResponse.SC_BAD_REQUEST);
         try {
-            int n = Integer.parseInt(key.trim());
-	    /*
-            cache.remove(n);
-            send_typed_response(request, response, n + " deleted.");
-	    */
+
         }
         catch(NumberFormatException e) {
             throw new HTTPException(HttpServletResponse.SC_BAD_REQUEST);
