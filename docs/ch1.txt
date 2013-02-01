@@ -271,8 +271,10 @@ the client is, by assumption, a Java application. The challenge involves the
 additional programmer-defined types such as Department and 
 BusinessCertification that are needed
 to support the client-side invocation of a remotely executed method. The
-set-up on the client side to enable a call such as
+set-up on the client side to enable a remote call such as
 
+   Emp fred = new Emp();
+   // set properties...
    List<EmpBenefit> fredBenefits = remote_object.getBenefits(fred);  
 
 is significant, with lots of bytes required to move from the server down to
