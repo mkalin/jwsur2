@@ -247,19 +247,17 @@ public interface BenefitsService extends java.rmi.Remote {
    public List<EmpBenefits> getBenefits(Emp emp) throws RemoteException;
 }
 
-A client against this service needs a Java RMI stub, an instance
+The interface appears deceptively simple in that declares only one 
+method, getBenefits; yet the interface likewise hints at what makes
+a distributed-object architecture so tricky. 
+A client against this BenefitsService uses a Java RMI stub, an instance
 of a class that implements the BenefitsService
-interface. The stub is an object, that is, an instance of the
-implementing class; hence, the implementing class as well must be
-downloaded to the client. The problem is not so much the actual
-downloading, as this is handled automatically through a network
-connection, a socket, that connects the client machine and the 
-service machine. Instead, the problem is that so that bytes need to
-be downloaded in order to distribute an object--the stub--to the client
-machine. The reason for the complication is that an interface type such as 
-BenefitsService declares methods whose arguments and return types also may be 
-programmer-defined types such as Emp, Department, BusinessCertification, and 
-ClientAccount:
+interface, to invoke the getBenefits method. Invoking the method
+requires that the byte codes for various Java classes, standard and
+programmer-defined, be on the client machine. To begin, the client
+needs the classes Emp, the argument type for getBenefits, and
+EmpBenefits, the member type for the List that getBenfits returns.
+Now suppose that the class Emp looks something like this:
 
 public class Emp {
    private Department                   department;
@@ -270,18 +268,15 @@ public class Emp {
 
 The standard Java types such as List already are available on the client side as 
 the client is, by assumption, a Java application. The challenge involves the 
-programmer-defined types such as Emp and EmpBenefits that are needed
-to support the client-side invocation of a remotely executed method, as
-this code segment illustrates:
+additional programmer-defined types such as Department and 
+BusinessCertification that are needed
+to support the client-side invocation of a remotely executed method. The
+set-up on the client side to enable a call such as
 
    List<EmpBenefit> fredBenefits = remote_object.getBenefits(fred);  
 
-Java RMI, like DotNet Remoting, requires lots of bytes to move from
-the server to the client in order to support the remote method invocation.
-The setup is inherently complicated and, therefore, prone to error. Finally,
-the client and the server communicate through binary rather than text streams;
-and the structure of the byte streams is proprietary. All of this further
-complicates troubleshooting.
+is significant, with lots of bytes required to move from the server down to
+the client. Anything this complicated is, of course, prone to error.
 
 Web services, as a foundational code base in an SOA system, simplify matters. 
 For one thing, the client and service typically exchange XML or equivalent documents,
