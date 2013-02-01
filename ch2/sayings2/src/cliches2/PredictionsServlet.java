@@ -10,6 +10,8 @@ import java.util.Arrays;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.beans.XMLEncoder;
 import org.json.JSONObject;
 import org.json.XML;
@@ -89,9 +91,42 @@ public class PredictionsServlet extends HttpServlet {
     // PUT /cliches
     // HTTP body should contain at least two keys: the id (which prediction is
     // to be edited) must be present; the predictor or the prediction or both
-    // should be present.
+    // should be present. See documentation below, however.
     public void doPut(HttpServletRequest req, HttpServletResponse res) {
-	String key = req.getParameter("id");
+	/* A workaround is necessary for a PUT request to Tomcat, which does 
+	   not parse the request stream to generate the parameter map. A
+	   hack is thus required. */
+	String key = null;
+	String rest = null;
+	boolean who = false;
+
+	/* Let the hack begin. */
+	try {
+	    BufferedReader br = 
+		new BufferedReader(new InputStreamReader(req.getInputStream()));
+	    String data = br.readLine();
+
+	    System.err.println("########### " + data);
+
+	    /* To simplify the hack, assume that the PUT request has exactly
+	       two parameters: the id and either who or what. Assume, further,
+	       that the id comes first.
+	     */
+	    String[] args = data.split("&");      // id in args[0], rest in args[1]
+	    String[] parts1 = args[0].split("="); // id = parts1[1]
+	    key = parts1[1];
+	    /*
+	    String[] parts2 = args[1].split("="); // parts2[0] is key
+	    if (parts2[0].contains("who")) who = true;
+	    rest = parts2[1];
+	    */
+	    rest = "Whatever";
+	}
+	catch(Exception e) { 
+	    throw new HTTPException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+	}
+
+	// String key = req.getParameter("id");
 	if (key == null)
 	    throw new HTTPException(HttpServletResponse.SC_BAD_REQUEST);
 
@@ -101,19 +136,15 @@ public class PredictionsServlet extends HttpServlet {
 	    sendResponse(res, msg, false);
 	}
 	else {
-	    // At least one of these must be present.
-	    String who = req.getParameter("who");
-	    String what = req.getParameter("what");
-
-	    if (who == null && what == null) {
+	    if (rest == null) {
 		throw new HTTPException(HttpServletResponse.SC_BAD_REQUEST);
 	    }
 	    // Do the editing.
 	    else {
-		if (who != null) p.setWho(who);
-		if (what != null) p.setWhat(what);
-		
-		String msg = "Prediction " + key + " has been edited.";
+		if (who) p.setWho(rest);
+		else p.setWhat(rest);
+
+		String msg = "Prediction " + key + " has been edited.\n";
 		sendResponse(res, msg, false);
 	    }
 	}
