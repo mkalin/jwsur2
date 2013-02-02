@@ -274,15 +274,14 @@ to support the client-side invocation of a remotely executed method. The
 set-up on the client side to enable a remote call such as
 
    Emp fred = new Emp();
-   // set properties...
+   // set other properties...
    List<EmpBenefit> fredBenefits = remote_object.getBenefits(fred);  
 
 is significant, with lots of bytes required to move from the server down to
 the client. Anything this complicated is, of course, prone to error.
 
-Web services, as a foundational code base in an SOA system, simplify matters. 
-For one thing, the client and service typically exchange XML or equivalent documents,
-that is, text. If needed, non-text bytes can be exchanged
+Web services simplify matters. For one thing, the client and service typically 
+exchange XML or equivalent documents, that is, text. If needed, non-text bytes can be exchanged
 instead but the preferred payloads are text. The exchanged text can be inspected, validated, 
 transformed, persisted, and otherwise processed using readily available,
 non-proprietary, and often free tools. Each side, client and service,
