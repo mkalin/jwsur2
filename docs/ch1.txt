@@ -596,7 +596,7 @@ The start line
 
    HTTP/1.1 200 OK
 
-begins with the HTTP version in use. Next comes the HTTP status code (SC for short) as
+begins with the HTTP version in use on the server. Next comes the HTTP status code (SC for short) as
 a number, 200, and in English, OK. Status codes in the 200-range signal success. Five
 header elements follow, including the name of the web server that sends the
 response and the content type of the response. Note that the response type is given
