@@ -5,20 +5,19 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
-import java.util.Map;
-import java.util.HashMap;
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.Collections;
 import java.beans.XMLEncoder; // simple and effective
 import javax.servlet.ServletContext;
 
 public class Predictions {
-    private Map<String, Prediction> predictions;
+    private ConcurrentMap<String, Prediction> predictions;
     private ServletContext sctx;
     private static int mapKey = 1;
 
     public Predictions() { 
-	predictions = 
-	    Collections.synchronizedMap(new HashMap<String, Prediction>());
+	predictions = new ConcurrentHashMap<String, Prediction>();
     }
 
     //** properties
@@ -30,10 +29,10 @@ public class Predictions {
     }
     public ServletContext getServletContext() { return this.sctx; }
 
-    public void setMap(Map<String, Prediction> predictions) { 
+    public void setMap(ConcurrentMap<String, Prediction> predictions) { 
 	// no-op for now
     } 
-    public Map<String, Prediction> getMap() {
+    public ConcurrentMap<String, Prediction> getMap() {
 	// Has the ServletContext been set?
 	if (getServletContext() == null) return null;      
 

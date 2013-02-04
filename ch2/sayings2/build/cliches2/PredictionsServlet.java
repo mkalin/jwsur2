@@ -1,6 +1,6 @@
 package cliches2;
 
-import java.util.Map;
+import java.util.concurrent.ConcurrentMap;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -41,7 +41,7 @@ public class PredictionsServlet extends HttpServlet {
 	
         // If no query string, assume client wants the full list.
         if (key == null) {
-	    Map<String, Prediction> map = predictions.getMap();
+	    ConcurrentMap<String, Prediction> map = predictions.getMap();
 
 	    // Sort the map's values for readability.
 	    Object[] list = map.values().toArray();
