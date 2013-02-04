@@ -110,17 +110,18 @@ public class PredictionsServlet extends HttpServlet {
 
 	    /* To simplify the hack, assume that the PUT request has exactly
 	       two parameters: the id and either who or what. Assume, further,
-	       that the id comes first.
+	       that the id comes first. From the client side, a hash character
+	       # separates the id and the who/what, e.g.,
+
+	          id=33#who=Homer Allision
 	     */
-	    String[] args = data.split("&");      // id in args[0], rest in args[1]
+	    String[] args = data.split("#");      // id in args[0], rest in args[1]
 	    String[] parts1 = args[0].split("="); // id = parts1[1]
 	    key = parts1[1];
-	    /*
-	    String[] parts2 = args[1].split("="); // parts2[0] is key
+
+	    String[] parts2 = args[1].split("="); // parts2[0] is key 
 	    if (parts2[0].contains("who")) who = true;
 	    rest = parts2[1];
-	    */
-	    rest = "Whatever";
 	}
 	catch(Exception e) { 
 	    throw new HTTPException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
@@ -132,7 +133,7 @@ public class PredictionsServlet extends HttpServlet {
 
 	Prediction p = predictions.getMap().get(key);
 	if (p == null) {
-	    String msg = key + " does not map to a Prediction.";
+	    String msg = key + " does not map to a Prediction.\n";
 	    sendResponse(res, msg, false);
 	}
 	else {
