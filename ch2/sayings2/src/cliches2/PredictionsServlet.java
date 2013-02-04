@@ -55,7 +55,7 @@ public class PredictionsServlet extends HttpServlet {
 	    Prediction pred = predictions.getMap().get(key);
 
 	    if (pred == null) { // no such Prediction
-		String msg = key + " does not map to a prediction.";
+		String msg = key + " does not map to a prediction.\n";
 		sendResponse(response, predictions.toXML(msg), false);
 	    }
 	    else { // requested Prediction found
