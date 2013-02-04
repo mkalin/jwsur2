@@ -127,7 +127,6 @@ public class PredictionsServlet extends HttpServlet {
 	    throw new HTTPException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 	}
 
-	// String key = req.getParameter("id");
 	if (key == null)
 	    throw new HTTPException(HttpServletResponse.SC_BAD_REQUEST);
 
