@@ -83,7 +83,7 @@ interoperability among services.
 * Platform and language transparency
 +
 Web services and their clients can interoperate even if
-written in different programming languages. Languages such as C/C++,
+written in different programming languages. Languages such as C,
 C#, Gom Java, JavaScript, Perl, Python, Ruby, and others provide libraries,
 utilities, and even frameworks in support of web services. Web services
 can be published and consumed on various hardware platforms and under
@@ -182,7 +182,7 @@ DCE/RPC has the familiar client/server architecture in which a
 client invokes a procedure that executes on the server. Arguments can be
 passed from the client to the server and return values can be passed from
 the server to the client. The framework is platform and language neutral in principle,
-although strongly biased towards C/C++ in practice. DCE/RPC includes
+although strongly biased towards C in practice. DCE/RPC includes
 utilities for generating client and server artifacts (stubs and skeletons,
 respectively) and software libraries that hide the transport details. Of
 interest now is the IDL (Interface Definition Language) document that acts as the 
@@ -341,10 +341,7 @@ distributed hypermedia system of interest. In the Web, HTTP is both a
 transport protocol and a messaging system because HTTP requests and
 responses are messages. The payloads of HTTP messages can be typed using
 the MIME (*M*ultipurpose *I*nternet *M*ail *E*xtension) type system. MIME has 
-familiar types as +text/html+ or +application/octet-stream+ together with
-highly specicialed types such as 
-+application/vnd.openxmlformats-officedocument.spreadsheetml.sheet+, the
-type of a Microsoft Excel document.
+types as +text/html+, +application/octet-stream+, and +audio/mpeg3+.
 HTTP also provides response status codes to inform
 the requester about whether a request succeeded and, if not, why.
 
@@ -506,14 +503,17 @@ The next section has a REST-style service whose URL is
 ----
 http://localhost:8080/preds/sayings.jsp
 ----
+
 If this URL were typed into a brower's window, the browser 
 would generate an HTTP request similar to
+
 ----
 GET /preds/sayings.jsp HTTP/1.1
 User-Agent: Mozilla/5.0 (X11; Linux x86_64) Chrome/24.0.1312.56
 Host: localhost:8080
 Accept: text/html
 ----
+
 The browers parses the entered URL into these parts, with clarifications
 below:
 
@@ -783,6 +783,7 @@ the Java runtime on the host system. To that end, Tomcat requires that the
 environment variable _JAVA_HOME_ be set to the Java install directory (e.g., to
 _/usr/local/java7_, _D:\java7_, and the like). In summary, the key commands (with comments
 introduced with two semicolons) are (with +%+ as the command-line prompt):
+
 ----
 % startup.sh   ;; or startup.bat on Windows to start Tomcat
 % shutdown.sh  ;; or shutdown.bat on Windows to stop Tomcat
@@ -901,6 +902,7 @@ WEB-INF/lib/json.jar
 acme/org/Products.java
 products.jsp
 ----
+
 Any _.xml_ file winds up in _WEB-INF_; any _.jar_ file winds up
 in _WEB-INF/lib_; and any _.db_ file winds up in _WEB-INF/data_. JSP files 
 such as _products.jsp_ are at the WAR file's top level.
@@ -911,21 +913,27 @@ such as _products.jsp_ are at the WAR file's top level.
 
 The Ant script _build.xml_ begins with extensive documentation, some of which
 is repeated here. The second executable line in the script 
+
 ----
 <property name="tomcat.home" value="/home/mkalin/tomcat7"/>
 ----
+
 defines the property named +tomcat.home+, whose value is the install directory
 for Tomcat. This value must be edited for your system. For example, on my
 MacBook labtop, this line has been changed to
+
 ----
 <property name="tomcat.home" value="/Users/kalin/tomcat7"/>
 ----
 
 The command
+
 ----
 % ant
 ----
+
 produces the output
+
 ----
    usage:
         [echo] 
@@ -935,12 +943,14 @@ produces the output
         [echo] ant deploy -Dwar.name=test1 --> to deploy test1.war
         [echo] 
 ----
+
 In the last command, the _-D_ flag sets an Ant property at the command line,
 in this case the property war.name that names the WAR file. Note that
 the _.war_ extension is not included in the name; the Ant script adds the
 extension.
 
 The Ant script can be edited, of course, to meet special needs. 
+****
 
 On a successful request, the JSP script invokes the back-end bean method
 +setServletContext+ (the implicit object reference is +application+) because
@@ -1124,7 +1134,7 @@ Server: Apache-Coyote/1.1
 Set-Cookie: JSESSIONID=96C78773C190884EDE76C714728164EC; Path=/test1/;
 Content-Type: text/html;charset=ISO-8859-1
 Transfer-Encoding: chunked
----
+----
 
 Recall that an HTTP GET message has no body; hence, the entire message is the
 start line and the headers. The response shows the session identifier (a 128-bit
@@ -1147,7 +1157,7 @@ Host: localhost:8080
 Accept: */*
 Content-Length: 7
 Content-Type: application/x-www-form-urlencoded
----
+----
 
 and the response header is
 
@@ -1179,16 +1189,16 @@ scripts, encouraging their use for RESTful web services in Java.
 In summary, the predictions example highlights key aspects of a RESTful 
 service:
 
-* The service provides access to resource under a standard name, the URI /preds/sayings.jsp or, in abbreviation, /preds/.
+The service provides access to resource under a standard name, the URI +/preds/sayings.jsp+ or, in abbreviation, +/preds/+.
 
-* The service provides or denies access depending on the HTTP request
-+
-     verb. In this example, only GET requests are successful; any other
-     type of request generates a "bad method" error.
+The service provides or denies access depending on the HTTP request
 
-* The service responds with an XML payload, which the consumer now
-     must process in some appropriate way. This first example merely
-     displays the XML without any processing.
+verb. In this example, only GET requests are successful; any other
+type of request generates a "bad method" error.
+
+The service responds with an XML payload, which the consumer now
+must process in some appropriate way. This first example merely
+displays the XML without any processing.
 
 ==== Why Servlets and JSP Scripts for RESTful Web Services?
 
@@ -1205,7 +1215,7 @@ an +HttpServlet+ provides methods such as +doGet+, +doPost+, +doPut+, and
 servlet methods execute as callbacks that the servlet container, explained shortly, invokes 
 as needed. The +HttpServlet+ class also provides symbolic constants for HTTP status codes, for 
 example, +SC_NOT_FOUND+ for status code 404 and +SC_METHOD_NOT_ALLOWED+ for status
-code 405. Each of the +HttpServlet+ _do_ methods take the same two arguments:
+code 405. Each of the +HttpServlet+ _do_-methods take the same two arguments:
 an +HttpServletRequest+ and an +HttpServletResponse+. The servlet request contains, as
 key/value pairs, all of the appropriate information encapsulated in the HTTP request.
 The +HttpServletRequest+ map is easy to read and, if needed, to update and forward.
