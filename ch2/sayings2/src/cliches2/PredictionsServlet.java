@@ -85,7 +85,7 @@ public class PredictionsServlet extends HttpServlet {
 
 	// Generate the confirmation message.
 	String msg = "Prediction " + id + " created.\n";
-	sendResponse(response, msg, false);
+	sendResponse(response, predictions.toXML(msg), false);
     }
 
     // PUT /cliches
@@ -105,8 +105,6 @@ public class PredictionsServlet extends HttpServlet {
 	    BufferedReader br = 
 		new BufferedReader(new InputStreamReader(req.getInputStream()));
 	    String data = br.readLine();
-
-	    System.err.println("########### " + data);
 
 	    /* To simplify the hack, assume that the PUT request has exactly
 	       two parameters: the id and either who or what. Assume, further,
@@ -133,7 +131,7 @@ public class PredictionsServlet extends HttpServlet {
 	Prediction p = predictions.getMap().get(key);
 	if (p == null) {
 	    String msg = key + " does not map to a Prediction.\n";
-	    sendResponse(res, msg, false);
+	    sendResponse(res, predictions.toXML(msg), false);
 	}
 	else {
 	    if (rest == null) {
@@ -145,7 +143,7 @@ public class PredictionsServlet extends HttpServlet {
 		else p.setWhat(rest);
 
 		String msg = "Prediction " + key + " has been edited.\n";
-		sendResponse(res, msg, false);
+		sendResponse(res, predictions.toXML(msg), false);
 	    }
 	}
     }
@@ -158,6 +156,8 @@ public class PredictionsServlet extends HttpServlet {
             throw new HTTPException(HttpServletResponse.SC_BAD_REQUEST);
         try {
 	    predictions.getMap().remove(key);
+	    String msg = "Prediction " + key + " removed.\n";
+	    sendResponse(res, predictions.toXML(msg), false);
         }
         catch(Exception e) {
             throw new HTTPException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
