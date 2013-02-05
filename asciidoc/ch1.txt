@@ -503,21 +503,17 @@ proper name that denotes exactly one resource.
 ==== Review of HTTP Requests and Responses
 
 The next section has a REST-style service whose URL is
-
 ----
 http://localhost:8080/preds/sayings.jsp
 ----
-
 If this URL were typed into a brower's window, the browser 
 would generate an HTTP request similar to
-
 ----
 GET /preds/sayings.jsp HTTP/1.1
 User-Agent: Mozilla/5.0 (X11; Linux x86_64) Chrome/24.0.1312.56
 Host: localhost:8080
 Accept: text/html
 ----
-
 The browers parses the entered URL into these parts, with clarifications
 below:
 
@@ -913,7 +909,7 @@ such as _products.jsp_ are at the WAR file's top level.
 
 * Leaves a copy of the WAR file in the cwd, in this case the directory service1.
 
-The Ant script build.xml begins with extensive documentation, some of which
+The Ant script _build.xml_ begins with extensive documentation, some of which
 is repeated here. The second executable line in the script 
 ----
 <property name="tomcat.home" value="/home/mkalin/tomcat7"/>
@@ -929,7 +925,6 @@ The command
 ----
 % ant
 ----
-
 produces the output
 ----
    usage:
@@ -946,17 +941,16 @@ the _.war_ extension is not included in the name; the Ant script adds the
 extension.
 
 The Ant script can be edited, of course, to meet special needs. 
-****
 
 On a successful request, the JSP script invokes the back-end bean method
-setServletContext (the implicit object reference is application) because
++setServletContext+ (the implicit object reference is +application+) because
 the back-end bean needs access to the servlet context in order to read data from a
-text file embedded in the deployed WAR file. The call to setServletContext sets up
-the subsequent call to getPredictions, which returns the XML representation shown in
+text file embedded in the deployed WAR file. The call to +setServletContext+ sets up
+the subsequent call to +getPredictions+, which returns the XML representation shown in
 Figure 1.1.
 
-Figure 1.3 is the class for the back-end bean cliches.Prediction and Figure 1.4 is 
-the associated class cliches.Predictions.
+Figure 1.3 is the class for the back-end bean +cliches.Prediction+ and Figure 1.4 is 
+the associated class +cliches.Predictions+.
 
 .Figure 1.3: the back-end +Prediction+ JavaBean
 ----
@@ -1075,19 +1069,19 @@ public class Predictions {
 }
 ----
 
-The XML from the service is generated using the standard Java XMLEncoder class.
+The XML from the service is generated using the standard Java +XMLEncoder+ class.
 Java provides other ways to generate XML but none quite as simple as 
-XMLEncoder. In this example, an array of Prediction objects is encoded in XML, 
-which requires that each Prediction be Serializable; hence, the Prediction
-class implements the empty Serializable interface and defines the
-get/set methods that define the properties who (the predictor) and what (the
-prediction). The Predictions class contains properties so that the JSP script
++XMLEncoder+. In this example, an array of +Prediction+ objects is encoded in XML, 
+which requires that each +Prediction+ be +Serializable+; hence, the +Prediction+
+class implements the empty +Serializable+ interface and defines the
+get/set methods that define the properties +who+ (the predictor) and +what+ (the
+prediction). The +Predictions+ class contains properties so that the JSP script
 can set the servlet context and subsequently read the predictions from the
 data file. (The predictions need to be read only once from the file into the
-array; thereafter, the data in the array are used.) The Predictions class also 
-has two utility methods to support the properties: the populate method
-reads the data from a text file embedded in the WAR and the toXML method 
-serializes the array of in-memory Prediction objects into XML format. For now,
+array; thereafter, the data in the array are used.) The +Predictions+ class also 
+has two utility methods to support the properties: the +populate+ method
+reads the data from a text file embedded in the WAR and the +toXML+ method 
+serializes the array of in-memory +Prediction+ objects into XML format. For now,
 the XML representation is generated on each request; a more efficient
 implementation is explained later.
 
@@ -1141,7 +1135,7 @@ for now, the goal is brevity and simplicity.
 If a POST request were sent to the RESTful predictions service
 
 ----
-% curl --request POST --data "foo=bar" -v http://localhost:8080/sayings/
+% curl --request POST --data "foo=bar" http://localhost:8080/sayings/
 ----
 
 the request message header becomes
@@ -1199,18 +1193,18 @@ service:
 ==== Why Servlets and JSP Scripts for RESTful Web Services?
 
 Chapter 2 explores various ways in which to code and publish RESTful services. This
-section introduces my preferred way to do both: code the service as a servlet and
-publish it with a Java-based web server such as Apache Tomcat (see Note 1 about
+section introduces my preferred way to do both: the service is implemented as a servlet and
+published with a lightweight, Java-based web server such as Apache Tomcat (see Note 1 about
 installing and running Tomcat and Note 2 about an Ant script to deploy web
 services and sites under Tomcat).
 
 +HttpServlet+s are a natural, convenient way to implement RESTful web services for two 
 main reasons. First, such servlets are close to the HTTP metal. For example,
-an HttpServlet provides methods such as doGet, doPost, doPut, and
-doDelete that match up with the HTTP verbs aligned with the CRUD operations. These
+an +HttpServlet+ provides methods such as +doGet+, +doPost+, +doPut+, and
++doDelete+ that match up with the HTTP verbs aligned with the CRUD operations. These
 servlet methods execute as callbacks that the servlet container, explained shortly, invokes 
-as needed. The HttpServlet class also provides symbolic constants for HTTP status codes, for 
-example, SC_NOT_FOUND for status code 404 and SC_METHOD_NOT_ALLOWED for status
+as needed. The +HttpServlet+ class also provides symbolic constants for HTTP status codes, for 
+example, +SC_NOT_FOUND+ for status code 404 and +SC_METHOD_NOT_ALLOWED+ for status
 code 405. Each of the +HttpServlet+ _do_ methods take the same two arguments:
 an +HttpServletRequest+ and an +HttpServletResponse+. The servlet request contains, as
 key/value pairs, all of the appropriate information encapsulated in the HTTP request.
@@ -1233,37 +1227,37 @@ such as Tomcat is the natural way to publish real-world web services, including
 RESTful ones. Figure x.x depicts a servlet container with several instances of
 executing servlets, each awaiting client requests.
 
-Here is a short, fuller review of servlets with emphasis on their use to
-deliver RESTful services. The class HttpServlet extends
-the class GenericServlet , which in turn implements the
-Servlet  interface. All three are in the package
-javax.servlet , which is not included in core Java. The
-Servlet  interface declares five methods, the most
-important of which is the  service  method that a Web
+Here is a short, more technical review of servlets with emphasis on their use to
+deliver RESTful services. The class +HttpServlet+ extends
+the class +GenericServlet+, which in turn implements the
++Servlet+ interface. All three are in the package
++javax.servlet+, which is not included in core Java. The
++Servlet+ interface declares five methods, the most
+important of which is the  service  method that a web
 container invokes on every request to a servlet. The
-service  method has a  ServletRequest and a  ServletResponse  parameter. The request 
+service  method has a  +ServletRequest+ and a  +ServletResponse+  parameter. The request 
 is a map that contains the request information from a client and the response
 provides a network connection back to the client. The
-GenericServlet class implements the Service  methods in a transport-neutral fashion, whereas
-its  HttpServlet  subclass implements these methods in an
++GenericServlet+ class implements the +Service+  methods in a transport-neutral fashion, whereas
+its  +HttpServlet+  subclass implements these methods in an
 HTTP-specific way. Accordingly, the service parameters in the
-HttpServlet  have the types HttpServletRequest  and
-HttpServletResponse. The HttpServlet also provides request filtering that naturally
++HttpServlet+  have the types +HttpServletRequest+  and
++HttpServletResponse+. The +HttpServlet+ also provides request filtering that naturally
 supports a REST-style service: the service method dispatches a incoming
-GET request to the method  doGet , an incoming POST
-request to the method  doPost, and so on.
+GET request to the method +doGet+ , an incoming POST
+request to the method +doPost+, and so on.
 
-In the  +HttpServlet+  class, the do methods are no-ops (that is, methods with empty
+In the  +HttpServlet+  class, the _do_ methods are no-ops (that is, methods with empty
 bodies) that can be overridden as needed in a programmer-derived subclass.
 For example, if the class  +MyServlet+  extends +HttpServlet+  and overrides  +doGet+  but
 not +doPost+ , then  +doPost+ remains a no-op in +MyServlet+  instances.
 
 JSP scripts are an arbitrary mix of HTML and code. In the case of web services, of course,
 these scripts would consist predominantly and, for the most part, exclusively of code. The
-advantage of a JSP script over an HttpServlet is that the programmer does not need to 
+advantage of a JSP script over an +HttpServlet+ is that the programmer does not need to 
 compile a JSP script. The web container assumes this responsibility. A JSP script is deployed
 as a text file but executes as a servlet because the web container automatically 
-translates the script into an HttpServlet before loading one or more instances of the
+translates the script into an +HttpServlet+ before loading one or more instances of the
 resulting servlet into the container. For short examples and for the kind of experimentation
 typical of code development, JSP scripts are attractive. For deployment to production, the
 straight Java code of a servlet would be best practice. My examples use a mix of JSP scripts
@@ -1271,7 +1265,8 @@ and servlets.
 
 === What is Next?
 
-Chapter 2 focuses on the service side by exploring options for implementing
+RESTful services are rich enough to warrant two chapters are the basics. Accordordingly, the
+next chapter focuses on the service side by exploring options for implementing
 and publishing RESTful services. The options include 
 
 * explicit servlets and JSP scripts published with a web server such as Tomcat
@@ -1280,7 +1275,8 @@ and publishing RESTful services. The options include
 
 * JAX-RS annotated resources published with a web server such as Tomcat
 
-Chapter 3 focuses on the client or consumer side. This chapter includes client code against commercial RESTful services from
-Amazon, Twitter, and Tumblr.
+Chapter 3 then changes the focus to the client or consumer side. The chapter includes client code against commercial RESTful services from
+Amazon, Twitter, and Tumblr together with a discussion about how the JAX-B (*Java* *A*PI for *X*ML-*B*inding) packages can be put to
+good use by the hiding the XML in the consumption of RESTful services.
 
 
