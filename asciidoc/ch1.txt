@@ -409,19 +409,19 @@ operations so familiar throughout computing:
 
 .HTTP Methods (Verbs) and CRUD Operations
 [options="header"]
-|======
+|==========
 |HTTP Verb|Meaning in CRUD
 |POST     |Create
 |GET      |Read
 |PUT      |Update
 |DELETE   |Delete
-|======
+|==========
 
- Although HTTP is not case sensitive, the HTTP verbs are
- traditionally written in uppercase. There are additional verbs. For
- example, the verb HEAD is a variation on GET that requests only the HTTP
- headers that would be sent to fulfill a GET request. There are also TRACE
- and INFO verbs.
+Although HTTP is not case sensitive, the HTTP verbs are
+traditionally written in uppercase. There are additional verbs. For
+example, the verb HEAD is a variation on GET that requests only the HTTP
+headers that would be sent to fulfill a GET request. There are also TRACE
+and INFO verbs.
 
 Figure (restful.png) is a whimsical depiction of a
 resource with its identifying URI together with a RESTful client and some
@@ -443,24 +443,24 @@ was handled successfully. In short, HTTP provides request verbs and MIME
 types for client requests and status codes (and MIME types) for service
 responses.
 
- Modern browsers generate only GET and POST requests. Moreover, many
- applications unfortunately treat these two types of requests interchangeably. For
- example, Java +HttpServlet+s have callback methods such
- as +doGet+ and +doPost+ that handle GET
- and POST requests, respectively. Each callback has the same parameter
- types, +HttpServletRequest+ (the key/value pairs from the
- requester) and +HttpServletResponse+ (a typed response to
- the requester). It is not unknown to have the two callbacks execute the same
- code (for instance, by having one invoke the other), thereby conflating
- the original HTTP distinction between read and
- create. A key guiding principle of the RESTful style
- is to respect the original meanings of the HTTP verbs. In particular, any
- GET request should be side-effect free (or, in jargon,
- idempotent) because a GET is a
- read rather than a create,
- update, or delete operation. A
- GET as a read with no side effects is called a
- safe GET. 
+Modern browsers generate only GET and POST requests. Moreover, many
+applications unfortunately treat these two types of requests interchangeably. For
+example, Java +HttpServlet+s have callback methods such
+as +doGet+ and +doPost+ that handle GET
+and POST requests, respectively. Each callback has the same parameter
+types, +HttpServletRequest+ (the key/value pairs from the
+requester) and +HttpServletResponse+ (a typed response to
+the requester). It is not unknown to have the two callbacks execute the same
+code (for instance, by having one invoke the other), thereby conflating
+the original HTTP distinction between read and
+create. A key guiding principle of the RESTful style
+is to respect the original meanings of the HTTP verbs. In particular, any
+GET request should be side-effect free (or, in jargon,
+idempotent) because a GET is a
+read rather than a create,
+update, or delete operation. A
+GET as a read with no side effects is called a
+safe GET. 
 
 The REST approach does not imply that either resources or the
 processing needed to generate adequate representations of them are simple.
