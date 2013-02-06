@@ -826,7 +826,8 @@ the farewell message would appear in the _catalina.out_ log file.
 
 Apache Tomcat is not the only game in town. There is the related TomEE web server, 
 basically Tomcat with support for Java EE beyond servlets. Another popular Java-centric 
-web server is Jetty (_http://jetty.codehaus.org/jetty/_).
+web server is Jetty (_http://jetty.codehaus.org_). My first example uses 
+Tomcat but later examples use Jetty as well.
 ****
 
 .An Ant script to automate Tomcat deployment
@@ -1199,7 +1200,7 @@ In summary, the _predictions_ service highlights key aspects of a REST:
 
 Chapter 2 explores various ways in which to implement and publish RESTful services. In the Java world,
 there are almost always options.
-This section introduces my preferred way to do RESTful services: the service is implemented as a servlet and
+This section introduces an excellent way to do RESTful services: the service is implemented as a servlet and
 published with a lightweight, Java-based web server such as Apache Tomcat (see Note 1 about
 installing and running Tomcat and Note 2 about an Ant script to deploy web
 services and sites under Tomcat).
