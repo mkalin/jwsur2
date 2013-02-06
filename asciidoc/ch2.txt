@@ -410,7 +410,9 @@ Jetty can be started at the command line with the command
 % java -jar start.jar
 ----
 
-A standard WAR file deployable under Tomcat is deployable under Jetty and vice-versa. The Jetty web
+A standard WAR file deployable under Tomcat is deployable under Jetty and vice-versa. (A _standard_ WAR
+file contains only the regular deployment descriptor _web.xml_ and not any product-specific 
+configuration files.) The Jetty web
 server, like Tomcat, listens by default on port 8080. Jetty is a first-rate web server that
 has a lighter feel than does Tomcat. In the end, it is hard to make a bad choice between Tomcat and
 Jetty.
