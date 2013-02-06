@@ -777,12 +777,12 @@ still available.
 
 There are different ways to download Tomcat, including as a ZIP. Tomcat can be installed in
 any directory, for example, in _/usr/local/tomcat_ on a Unixy system or in _D:\tomcatWS_ on a 
-Windows system. For convenience, let _TOMCAT_HOME_ be the install directory. The
-directory _TOMCAT_HOME/bin_ has startup and showndown scripts for Unixy and Windows 
+Windows system. For convenience, let 'TOMCAT_HOME' be the install directory. The
+directory 'TOMCAT_HOME/bin' has startup and showndown scripts for Unixy and Windows 
 systems. For instance, the startup script is _startup.sh_ for Unix and _startup.bat_ for
 Windows. Tomcat is written in Java but does not ship with Java; instead, Tomcat uses 
 the Java runtime on the host system. To that end, Tomcat requires that the
-environment variable _JAVA_HOME_ be set to the Java install directory (e.g., to
+environment variable 'JAVA_HOME' be set to the Java install directory (e.g., to
 _/usr/local/java7_, _D:\java7_, and the like). In summary, the key commands (with comments
 introduced with two semicolons) are (with +%+ as the command-line prompt):
 
@@ -804,19 +804,19 @@ Using CLASSPATH:       /home/mkalin/tomcat7/bin/bootstrap.jar:/home/mkalin/tomca
 
 should appear.
 
-Under _TOMCAT_HOME_ there is directory named logs, which contains various log 
+Under 'TOMCAT_HOME' there is directory named logs, which contains various log 
 files, and several other directories, some of which will be clarified later. A 
-important directory for now is _TOMCAT_HOME/webapps_, which holds JAR files with .war extension
-(hence the name WAR file). Subdirectories under _TOMCAT_HOME/webapps_ can be added as
+important directory for now is 'TOMCAT_HOME/webapps', which holds JAR files with .war extension
+(hence the name WAR file). Subdirectories under 'TOMCAT_HOME/webapps' can be added as
 needed. To deploy a web site or a web service under Tomcat, you
-copy the WAR file containing the site or service to _TOMCAT_HOME/webapps_; to undeploy
+copy the WAR file containing the site or service to 'TOMCAT_HOME/webapps'; to undeploy
 the site or service, you remove the WAR file. (There is a sidebar that introduces an Ant script,
 included in the ZIP file with my code, to automate the deployement of a web
 site or service under Tomcat.)
 
-Tomcat maintains various log files in _TOMCAT_HOME/logs_, one of which is especially
+Tomcat maintains various log files in 'TOMCAT_HOME/logs', one of which is especially
 convenient for ad hoc debugging. Tomcat automatically redirects output to 
-System.err to _TOMCAT_HOME/logs/catalina.out_. Accordingly, if a servlet executes
+System.err to 'TOMCAT_HOME/logs/catalina.out'. Accordingly, if a servlet executes
 
 ----
 System.err.println("Goodbye, cruel world!");
@@ -911,7 +911,7 @@ Any _.xml_ file winds up in _WEB-INF_; any _.jar_ file winds up
 in _WEB-INF/lib_; and any _.db_ file winds up in _WEB-INF/data_. JSP files 
 such as _products.jsp_ are at the WAR file's top level.
 
-* Copies the WAR file to TOMCAT_HOME/webapps and thereby deploys the web service.
+* Copies the WAR file to 'TOMCAT_HOME/webapps' and thereby deploys the web service.
 
 * Leaves a copy of the WAR file in the cwd, in this case the directory service1.
 

@@ -396,8 +396,23 @@ public class Predictions {
 }
 -----
 
+.Deploying under Jetty instead of Tomcat
+****
 
+The Jetty web server is available at _http://jetty.codehaus.org_ as a ZIP file. Assume that 'JETTY_HOME'
+is the install directory. The subdirectories of 'JETTY_HOME' are similar to those of 'TOMCAT_HOME'. For
+example, 'JETTY_HOME' has a _webapps_ subdirectory into which WAR files are deployed; a _logs_ subdirectory; a _lib_ subdirectory with various 
+JAR files, including a versioned counterpart
+of Tomcat's _servlet-api.jar_; and others. Jetty ships with an executable JAR file _start.jar_; hence,
+Jetty can be started at the command line with the command
 
+----
+% java -jar start.jar
+----
 
-
+A standard WAR file deployable under Tomcat is deployable under Jetty and vice-versa. The Jetty web
+server, like Tomcat, listens by default on port 8080. Jetty is a first-rate web server that
+has a lighter feel than does Tomcat. In the end, it is hard to make a bad choice between Tomcat and
+Jetty.
+****
 

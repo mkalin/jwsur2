@@ -1,0 +1,13 @@
+The Jetty web server is available at http://jetty.codehaus.org as a ZIP file. Assume that JETTY_HOME
+is the install directory. The subdirectories of JETTY_HOME are similar to those of TOMCAT_HOME. For
+example, JETTY_HOME has a webapps subdirectory into which WAR files are deployed; a log subdirectory; a lib subdirectory with various 
+JAR files, including a versioned counterpart
+of Tomcat's servlet-api.jar; and others. Jetty ships with an executable JAR file start.jar; hence,
+Jetty can be started at the command line with the command
+
+% java -jar start.jar
+
+A standard WAR file deployable under Tomcat is deployable under Jetty and vice-versa. The Jetty web
+server, like Tomcat, listens by default on port 8080. Jetty is a first-rate servlet container that
+has a lighter feel than its Tomcat counterpart, Catalina. In the end, Tomcat and Jetty are two fine
+choices. 
