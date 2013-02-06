@@ -17,7 +17,8 @@ standard and third-party. Here is a short list:
 
 * The third-party _restlet_ API.
 
-For the most part, the API does not constrain how the service is to published. The exception is the servlet API, as servlets need to be
+For the most part, the API used to implement the web service does not constrain how this service is to published. 
+The exception is the servlet API, as servlets need to be
 deployed in a servlet container such as Tomcat's Catalina or Jetty. (Jetty is the name of both the web server
 and its servlet container.) This chapter uses Tomcat and Jetty to publish servlet-based services. There are shotcuts for
 publishing JAX-RS and JAX-WS services but these, too, can be published with Tomcat or Jetty. Services based on the
@@ -41,7 +42,7 @@ is the name of the predictor and a +what+ key whose value is the prediction.
 +
 If the GET request has a query string with an +id+ key, then the corresponding +Prediction+, if any, is returned.
 If the GET request has no query string, then the list of +Predictions+ is returned. On any GET request,
-the client can request that the response payload be in JSON instead of in the default XML format.
+the client can indicate a preference for JSON rather the default XML format.
 
 * A specified +Prediction+ can be updated with a PUT request that provides the +Prediction+ identifier and either
 a new +who+ or a new +what+. (The reason for this restriction, explained in detail later, is that Tomcat has
