@@ -55,7 +55,7 @@ public class PredictionsServlet extends HttpServlet {
 	    Prediction pred = predictions.getMap().get(key);
 
 	    if (pred == null) { // no such Prediction
-		String msg = key + " does not map to a prediction.";
+		String msg = key + " does not map to a prediction.\n";
 		sendResponse(response, predictions.toXML(msg), false);
 	    }
 	    else { // requested Prediction found
@@ -85,36 +85,31 @@ public class PredictionsServlet extends HttpServlet {
 
 	// Generate the confirmation message.
 	String msg = "Prediction " + id + " created.\n";
-	sendResponse(response, msg, false);
+	sendResponse(response, predictions.toXML(msg), false);
     }
 
     // PUT /cliches
-    // HTTP body should contain at least two keys: the id (which prediction is
-    // to be edited) must be present; the predictor or the prediction or both
-    // should be present. See documentation below, however.
-    public void doPut(HttpServletRequest req, HttpServletResponse res) {
-	/* A workaround is necessary for a PUT request to Tomcat, which does 
-	   not parse the request stream to generate the parameter map. A
-	   hack is thus required. */
+    // HTTP body should contain at least two keys: the prediction's id
+    // and either who or what.
+    public void doPut(HttpServletRequest request, HttpServletResponse response) {
+	/* A workaround is necessary for a PUT request because neither Tomcat
+	   nor Jetty generates a workable parameter map for this HTTP verb. */
 	String key = null;
 	String rest = null;
 	boolean who = false;
-
+	
 	/* Let the hack begin. */
 	try {
 	    BufferedReader br = 
-		new BufferedReader(new InputStreamReader(req.getInputStream()));
+		new BufferedReader(new InputStreamReader(request.getInputStream()));
 	    String data = br.readLine();
-
-	    System.err.println("########### " + data);
-
 	    /* To simplify the hack, assume that the PUT request has exactly
 	       two parameters: the id and either who or what. Assume, further,
 	       that the id comes first. From the client side, a hash character
 	       # separates the id and the who/what, e.g.,
-
+	       
 	          id=33#who=Homer Allision
-	     */
+	    */
 	    String[] args = data.split("#");      // id in args[0], rest in args[1]
 	    String[] parts1 = args[0].split("="); // id = parts1[1]
 	    key = parts1[1];
@@ -127,16 +122,17 @@ public class PredictionsServlet extends HttpServlet {
 	    throw new HTTPException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 	}
 
-	// String key = req.getParameter("id");
+	// If no key, then the request is ill formed.
 	if (key == null)
 	    throw new HTTPException(HttpServletResponse.SC_BAD_REQUEST);
 
+	// Look up the specified prediction.
 	Prediction p = predictions.getMap().get(key);
-	if (p == null) {
+	if (p == null) { // not found? 
 	    String msg = key + " does not map to a Prediction.\n";
-	    sendResponse(res, msg, false);
+	    sendResponse(response, predictions.toXML(msg), false);
 	}
-	else {
+	else { // found
 	    if (rest == null) {
 		throw new HTTPException(HttpServletResponse.SC_BAD_REQUEST);
 	    }
@@ -146,19 +142,21 @@ public class PredictionsServlet extends HttpServlet {
 		else p.setWhat(rest);
 
 		String msg = "Prediction " + key + " has been edited.\n";
-		sendResponse(res, msg, false);
+		sendResponse(response, predictions.toXML(msg), false);
 	    }
 	}
     }
 
     // DELETE /cliches2?id=1
-    public void doDelete(HttpServletRequest req, HttpServletResponse res) {
-        String key = req.getParameter("id");
+    public void doDelete(HttpServletRequest request, HttpServletResponse response) {
+        String key = request.getParameter("id");
         // Only one Prediction can be deleted at a time.
         if (key == null)
             throw new HTTPException(HttpServletResponse.SC_BAD_REQUEST);
         try {
 	    predictions.getMap().remove(key);
+	    String msg = "Prediction " + key + " removed.\n";
+	    sendResponse(response, predictions.toXML(msg), false);
         }
         catch(Exception e) {
             throw new HTTPException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
@@ -166,22 +164,22 @@ public class PredictionsServlet extends HttpServlet {
     }
 
     // Method Not Allowed
-    public void doInfo(HttpServletRequest req, HttpServletResponse res) {
+    public void doInfo(HttpServletRequest request, HttpServletResponse response) {
         throw new HTTPException(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
     }
 
     // Method Not Allowed
-    public void doHead(HttpServletRequest req, HttpServletResponse res) {
+    public void doHead(HttpServletRequest request, HttpServletResponse response) {
         throw new HTTPException(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
     }
 
     // Method Not Allowed
-    public void doOptions(HttpServletRequest req, HttpServletResponse res) {
+    public void doOptions(HttpServletRequest request, HttpServletResponse response) {
         throw new HTTPException(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
     }
 
     // Send the response payload to the client.
-    private void sendResponse(HttpServletResponse res, String payload, boolean json) {
+    private void sendResponse(HttpServletResponse response, String payload, boolean json) {
 	try {
 	    // Convert to JSON?
 	    if (json) {
@@ -189,7 +187,7 @@ public class PredictionsServlet extends HttpServlet {
 		payload = jobt.toString(3); // 3 is indentation level for nice look
 	    }
 
-	    OutputStream out = res.getOutputStream();
+	    OutputStream out = response.getOutputStream();
 	    out.write(payload.getBytes());
 	    out.flush();
 	}

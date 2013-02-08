@@ -813,4 +813,8 @@ For example, the Java client of the 'sayings' service could transform the XML li
 +List<Prediction>+ and then process this +List+ in some typical Java way. Languages other than Java have
 utilities comparable to JAX-B.
 
+Figure X depicts this scenario. 
+
+The JAX-B utilities offer the client the chance to bypass XML parsing and, instead, to generate Java 
+directly from XML. 
 

@@ -12,10 +12,10 @@ web service is with a web server; and a web service
 client needs to execute on a machine that has network access, usually through HTTP, to the 
 web server. In slightly more technical 
 terms, a web service is a distributed application whose components can be deployed and executed on physically
-distinct devices. Figure 1 depicts such a service, with _host1_ as a web server machine and 
+distinct devices. Figure 1.1 depicts such a service, with _host1_ as a web server machine and 
 _host2_ as a mobile device. Web services can be
 arbitrarily complex. For instance, a stock-picking web service might consist of several code components, 
-each hosted on a separate commercial-grade web server; and any mix of PCs, handhelds, and other 
+each hosted on a separate commerical-grade web server; and any mix of PCs, handhelds, and other 
 networked devices might consume the service.
 
 Web services come in two popular flavors: SOAP based and REST style. SOAP is an XML dialect with
@@ -23,10 +23,10 @@ a grammar that specifies the structure that a document must have in order to cou
 typical SOAP-based service, the client sends SOAP messages to the service and the service 
 responds in kind, that is, with SOAP messages. REST-style services are hard to characterize in a 
 sentence or two; hence, the next section goes into detail. For now, a REST-style service is one that treats HTTP
-not only as a transport protocol also but as a set of guidelines for structuring service requests 
-and service responses. In a REST-style service, HTTP itself acts as an API. SOAP has standards, tool-kits, and 
+not only as a transport proctol also but as a set of guidelines for structuring service requests 
+and service responses. In a REST-style service, HTTP itself acts as API. SOAP has standards, toolkits, and 
 bountiful software libraries. REST has no 
-official standards, few tool-kits, and uneven software libraries across programming languages. 
+official standards, few toolkits, and uneven software libraries across programming languages. 
 The REST style can be viewed as an antidote to the creeping complexity of SOAP-based web services. 
 This book covers SOAP-based and REST-style web services, starting with REST-style ones. This chapter
 ends with a sample REST-style service.
@@ -36,7 +36,7 @@ HTTP can be seen as a special case of a REST-style service. SOAP originally stoo
 Access Protocol and then, by serendipity but not officially, might have stood for Service
 Oriented Architecture (SOA) Protocol. (SOA is discussed in Section 1.4.) Deconstructing SOA is
 non-trivial but one point is indisputable: whatever SOA may be, web services play a central role in the 
-SOA approach to software design and development. The World Wide Web Consortium (hereafter, W3C) currently
+SOA approach to software design and development. The World Wide Web Consoritium (hereafter, W3C) currently
 oversees the SOAP standard; and SOAP officially is no longer an acronym.
 
 === Web Service Miscellany
@@ -59,8 +59,8 @@ web service written in Java can have a Perl or a Ruby consumer,
 there must be an intermediary layer that handles the differences in data types
 between the service and the client languages. XML technologies, which
 support structured document interchange and processing, act as one such
-intermediary level. Another intermediary level is JSON (JavaScript Object Notation).
-Web service clients are increasingly JavaScript programs embedded in
+intermediary level. Another intermediary level is JSON (JavaScript Object Notation)
+because web service clients are increasing JavaScript programs embedded in
 HTML documents and executing in a browser.  For a JavaScript
 consumer of a web service, JSON has obvious appeal because a JSON document represents 
 a native JavaScript object. Chapter 3 focuses on XML and JSON payloads from
@@ -126,7 +126,7 @@ are, first and foremost, language and platform neutral. If a legacy
 COBOL system is exposed through a web service, the system is thereby
 interoperable with service clients written in other, currently more
 widely used languages. Exposing a legacy COBOL system as a web service should be
-significantly less expensive than, say, rewriting the system from scratch.
+significantly less expensive than, say, rewriting the system in some other language.
 
 Web services are inherently distributed systems that communicate mostly over HTTP but 
 can communicate over other popular transports as well. The communication payloads of web services
@@ -157,7 +157,7 @@ passed to the service operation together with the number and type of values retu
 operation. 
 
 At the implementation level, a service operation is a function call: the function takes zero or more arguments and
-returns a value, perhaps a list. The implementation model is thus very simple; and
+returns a value. The implementation model is thus very simple; and
 the simplicity of service operations promotes code reuse through the composition of new services out of 
 existing ones and enables relatively straightforward troubleshooting because services reduce to
 primitive function calls. Perhaps the best way to clarify SOA is to contrast this approach to distributed 
@@ -172,12 +172,7 @@ that emerged in the early 1990s. DCE includes a distributed file system
 origins in the Unix world, Microsoft quickly did its own implementation
 known as MSRPC, which in turn served as the infrastructure for interprocess communication in Windows. 
 Microsoft's COM/OLE (Common Object Model/Object Linking and Embedding) technologies and services 
-were built on a DCE/RPC foundation. There is irony here. DCE designed RPC as a way to do
-distributed computing, that is, computing across distinct physical devices; and Microsoft cleverly
-adapted RPC to support interprocess communication, in the form of COM infrastructure, on a single
-device, a PC running Windows.
-
-The first-generation frameworks for distributed-object systems, 
+were built on a DCE/RPC foundation. The first-generation frameworks for distributed-object systems, 
 CORBA (Common Object Request Broker Architecture) and Microsoft's DCOM (Distributed COM), are anchored 
 in the DCE/RPC procedural framework. Java RMI (Remote Method Invocation) also derives from DCE/RPC; and the 
 method calls in Java EE (Enterprise Edition), specifically in Session and Entity EJBs (Enterprise Java Bean), 
@@ -197,11 +192,10 @@ utilities for generating client and server artifacts (stubs and skeletons,
 respectively) and software libraries that hide the transport details. Of
 interest now is the IDL (Interface Definition Language) document that acts as the 
 service contract and is an input to utilities that generate artifacts in support
-of the DCE/RPC calls. Example 1 is a sample IDL file.
+of the DCE/RPC calls. Figure 1 is a sample IDL file.
 
-[[Ex1]]
-.A sample IDL file that declares the +echo+ function
-====
+.Figure 1.2: A sample IDL file that declares the +echo+ function.
+[options="header"]
 ----
 /* echo.idl */
 [uuid(2d6ead46-05e3-11ca-7dd1-426909beabcd), version(1.0)]
@@ -214,9 +208,8 @@ interface echo {
     );
 }
 ----
-====
 
-The IDL interface, identified with a machine-generated UUID (Universally Unique IDentifier), 
+The interface, identified with a machine-generated UUID (Universally Unique IDentifier), 
 declares a single function of three arguments, two of which are
 +in+ parameters (that is, inputs into the remote procedure) and one of which is an +out+ parameter (that
 is, an output from the remote procedure). The first argument, of built-in
@@ -224,14 +217,7 @@ type +handle_t+, is required and points to an RPC data structure. The function +
 not return a value because the echoed string is returned instead as an +out+ parameter. The IDL specifies 
 the invocation syntax for the +echo+ function, which is the one and only operation in the service.
 
-There is a Microsoft twist to the IDL story as well. An ActiveX control under Windows is a
-DLL (Dynamic Link Library) with an embedded _typelib_, which in turn is a compiled IDL file. For 
-example, suppose that a calendar ActiveX control is plugged into a browser. The browser can read the
-_typelib_, which contains the invocation syntax for each operation (_e.g._, displaying the next month) 
-in the control. This is yet another inspired local use of a technology designed for distributed computing.
-
-In the late 1990s, Dave Winer of UserLand Software developed XML-RPC, a technology innovation that has 
-as good a claim as any to mark
+In the late 1990s, Dave Winer of UserLand Software developed XML-RPC, a technology that marks
 the birth of web services. XML-RPC is a very lightweight RPC system with support for
 elementary data types (basically, the built-in C types together with a
 +boolean+ and a +datetime+ type) and a few simple commands. The original specification is about seven 
@@ -286,7 +272,7 @@ interface and is downloaded automatically from the server, to invoke the +getBen
 requires that the byte codes for various Java classes, standard and
 programmer-defined, be downloaded to the client machine. To begin, the client
 needs the classes +Emp+, the argument type for the +getBenefits+ method, and
-+EmpBenefits+, the member type for the +List+ that the method +getBenfits+ returns.
++EmpBenefits+, the member type for the +List+ that method +getBenfits+ returns.
 Now suppose that the class +Emp+ looks like this:
 
 ----
@@ -340,7 +326,7 @@ the same language or even in the same style of language. Clients and
 services can be implemented in object-oriented, procedural, functional,
 and other language styles. The languages on either end may be statically
 typed (for instance, Java and Go) or dynamically typed (for example, JavaScript
-and Ruby). The complexities of stubs and skeletons, the serializing and
+and Ruby). The complexities of stubs and skeletons, the serializating and
 deserializing of objects encoded in some proprietary format, gives way to relatively
 simple text-based representations of request and response messages.
 
@@ -373,7 +359,7 @@ the requester about whether a request succeeded and, if not, why.
 REST stands for REpresentational State Transfer, which requires clarification because the
 central abstraction in REST—the resource—does not
 occur in the acronym. A _resource_ in the RESTful sense is an HTTP resource: 
-anything that has a URI, that is, an identifier that satisfies formatting requirements. The
+anything that has an URI, that is, an identifier that satisfies formatting requirements. The
 formatting requirements are what make URIs uniform.
 Recall, too, that URI stands for Uniform Resource
 Identifier; hence, the notions of URI and
@@ -429,7 +415,7 @@ verbs, officially known as _methods_. Table 1 lists the HTTP verbs that correspo
 the CRUD (Create, Read, Update, Delete)
 operations so familiar throughout computing:
 
-.HTTP verbs and their CRUD operations
+.Figure 1.3: HTTP verbs and their CRUD operations.
 [options="header"]
 |==========
 |HTTP Verb|CRUD Operation
@@ -476,14 +462,14 @@ types, +HttpServletRequest+ (the key/value pairs from the
 request) and +HttpServletResponse+ (a typed response to
 the requester). It is not unknown for a programmer to have the two callbacks execute the same
 code (for instance, by having one invoke the other), thereby conflating
-the original HTTP distinction between 'read' and
-'create'. A key guiding principle of the RESTful style
+the original HTTP distinction between read and
+create. A key guiding principle of the RESTful style
 is to respect the original meanings of the HTTP verbs. In particular, any
 GET request should be side-effect free (or, in jargon,
 idempotent) because a GET is a
-'read' rather than a 'create',
-'update', or 'delete' operation. A
-GET as a 'read' with no side effects is called a
+read rather than a create,
+update, or delete operation. A
+GET as a read with no side effects is called a
 _safe_ GET. 
 
 The REST approach does not imply that either resources or the
@@ -501,10 +487,11 @@ require significant XML processing to extract the desired information from
 the XML representations transferred from the service to the client. Yet
 the RESTful approach keeps the complexity out of the transport level, as a
 resource representation is transferred to the client as the body of an
-HTTP response message. For the record, RESTful web services are Turing complete; that is,
-these services are equal in power to any computational system, including
-a system that consists of SOAP-based web services. 
-footnote:[For a thorough coverage of REST-style web services, see
+HTTP response message. By contrast, a SOAP-based service inevitably
+complicates the transport level because a SOAP
+message is encapsulated as the body of a transport message, for instance, an HTTP or 
+SMTP message. SOAP requires messages within messages, whereas REST does not. 
+footnote:[For a thorough coverage of REST-style Web services, see
         Richardson and Ruby’s book _RESTful Web Services_
         (O'Reilly, 2007).]
 
@@ -536,42 +523,43 @@ proper name that denotes exactly one resource.
 
 The next section has a REST-style sample service whose URL is
 ----
-http://localhost:8080/cliches/
+http://localhost:8080/preds/sayings.jsp
 ----
 
-If this URL were typed into a browser's window, the browser 
+If this URL were typed into a brower's window, the browser 
 would generate an HTTP request similar to
 
 ----
-GET /cliches/ HTTP/1.1
+GET /preds/sayings.jsp HTTP/1.1
 User-Agent: Mozilla/5.0 (X11; Linux x86_64) Chrome/24.0.1312.56
 Host: localhost:8080
 Accept: text/html
 ----
 
-The browsers parses the entered URL into these parts, with clarifications
+The browers parses the entered URL into these parts, with clarifications
 below:
 
-* +GET /cliches/ HTTP/1.1+
+* GET /preds/sayings.jsp HTTP/1.1
 +
 This is the HTTP request 'start line':
 
-** GET is the HTTP method (verb)
+GET is the HTTP method (verb)
 
-** +/cliches/+ is the URI (resource's name)
++/preds/sayings.jsp+ is the URI (resource's name)
 
-** +HTTP/1.1+ is the HTTP version that the requester is using
++HTTP/1.1+ is the HTTP version that the requester is using
 
-* +User-Agent: Mozilla/5.0 (X11; Linux x86_64) Chrome/24.0+
+
+* User-Agent: Mozilla/5.0 (X11; Linux x86_64) Chrome/24.0
 +
-Chrome is the browser used in this request and Mozilla/5.0 specifies
-a browser-compatibility type. The +User-Agent+ information also
+Chrome is browser used in this request and Mozilla/5.0 specifies
+a browser-compatibility type. The User-Agent information also
 includes the operating system in use, 64-bit Linux.
 Of interest here is that term 'user agent' captures
 the intended meaning: it is the application (agent) that a user employs
 to make a request.
 
-* +Host: localhost:8080+
+* Host: localhost:8080
 +
 In +localhost:8080+, the network address of the machine that hosts
 the resource is to the left of the colon; and the port number, in this case +8080+, is to the
@@ -579,14 +567,14 @@ right. In this example, the network address is +localhost+ and its dotted-decima
 equivalent 127.0.0.1.
 Because the network address is +localhost+, the web server and
 the requesting application are on the same machine, which is convenient during development.
-In a production environment, the web server might have a network address such as
+In a production envirnonment, the web server might have a network address such as
 +dcequip.cti.depaul.edu+. Port numbers range from 0 to roughly 65,000, with
 port numbers from 0 through 1023 typically reserved for standard applications 
 such as web servers (port 80 for HTTP and 443 for HTTPS), SMTP (email, port 25), 
 SSH (secure shell, port 22), and so on. For convenience, Tomcat and Jetty use port 8080 by
 default but the number can be changed (for example, to the standard HTTP port number 80).
 
-* +Accept: text/html+
+* Accept: text/html
 +
 This is the MIME type (+text+) and subtype (+html+), which the browser 
 is ready to accept. The application running on web server may not honor the requested 
@@ -628,18 +616,17 @@ usually non-empty. The body of a POST request holds key/value pairs as well.
 If all goes well, sending an HTTP request to the URL
 
 ----
-http://localhost:8080/cliches/sayings.jsp
+http://localhost:8080/preds/sayings.jsp
 ----
 
 leads to an HTTP response, which is similar to
 
-[[Ex2]]
-.HTTP XML response from the 'sayings' RESTful service
-====
+.Figure 1.4: HTTP XML response from the sayings RESTful service.
+[options="header"]
 ----
 HTTP/1.1 200 OK
 Server: Apache-Coyote/1.1
-Set-Cookie: JSESSIONID=35B1E3AA21EB7242FD2FC50044D2166A; Path=/cliches/; 
+Set-Cookie: JSESSIONID=35B1E3AA21EB7242FD2FC50044D2166A; Path=/preds/; 
 Content-Type: text/html;charset=ISO-8859-1
 Transfer-Encoding: chunked
 Date: Tue, 29 Jan 2013 17:40:15 GMT 
@@ -663,7 +650,6 @@ Date: Tue, 29 Jan 2013 17:40:15 GMT
   </void> 
   ...
 ----
-====
 
 The start line 
 ----
@@ -674,9 +660,9 @@ begins with the HTTP version in use on the server. Next comes the HTTP status co
 a number, 200, and in English, OK. Status codes in the 200-range signal success. Five
 header elements follow, including the name of the web server that sends the
 response and the content type of the response. Note that the response type is given
-as +text/html+ rather than as what it actually is: +text/xml+. The reason is that 
+as +text/html+ rather than as what it actually is: +text/xml+. The reason is that the
 my code, which generates the response, does not bother to set the content type;
-hence, the Apache-Coyote web server assumes the default type of +text/html+. Two
+hence, the Apache-Coyote web server assumes the default type of text/html. Two
 newline characters again separate the headers from the HTTP body, which can be 
 empty. In this case, the body is an XML document that lists corporate predictions
 together with their predictors.
@@ -690,12 +676,11 @@ against a URI such as '/products' is equivalent to the same request for '/produc
 list of products is returned in response. A GET request against '/products.json' or
 '/products.xml' would return the same list but in JSON or XML, respectively. Rails as a scheme of
 URI naming patterns and the HTTP verbs that highlight the elegant yet practical use of HTTP
-as an API. Below is a summary of the Rails approach. In a URI, a term such as ':id', which
-begins with a colon character, 
+as an API. Below is a summary of the Rails approach. In a URI, a coloned term such as ':id'
 indicates a placeholder or parameter, in this case a placeholder whose intended value is a
 numerical identifier such as 27.
 
-.Rails routing idioms
+.Figure 1.5: Rails routing idioms.
 [options="header"]
 |======
 |HTTP Verb  |URI                  |Meaning
@@ -714,11 +699,14 @@ expressions about which operation should be performed on which resource.
 The POST and PUT verbs are used in requests that have an HTTP body;
 hence, the request data are in the HTTP message body. The GET and
 DELETE verbs are used in requests that have no body; hence, the request
-data are sent as query-string key/value pairs.
+data are sent as query-string entries.
 
-The decision about whether to be RESTful in a particular application depends, as
-always, on practical matters that will come to the fore throughout this book. The current section 
-has looked at REST from on high; it is now time to descend into details through a code example.
+For the record, RESTful web services are Turing complete; that is,
+these services are equal in power to any computational system, including
+a system that consists of SOAP-based web services. Yet the decision
+about whether to be RESTful in a particular application depends, as
+always, on practical matters. This section has looked at REST from
+on high; it is now time to descend into details through examples.
 
 === A First RESTful Example
 
@@ -735,17 +723,16 @@ Universal fault-tolerant architecture will synthesize bleeding-edge channels.
 
 Each prediction has an associated human predictor. The RESTful resource is thus a list of 
 predictor names (_e.g._, Hollis McCullough) and their predictions (Hollis is
-responsible for the third prediction shown above). The resource name or URI is +/cliches/+; 
+responsible for the third prediction shown above). The resource name or URI is +/preds/+; 
 and the only allowable HTTP verb is GET, which corresponds to read among the CRUD operations. 
 If the HTTP request is correct, the RESTful service returns an XML representation of the
 predictor/prediction list; otherwise, the service returns the appropriate HTTP 
 status code, _e.g._, 404 for "Not Found", if the URI is incorrect, or
-405 for "Method Not Allowed", if the verb is not GET. Figure 1.5 shows a slice of
-the XML payload returned upon a successful request.
+405 for "Method Not Allowed", if the verb is not GET. Figure 1.6 shows a larger slice of
+the returned XML on a successful request.
 
-[[Ex3]]
-.The XML response from the sayings service
-====
+.Figure 1.6: The XML response from the sayings service.
+[options="header"]
 ----
 <?xml version="1.0" encoding="UTF-8"?> 
 <java version="1.7.0" class="java.beans.XMLDecoder"> 
@@ -790,18 +777,22 @@ the XML payload returned upon a successful request.
  </array> 
 </java> 
 ----
-====
+This section first clarifies the details of the service and then discusses options for
+consuming the service. Afterwards the section explains why servlets and JSP scripts are
+a very good choice for implementing RESTful services in Java.
 
-==== How the 'sayings' Web Service Works
+==== How the Service Works
 
-The JSP script (see Example 4) first checks the request's HTTP method and, if this is GET, returns an XML 
+The JSP script first checks the request's HTTP method and, if this is GET, returns an XML 
 representation of the predictor/prediction list. If the verb is not GET, the script returns an
 error message together with the HTTP status code. The relevant code is:
 
 ----
 String verb = request.getMethod();
+
 if (!verb.equalsIgnoreCase("GET")) {
-  response.sendError(response.SC_METHOD_NOT_ALLOWED, "GET requests only are allowed.");
+  response.sendError(response.SC_METHOD_NOT_ALLOWED,
+                     "GET requests only are allowed.");
 }
 ----
 
@@ -810,19 +801,21 @@ field or a parameter in the servlet code into which the web server, in this case
 translates the JSP script. Accordingly, the JSP script can make the same calls as an
 +HttpServlet+. 
 
-.The JSP script +sayings.jsp+.
-====
+.Figure 1.7: The JSP script sayings.jsp.
+[options="header"]
 ----
-<!-- Connect to the back-end Predictions POJO and set the ServletContext. -->
+<!-- Connect to the backend Predictions POJO and set the ServletContext. -->
 <jsp:useBean id    = "preds" 
 	     type  = "cliches.Predictions" 
 	     class = "cliches.Predictions"> 
 
-  <% // Check the HTTP verb: if it's anything but GET, return 405 (Method Not Allowed).
+  <% // Check the HTTP verb: if it's anything but GET,
+     // return a 405 (Method Not Allowed) status code.
      String verb = request.getMethod();
 
      if (!verb.equalsIgnoreCase("GET")) {
-       response.sendError(response.SC_METHOD_NOT_ALLOWED, "GET requests only are allowed.");
+       response.sendError(response.SC_METHOD_NOT_ALLOWED,
+                          "GET requests only are allowed.");
      }
      // If it's a GET request, return the predictions.
      else {
@@ -834,7 +827,6 @@ translates the JSP script. Accordingly, the JSP script can make the same calls a
   %>
 </jsp:useBean>  
 ----
-====
 
 On a successful request, the JSP script returns a list of predictions and
 their predictors, a list available from the back-end JavaBean 
@@ -844,75 +836,167 @@ their predictors, a list available from the back-end JavaBean
 out.println(preds.getPredictions());
 ----
 
-The object reference +out+, available in every JSP script, refers to an output stream
+The object reference +out+, available in every JSP script, is an output stream
 through which the JSP script can communicate with the client. In this example,
 the object reference +preds+ refers to the back-end JavaBean that maintains
-the collection of predictions; and the +getPredictions+ method converts the Java list of
-+Predictions+ into an XML document.
+the list of predictions; and the +getPredictions+ method converts the Java list
+into an XML document.
 
-The back-end code consists of two classes, +Prediction+ (see Example 5) and +Predictions+ (see Example 6). The
+The back-end code consists of two classes, +Prediction+ and +Predictions+. The
 +Prediction+ class is quite simple, consisting of two properties: +who+ is the
 person making the prediction and +what+ is the prediction. The +Predictions+
-class does the grunt work. For example, its +populate+ method reads the prediction
-data from a text file, 'predictions.db', encapsulated in the deployed WAR file; and
-the +toXML+ method serializes a Java +List<Prediction>+ into an XML document, which in
+class does the grunt work, for example, its +populate+ method reads the prediction
+data from a text file, 'preddictions.db', encapsulated in the deployed WAR file; and
+its +toXML+ method serializes a Java +List<Prediction>+ into an XML document, which in
 turn is sent back to the client.
+
+.Installing and using Tomcat
+[options="header"]
+****
+Apache Tomcat (_http://tomcat.apache.org/_) is a commercial-grade yet lightweight web server 
+implemented in Java. Tomcat has various subsystems for administration, security, logging,
+and trouble-shooting but its central subsystem is Catalina, a container that executes servlets, 
+including JSP and other scripts (_e.g._, JSF scripts) that Tomcat automatically translates into 
+servlets. Tomcat also includes a web console, tutorials, and sample code. This note focuses on 
+installing Tomcat and on basic post-installation tasks such as starting and stopping the web server.
+The current version is 7.x, which requires Java SE 6 or 7. Earlier Tomcat versions are
+still available.
+
+There are different ways to download Tomcat, including as a ZIP. Tomcat can be installed in
+any directory, for example, in _/usr/local/tomcat_ on a Unixy system or in _D:\tomcatWS_ on a 
+Windows system. For convenience, let 'TOMCAT_HOME' be the install directory. The
+directory 'TOMCAT_HOME/bin' has startup and showndown scripts for Unixy and Windows 
+systems. For instance, the startup script is _startup.sh_ for Unix and _startup.bat_ for
+Windows. Tomcat is written in Java but does not ship with Java; instead, Tomcat uses 
+the Java runtime on the host system. To that end, Tomcat requires that the
+environment variable 'JAVA_HOME' be set to the Java install directory (_e.g._, to
+_/usr/local/java7_, _D:\java7_, and the like). In summary, the key commands (with comments
+introduced with two semicolons) are (with +%+ as the command-line prompt):
+
+----
+% startup.sh   ;; or startup.bat on Windows to start Tomcat
+% shutdown.sh  ;; or shutdown.bat on Windows to stop Tomcat
+----
+
+The commands can be given at a command-line prompt. On startup, a message
+similar to
+
+----
+Using CATALINA_BASE:   /home/mkalin/tomcat7
+Using CATALINA_HOME:   /home/mkalin/tomcat7
+Using CATALINA_TMPDIR: /home/mkalin/tomcat7/temp
+Using JRE_HOME:        /usr/local/java
+Using CLASSPATH:       /home/mkalin/tomcat7/bin/bootstrap.jar
+----
+
+should appear.
+
+Under 'TOMCAT_HOME' there is directory named 'logs', which contains various log 
+files, and several other directories, some of which will be clarified later. A 
+important directory for now is 'TOMCAT_HOME/webapps', which holds JAR files with a '.war' extension
+(hence the name WAR file). Subdirectories under 'TOMCAT_HOME/webapps' can be added as
+needed. Deploying a web service under Tomcat is the same as deploying a web site: a WAR file 
+containing the site or the service is copied to 
+'TOMCAT_HOME/webapps'; and a web site or web service is undeployed by removing its WAR file.
+the site or service, you remove the WAR file. 
+
+Tomcat maintains various log files in 'TOMCAT_HOME/logs', one of which is especially
+convenient for 'ad hoc' debugging. Tomcat automatically redirects output to 
++System.err+ to 'TOMCAT_HOME/logs/catalina.out'. Accordingly, if a servlet executes
+
+----
+System.err.println("Goodbye, cruel world!");
+----
+
+the farewell message would appear in the _catalina.out_ log file.
+
+Apache Tomcat is not the only game in town. There is the related TomEE web server, 
+basically Tomcat with support for Java EE beyond servlets. Another popular Java-centric 
+web server is Jetty (_http://jetty.codehaus.org_). My first example uses 
+Tomcat but later examples use Jetty as well; and the next chapter explains how to
+install and run Jetty.
+****
+
+.An Ant script to automate Tomcat deployment.
+[options="header"]
+*****
+The first sample web service is deployed to a web server such as Tomcat. The ZIP
+file with the code examples includes an Ant script to ease the task of deployment. 
+The Ant utility, written in Java, is available on all platforms. My script requires 
+Ant 1.6 or greater.
+
+Consider a web service that includes a
+JSP script, a back-end JavaBean, the Tomcat deployment file 'web.xml',
+and a JAR file that holds JSON library. These artifacts reside in any directory
+on the local file system, hereafter the 'current working directory' or 'cwd' for shot.
+The Ant file 'build.xml' is in the 'cwd'. Under the 'cwd' is a subdirectory named 'src'
+----
+cwd: build.xml
+ |
+src
+----
+that holds the JSP script, the JAR file, and the deployment file:
+----
+cwd: build.xml
+ |
+src: products.jsp, json.jar, web.xml
+----
+Suppose that the back-end JavaBean has the fully qualified name
++acme.Products+. The layout is now
+
+----
+cwd: build.xml
+ |
+src: products.jsp, json.jar, web.xml
+ |
+acme: Products.java
+----
+
+Finally, assume that the 'src' directory also holds the data file 'new_products.db'.
+From the 'cwd' command-line, the command
+----
+% ant -Dwar.name=products.war deploy
+----
+does the following:
+
+* Creates the directory 'service1/build', which holds copies of files in directory 'src' and any subdirectories.
+* Compiles any _.java_ files, in this case _acme.org.Products.java_.
+* Builds the WAR file, whose major contents are:
++
+---- 
+WEB-INF/web.xml
+WEB-INF/classes/acme/org/Products.class
+WEB-INF/data/new_products.db
+WEB-INF/lib/json.jar
+acme/org/Products.java
+products.jsp
+----
+Any _.xml_ file winds up in _WEB-INF_; any _.jar_ file winds up
+in _WEB-INF/lib_; and any _.db_ file winds up in _WEB-INF/data_. JSP files 
+such as _products.jsp_ are at the WAR file's top level.
+
+* Copies the WAR file to 'TOMCAT_HOME/webapps' and thereby deploys the web service.
+* Leaves a copy of the WAR file in the cwd, in this case the directory service1.
+
+The Ant file 'build.xml' has extensive documentation and explains, in particular,
+what needs to be done to customize this file for your environment.
+Although the Ant script is targeted at Tomcat, the WAR files that it produces
+can be deployed to Jetty as well. Chapter 2 goes into the details of
+installing and running Jetty.
+*****
 
 On a successful request, the JSP script invokes the back-end bean method
 +setServletContext+ (the implicit object reference is +application+) because
 the back-end bean needs access to the servlet context in order to read data from a
-text file embedded in the deployed WAR file. The +ServletContext+ is a data structure
-through which a servlet/JSP script interacts explicitly with the servlet container.
-The call to the +setServletContext+ method sets up
-the subsequent call to the +getPredictions+ method, which returns the XML representation shown in
-Example 3. Here is the +getPredictions+ method without the comments:
+text file embedded in the deployed WAR file. The call to +setServletContext+ sets up
+the subsequent call to +getPredictions+, which returns the XML representation shown in
+Figure 1.6.
 
-----
-public String getPredictions() {
-   if (null == getServletContext()) return null;      
-   if (null == predictions) populate(); 
-   return toXML();
-}
-----
+Figure 1.9 is the class for the back-end bean +cliches.Prediction+ and Figure 1.4 is 
+the associated class +cliches.Predictions+.
 
-The +predictions+ reference is to the +Map+ in which +Prediction+ references are values. If
-the servlet context has not been set, then there is no point in continuing because the
-+populate+ method requires the servlet context (the reference is +sctx+ in the code)
-in order to access the data:
-
-----
-private void populate() {
-   String filename = "/WEB-INF/data/predictions.db";
-   InputStream in = sctx.getResourceAsStream(filename);
-   ...
-}
-----
-
-If the +predictions+ reference is +null+, then populating the +Map+ must occur. The
-+Map+, in turn, contains references to +Prediction+ objects built from data in the
-'predictions.db' file. Finally, the +toXML+ method serializes the
-Java predictions into XML using an +XMLEncoder+:
-
-----
-private String toXML() {
-   String xml = null;
-   try {
-      ByteArrayOutputStream out = new ByteArrayOutputStream();
-      XMLEncoder encoder = new XMLEncoder(out);
-      encoder.writeObject(predictions); // serialize to XML
-      encoder.close();
-      xml = out.toString(); // stringify
-   }	
-   catch(Exception e) { }
-   return xml;
-}
-----
-
-The XML document from the +toXML+ method becomes the body of the HTTP response to the client.
-
-[[Ex5]]
-.The +cliches.Prediction+ class
-====
+.Figure 1.9: the back-end +Prediction+ bean.
+[options="header"]
 ----
 package cliches;
 
@@ -942,11 +1026,9 @@ public class Prediction implements Serializable {
     }
 }
 ----
-====
 
-[[Ex6]]
-.The +cliches.Predictions+ class
-====
+.Figure 1.10: the back-end +Predictions+ bean.
+[options="header"]
 ----
 package cliches;
 
@@ -1031,186 +1113,55 @@ public class Predictions {
     }
 }
 ----
-====
 
-Although the XML from the 'sayings' service is generated using the standard +XMLEncoder+ class,
-Java does provide other ways to generate XML--but none quite as simple as 
-+XMLEncoder+. The +Prediction+ objects must be serializable in order to be encoded as
-XML using the +XMLEncoder+; hence, the +Prediction+
-class implements the empty (or 'marker') +Serializable+ interface and defines the
-'get/set' methods for the properties +who+ (the predictor) and +what+ (the
-prediction). 
+The XML from the service is generated using the standard Java +XMLEncoder+ class.
+Java provides other ways to generate XML but none quite as simple as 
++XMLEncoder+. In this example, an array of +Prediction+ objects is encoded in XML, 
+which requires that each +Prediction+ be +Serializable+; hence, the +Prediction+
+class implements the empty +Serializable+ interface and defines the
+'get/set' methods that define the properties +who+ (the predictor) and +what+ (the
+prediction). The +Predictions+ class contains properties so that the JSP script
+can set the servlet context and subsequently read the predictions from the
+data file. (The predictions need to be read only once from the file into the
+array; thereafter, the data in the array are used.) The +Predictions+ class also 
+has two utility methods to support the properties: the +populate+ method
+reads the data from a text file embedded in the WAR and the +toXML+ method 
+serializes the array of in-memory +Prediction+ objects into XML format. For now,
+the XML representation is generated on each request; a more efficient
+implementation is explained later.
 
 The predictions service can be deployed under the Tomcat web server using a provided 
 Ant script (with +%+ as the command-line prompt):
 
 ----
-% ant -Dwar.name=cliches deploy
+% ant -Dwar.name=preds deploy
 ----
 
-The first sidebar elaborates on the Apache Tomcat server and explains how to install and use
-this server. The second sidebar clarifies the Ant script, which is packaged with the book's
+Note 1 elaborates on the Apache Tomcat server and explains how to install and use
+this server. Note 2 clarifies the Ant script, which is packaged with the book's
 code examples. The deployed WAR file
-'cliches.war' includes a standard web deployment document, 'web.xml', so that
-the URI '/cliches/sayings.jsp' can be shortened to '/cliches/'. 
-
-.Installing and using the Tomcat web server
-[options="header"]
-****
-Apache Tomcat (_http://tomcat.apache.org/_) is a commercial-grade yet lightweight web server 
-implemented in Java. Tomcat has various subsystems for administration, security, logging,
-and trouble-shooting but its central subsystem is Catalina, a container that executes servlets, 
-including JSP and other scripts (_e.g._, JSF scripts) that Tomcat automatically translates into 
-servlets. Tomcat also includes a web console, tutorials, and sample code. This note focuses on 
-installing Tomcat and on basic post-installation tasks such as starting and stopping the web server.
-The current version is 7.x, which requires Java SE 6 or higher. Earlier Tomcat versions are
-still available.
-
-There are different ways to download Tomcat, including as a ZIP. Tomcat can be installed in
-any directory, for example, in _/usr/local/tomcat_ on a Unixy system or in _D:\tomcatWS_ on a 
-Windows system. For convenience, let 'TOMCAT_HOME' be the install directory. The
-directory 'TOMCAT_HOME/bin' has startup and showndown scripts for Unixy and Windows 
-systems. For instance, the startup script is _startup.sh_ for Unix and _startup.bat_ for
-Windows. Tomcat is written in Java but does not ship with the Java runtime; instead, Tomcat uses 
-the Java runtime on the host system. To that end, Tomcat requires that the
-environment variable 'JAVA_HOME' be set to the Java install directory (_e.g._, to
-_/usr/local/java7_, _D:\java7_, and the like). In summary, the key commands (with comments
-introduced with two semicolons) are (with +%+ as the command-line prompt):
-
-----
-% startup.sh   ;; or startup.bat on Windows to start Tomcat
-% shutdown.sh  ;; or shutdown.bat on Windows to stop Tomcat
-----
-
-The commands can be given at a command-line prompt. On startup, a message
-similar to
-
-----
-Using CATALINA_BASE:   /home/mkalin/tomcat7
-Using CATALINA_HOME:   /home/mkalin/tomcat7
-Using CATALINA_TMPDIR: /home/mkalin/tomcat7/temp
-Using JRE_HOME:        /usr/local/java
-Using CLASSPATH:       /home/mkalin/tomcat7/bin/bootstrap.jar
-----
-
-should appear.
-
-Under 'TOMCAT_HOME' there is directory named 'logs', which contains various log 
-files, and several other directories, some of which will be clarified later. A 
-important directory for now is 'TOMCAT_HOME/webapps', which holds JAR files with a '.war' extension
-(hence the name WAR file). Subdirectories under 'TOMCAT_HOME/webapps' can be added as
-needed. Deploying a web service under Tomcat is the same as deploying a web site: a WAR file 
-containing the site or the service is copied to 
-'TOMCAT_HOME/webapps'; and a web site or web service is undeployed by removing its WAR file.
-
-Tomcat maintains various log files in 'TOMCAT_HOME/logs', one of which is especially
-convenient for 'ad hoc' debugging. Tomcat automatically redirects output to 
-+System.err+ to 'TOMCAT_HOME/logs/catalina.out'. Accordingly, if a servlet executes
-
-----
-System.err.println("Goodbye, cruel world!");
-----
-
-the farewell message would appear in the _catalina.out_ log file.
-
-Apache Tomcat is not the only game in town. There is the related TomEE web server, 
-basically Tomcat with support for Java EE beyond servlets. Another popular Java-centric 
-web server is Jetty (_http://jetty.codehaus.org_). My first example uses 
-Tomcat but later examples use Jetty as well; and the next chapter explains how to
-install and run Jetty.
-****
-
-.An Ant script to automate Tomcat deployment
-[options="header"]
-*****
-The first sample web service is deployed to a web server such as Tomcat. The ZIP
-file with my code examples includes an Ant script to ease the task of deployment. 
-The Ant utility, written in Java, is available on all platforms. My script requires 
-Ant 1.6 or greater.
-
-Consider a web service that includes a
-JSP script, a back-end JavaBean, the Tomcat deployment file 'web.xml',
-and a JAR file that holds a JSON library. These artifacts reside in any directory
-on the local file system, hereafter the 'current working directory' or 'cwd' for short.
-The Ant file 'build.xml' is in the 'cwd'. Under the 'cwd' is a subdirectory named 'src'
-----
-cwd: build.xml
- |
-src
-----
-that holds the JSP script, the JAR file, and the deployment file:
-----
-cwd: build.xml
- |
-src: products.jsp, json.jar, web.xml
-----
-Suppose that the back-end JavaBean has the fully qualified name
-+acme.Products+. The layout is now
-
-----
-cwd: build.xml
- |
-src: products.jsp, json.jar, web.xml
- |
-acme: Products.java
-----
-
-Finally, assume that the 'src' directory also holds the data file 'new_products.db'.
-From the 'cwd' command-line, the command
-----
-% ant -Dwar.name=products.war deploy
-----
-does the following:
-
-* Creates the directory 'service1/build', which holds copies of files in directory 'src' and any subdirectories.
-* Compiles any _.java_ files, in this case _acme.org.Products.java_.
-* Builds the WAR file, whose major contents are:
-+
----- 
-WEB-INF/web.xml
-WEB-INF/classes/acme/org/Products.class
-WEB-INF/data/new_products.db
-WEB-INF/lib/json.jar
-acme/org/Products.java
-products.jsp
-----
-Any _.xml_ file winds up in _WEB-INF_; any _.jar_ file winds up
-in _WEB-INF/lib_; and any _.db_ file winds up in _WEB-INF/data_. JSP files 
-such as _products.jsp_ are at the WAR file's top level.
-
-* Copies the WAR file to 'TOMCAT_HOME/webapps' and thereby deploys the web service.
-* Leaves a copy of the WAR file in the 'cwd'.
-
-The Ant file 'build.xml' has extensive documentation and explains, in particular,
-what needs to be done to customize this file for your environment.
-Although the Ant script is targeted at Tomcat, the WAR files that it produces
-can be deployed to Jetty as well. Chapter 2 goes into the details of
-installing and running Jetty.
-*****
-
-==== A Client against the 'sayings' Web Service
-
-Later examples introduce
+'sayings.war' includes a standard web deployment document, 'web.xml', so that
+the URI '/preds/sayings.jsp' can be shortened to '/preds/'. Later examples introduce
 RESTful clients in Java and other languages; but, for now, either a browser or a 
 utility such as 'curl' is good enough. (The 'curl' utility is available on Unixy
 systems and a port for Windows can be found at from _http://curl.haxx.se/download.html_.)
 On a successful 'curl' request to the service
 
 ----
-% curl -v http://localhost:8080/cliches/
+% curl -v http://localhost:8080/preds/
 ----
 
-the response includes not only the XML shown earlier in Example 3 but also a trace (thanks to the '-v' flag) 
+the response includes not only the XML shown earlier in Figure 1.1 but also a trace (thanks to the '-v' flag) 
 of the HTTP request and response messages. The HTTP request is
 
 ----
-GET /cliches/ HTTP/1.1
+GET /sayings/ HTTP/1.1
 User-Agent: curl/7.19.7 
 Host: localhost:8080
 Accept: */*
 ----
 
-and the HTTP response start line and headers are
+and the HTTP response start line and header are
 
 ----
 HTTP/1.1 200 OK
@@ -1229,13 +1180,13 @@ for now, the goal is brevity and simplicity.
 If a POST request were sent to the RESTful predictions service
 
 ----
-% curl --request POST --data "foo=bar" http://localhost:8080/cliches/
+% curl --request POST --data "foo=bar" http://localhost:8080/sayings/
 ----
 
 the request message header becomes
 
 ----
-POST /cliches/ HTTP/1.1
+POST /test1/ HTTP/1.1
 User-Agent: curl/7.19.7 
 Host: localhost:8080
 Accept: */*
@@ -1259,18 +1210,22 @@ The error message
 GET requests only are allowed
 ----
 
-is in an HTML document that makes up the response message's body. Tomcat generates an HTML response
-because my code does not but could stipulate a format other than the Tomcat default format, HTML.
+is in an HTML document that makes up the response message's body, which contains the key/value 
+pair +foo/bar+. Tomcat generates an HTML response
+because a JSP script, in normal use, generates HTML for a browser to consume; and my code does
+not (but could) call for a format other than HTML.
 
-This first example illustrates how a JSP script 
-is readily adapted to support web services in addition to
+This first example thus illustrates how Java technologies such as JSP and
++HttpServlet+ are easily adapted to support web services in addition to
 web sites. The next section goes into more detail on servlets and JSP
-scripts. In summary, the predictions web service, which is implemented as the JSP script 'sayings.jsp' and the two
+scripts, encouraging their use for RESTful web services in Java.
+
+In summary, the _predictions_ service, which is implemented as the JSP script 'sayings.jsp' and the two
 back-end Java classes +Prediction' and 'Predictions', highlights key aspects of a REST:
 
-* The service provides access to resource under a standard name, the URI +/cliches/sayings.jsp+ or, in abbreviation, +/cliches/+.
+* The service provides access to resource under a standard name, the URI +/preds/sayings.jsp+ or, in abbreviation, +/preds/+.
 
-* The service filters access on the HTTP request verb. In this example, only GET requests are successful; any other type of request generates a 'bad method' error.
+* The service provides or denies access depending on the HTTP request verb. In this example, only GET requests are successful; any other type of request generates a 'bad method' error.
 
 * The service responds with an XML payload, which the consumer now must process in some appropriate way. This first example merely displays the XML without any 
 further processing.
@@ -1292,7 +1247,7 @@ code 405. Each of the +HttpServlet+ _do_-methods take the same two arguments:
 an +HttpServletRequest+ and an +HttpServletResponse+. The servlet request contains, as
 key/value pairs, all of the appropriate information encapsulated in the HTTP request.
 The +HttpServletRequest+ map is easy to read and, if needed, to update and to forward.
-The +HttpServletResponse+ has methods to adjust the HTTP response message as needed; 
+The +HttpServletResponse+ has methods to adjust the HTTP response message as needed
 and this class encapsulates an output stream to communicate back to the
 client.
 
@@ -1348,7 +1303,7 @@ and servlets.
 
 === What is Next?
 
-RESTful services are rich enough to warrant two chapters on the basics. Accordingly, the
+RESTful services are rich enough to warrant two chapters on the basics. Accordordingly, the
 next chapter focuses on the service side by exploring options for implementing
 and publishing RESTful services. The options include 
 
@@ -1358,7 +1313,7 @@ and publishing RESTful services. The options include
 
 * JAX-RS annotated resources published with a web server such as Tomcat or a lightweight container such as Grizzly.
 
-Chapter 3 then changes the focus to the client or consumer side. The chapter includes client code against commercial RESTful services such as
+Chapter 3 then changes the focus to the client or consumer side. The chapter includes client code against commercial RESTful services from
 Amazon, Twitter, and Tumblr together with a discussion about how the JAX-B (Java API for XML-Binding) packages can be put to
 good use by the hiding the XML in the consumption of RESTful services.
 
