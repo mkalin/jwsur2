@@ -794,28 +794,51 @@ original version. Here is a sample JSON response from a GET request on the +Pred
 }}
 ----
 
-The layout has been edited slightly for readability.
+=== A RESTful Web Service as a JAX-RS Resource
 
-=== Providing an XML Schema for a RESTful Web Service
+The servlet API, the grizzled workhorse for Java web sites, is still nimble enough to support RESTful web services as well.
+There are more recent APIs, among them JAX-RS (Java API for XML-RESTful Web Services). JAX-RS relies upon Java annotations to 
+advertise the RESTful role that a class and its encapsulated methods play. Jersey ('http://jersey-java.net') is the 
+'reference implementation' (RI) of JAX-RS and includes Grizzly, a development-oriented web server and 
+container that can be used to publish JAX-RS services. JAX-RS works well with Tomcat and Jetty (see the sidebar).
+The Jersey distribution can be download in various ways, including as a bundled JAR file for convenience. My examples
+assume that Jersey is available as this single JAR file, at this writing 'jersey-bundle-1.17.jar'.
 
-A web service client might prefer JSON over XML for various reasons but one obvious reason for
-this preference is that client is a JavaScript program ready to treat the JSON response document as a
-native JavaScript object. The JAX-B (Java API for XML-Binding) interfaces and classes offer a 
-similiarly convenient way for a Java client of a RESTful service to treat an XML response document
-as a native Java object; but some preparatory work is required. Here is a summary of how things
-would work:
+.Deploying JAX-RS web services with Tomcat
+****
+The Jersey packages do not ship with core Java. These packages must be available to Tomcat (or Jetty)
+in order for the web server to publish a JAX-RS service. Further, the service's deployed WAR file
+nees to link, through 'web.xml' entries, the service and the Jersey infrastructure. In effect, the
+'web.xml' tells Tomcat to do the following:
 
-* The RESTful service offers client, in addition to its regular business operations, an XML Schema or
-equivalent. The XML Schema specifies a grammar for the XML payload that the client receives.
+* Any request for the JAX-RS service should be passed to a Jersey servlet, which in turn interacts
+with the particular web service.
 
-* A Java client can apply JAX-B utilities to the XML Schema in order to generate native Java data types. 
-For example, the Java client of the 'sayings' service could transform the XML list of predictions into a 
-+List<Prediction>+ and then process this +List+ in some typical Java way. Languages other than Java have
-utilities comparable to JAX-B.
+* Throughout the request/response cycle, the Jersey servlet as an intermediary between the service
+and the servlet container.
 
-Figure X depicts this scenario. 
+At a practical level, two steps are required:
 
-The JAX-B utilities offer the client the chance to bypass XML parsing and, instead, to generate Java 
-directly from XML. The next chapter goes into the JAX-B details; for now, the issue is how to generate
-an XML Schema for the 'sayings' service.
+* The Jersey bundle in a single JAR (or its equivalent) should be copied to 'TOMCAT_HOME/lib'. If Tomcat is
+running, it needs to be restarted as Tomcat loads the JAR files in the 'lib' directory only at start-up.
 
+* The deployed WAR file's 'web.xml' links the web service to Jersey. Here is a minimalist example
+of such a 'web.xml' with 'cliches3.war' as the name name of the WAR file:
++
+----
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app>
+  <servlet>
+     <servlet-name>jerseyServlet</servlet-name>
+     <servlet-class>com.sun.jersey.spi.container.servlet.ServletContainer</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>jerseyServlet</servlet-name>
+    <url-pattern>/cliches3/*</url-pattern>
+  </servlet-mapping>
+</web-app> 
+----
+This 'web.xml' instructs Tomcat to forward any request whose URI begins with '/cliches3/' to the
+Jersey servlet, which then interacts with the web service deployed in 'cliches3.war'.
+
+****

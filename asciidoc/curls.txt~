@@ -1,6 +1,0 @@
-curl localhost:8080/cliches2/
-curl localhost:8080/cliches2/sayings.jsp?id=31
-curl --request POST --data "who=TSEliot&what=This is the way the world will end" localhost:8080/cliches2/
-curl localhost:8080/cliches2/
-curl --request PUT --data "id=33&what=This is an update" localhost:8080/cliches2/
-curl localhost:8080/cliches2/
