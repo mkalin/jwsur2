@@ -1,8 +1,0 @@
-Web Services and Service-Oriented Architecture
-
-It is common to link web services and service-oriented architecture (hereafter, SOA).
-SOA, like REST itself, is more an architectural style--indeed, even a mindset--than a 
-set of well-defined, strictly enforced rules for distributed systems. Perhaps the least
-controversial aspect of SOA is that web services play a natural, important role within
-this architecture.
-

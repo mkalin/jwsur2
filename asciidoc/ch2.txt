@@ -797,13 +797,14 @@ original version. Here is a sample JSON response from a GET request on the +Pred
 === A RESTful Web Service as a JAX-RS Resource
 
 The servlet API, the grizzled workhorse for Java web sites, is still nimble enough to support RESTful web services as well.
-There are more recent APIs, among them JAX-RS (Java API for XML-RESTful Web Services). JAX-RS relies upon Java annotations to 
+There are more recent APIs, among them JAX-RS (Java API for XML-RESTful Web Services). In a JAX-RS web service,
+a 'resource' is published against which clients can issue requests; and this JAX-RS resource is implemented as a 
+Java package, that is, a collection of compiled '.class' files.
+JAX-RS relies upon Java annotations to 
 advertise the RESTful role that a class and its encapsulated methods play. Jersey ('http://jersey-java.net') is the 
 'reference implementation' (RI) of JAX-RS and includes Grizzly, a development-oriented web server and 
 container that can be used to publish JAX-RS services. RESTEasy, a JBoss project ('http://www.jboss.org/resteasy'), is
-another implementation. JAX-RS works well with Tomcat and Jetty (see the sidebar).
-The Jersey distribution can be download in various ways, including as a bundled JAR file for convenience. My examples
-assume that Jersey is available as this single JAR file, at this writing 'jersey-bundle-1.17.jar'.
+another implementation. JAX-RS also works well with Tomcat and Jetty.
 
 .Deploying JAX-RS web services with Tomcat
 ****
@@ -844,14 +845,24 @@ Jersey servlet, which then interacts with the web service deployed in 'cliches3.
 
 ****
 
-This section has two examples. The first example introduces the look and feel of JAX-RS; the second
-example, a port of the 'sayings' service to JAX-RS, illustrates various service-side features of this API.
+This section has two examples. The first example introduces the look and feel of JAX-RS; and the
+first example is published with Grizzly. 
+The second example, a port of the 'sayings' service to JAX-RS, illustrates 
+additional service-side features of this API; and this example is published with Tomcat.
 
 ==== A First JAX-RS Web Service
 
 Example 5 is the +Adage+ class, which has an +import+ for the JAX-B (Java API for XML-Binding) 
 annotation +XmlRootElement+. The term 'binding' refers, in this context, to linking a 
-Java data type such as +String+ to an XML type, in this case 'xsd:string'. 
+Java data type such as +String+ to an XML type, in this case 'xsd:string'. This binding
+means that Java objects can be serialized into XML documents, which in turn can be 
+deserialized into Java objects. This two-way transformation, from Java to XML and from
+XML to Java, promotes the language transparency at the core of web service
+interoperability: language 'A' generates the XML, which language 'B' consumes--and the
+differences between the two languages are thereby rendered transparent to both
+'A' and 'B'. For now, the focus is more limited: Java generation of XML (and other MIME
+types, including JSON) in a JAX-RS service.
+
 [[Ex5]]
 .The +Adage+ class annotated for XML generation through JAX-B
 ====
@@ -931,14 +942,14 @@ public class Adages {
     @GET
     @Produces({MediaType.APPLICATION_XML}) // could use "application/xml" instead
     public JAXBElement<Adage> getXml() {
-	return transform2Document(createAdage());
+	return toXml(createAdage());
     }
 
     @GET
     @Produces({MediaType.APPLICATION_JSON})
     @Path("/json")
     public String getJson() {
-	return "json\n";
+	return toJson(createAdage());
     }
 
     @GET
@@ -948,19 +959,67 @@ public class Adages {
 	return createAdage().toString() + "\n";
     }
     
-    // Java object
+    // Create an Adage and set the words property, which
+    // likewise sets the wordCount property. The adage is
+    // randomly selected from the array, aphorisms.
     private Adage createAdage() {
 	Adage adage = new Adage();
 	adage.setWords(aphorisms[new Random().nextInt(aphorisms.length)]);
 	return adage;
     }
 
-    // Java object as XML/JSON document
+    // Java Adage --> XML document
     @XmlElementDecl(namespace = "http://aphorism.adage", name = "adage")
-    private JAXBElement<Adage> transform2Document(Adage adage) {
-	return new JAXBElement<Adage>(new QName("adage"), Adage.class, null, adage);
+    private JAXBElement<Adage> toXml(Adage adage) {
+	return new JAXBElement<Adage>(new QName("adage"), Adage.class, adage);
+    }
+
+    // Java Adage --> JSON document
+    private String toJson(Adage adage) {
+	return adage.toString();
     }
 } 
 ----
 ====
+
+As noted earlier, the Jersey implementation of JAX-RS includes the lightweight Grizzly web server, which
+acts as a container for JAX-RS resources. Example 7 is a publisher for the 'adages' resource.
+
+[[Ex7]]
+.A Grizzly-based publisher for the 'adages' JAX-RS resource
+====
+----
+package aphorism;
+
+import com.sun.jersey.api.container.grizzly2.GrizzlyServerFactory;
+import com.sun.jersey.api.core.PackagesResourceConfig;
+import com.sun.jersey.api.core.ResourceConfig;
+import org.glassfish.grizzly.http.server.HttpServer;
+
+public class Main {
+    public static void main(String[] args) {
+	String baseURL = "http://localhost:9876";
+	ResourceConfig config = new PackagesResourceConfig("aphorism");
+	System.out.println("Starting server on port 9876. Hit an key to stop server.\n");
+
+	try {
+	    HttpServer httpServer = GrizzlyServerFactory.createHttpServer(baseURL, config);
+
+	    System.in.read();
+	    httpServer.stop();
+	}
+	catch(Exception e) { }
+    }    
+}
+----
+====
+
+The full code example includes an Ant script, 'grizzly.xml', to handle compilation and
+execution (see the sidebar for details about the JAR files required for Jersey). The
+command
+----
+% ant -f grizzly.xml run
+---
+from the command line compiles the '.java' files, builds an executable 'GrizzlyPublish.jar',
+and executes this JAR file to start the server. 
 
