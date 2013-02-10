@@ -844,10 +844,123 @@ Jersey servlet, which then interacts with the web service deployed in 'cliches3.
 
 ****
 
-This section has two examples. The first is has very simple logic so that the focus stays on the
-JAX-RS artifacts, in particular the annotations. The second example is a port of the 'sayings' service
-to JAX-RS.
+This section has two examples. The first example introduces the look and feel of JAX-RS; the second
+example, a port of the 'sayings' service to JAX-RS, illustrates various service-side features of this API.
 
 ==== A First JAX-RS Web Service
 
-xxxxx
+Example 5 is the +Adage+ class, which has an +import+ for the JAX-B (Java API for XML-Binding) 
+annotation +XmlRootElement+. The term 'binding' refers, in this context, to linking a 
+Java data type such as +String+ to an XML type, in this case 'xsd:string'. 
+[[Ex5]]
+.The +Adage+ class annotated for XML generation through JAX-B
+====
+----
+package aphorism;
+
+import javax.xml.bind.annotation.XmlRootElement;
+
+@XmlRootElement(name = "adage")
+public class Adage {
+    private String words;
+    private int wordCount;
+    
+    public Adage() { }
+
+    // overrides
+    @Override
+    public String toString() {
+	return words + " -- " + wordCount + " words";
+    }
+    
+    // properties
+    public void setWords(String words) { 
+	this.words = words; 
+	this.wordCount = words.trim().split("\\s+").length;
+    }
+    public String getWords() { return this.words; }
+
+    public void setWordCount(int wordCount) { }
+    public int getWordCount() { return this.wordCount; }
+}
+----
+====
+The +XmlRootElement+ annotation signals that an +Adage+ object can be transformed into an XML document
+whose 'document' or 'root' (that is, outermost) element is named +adage+. For example,
+the XML document
+----
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<adage>
+  <wordCount>7</wordCount>
+  <words>What can be shown cannot be said.</words>
+</adage>
+----
+results from the JAX-B transformation of an in-memory +Adage+ object to an XML document.
+
+The +Adages+ class (see Example 6) is a JAX-RS 'resource' that accepts RESTful requests, in 
+this case only GET requests, and responds with payloads of three MIME types: +text/plain+,
++application/json+, and +application/xml+.
+
+[[Ex6]]
+.The 'Adages' class as a JAX-RS resource
+====
+----
+package aphorism;
+
+import javax.xml.bind.annotation.XmlElementDecl;
+import javax.xml.bind.JAXBElement;
+import javax.xml.namespace.QName;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
+import java.util.Random;
+
+@Path("/")
+public class Adages {
+    // Add aphorisms to taste...
+    private String[ ] aphorisms = 
+       {"What can be shown cannot be said.",
+	"If a lion could talk, we could not understand him.",
+	"Philosophy is a battle against the bewitchment of our intelligence by means of language.",
+	"Ambition is the death of thought.",
+	"The limits of my language mean the limits of my world."};
+
+    public Adages() { }
+
+    @GET
+    @Produces({MediaType.APPLICATION_XML}) // could use "application/xml" instead
+    public JAXBElement<Adage> getXml() {
+	return transform2Document(createAdage());
+    }
+
+    @GET
+    @Produces({MediaType.APPLICATION_JSON})
+    @Path("/json")
+    public String getJson() {
+	return "json\n";
+    }
+
+    @GET
+    @Produces({MediaType.TEXT_PLAIN})
+    @Path("/plain")
+    public String getPlain() {
+	return createAdage().toString() + "\n";
+    }
+    
+    // Java object
+    private Adage createAdage() {
+	Adage adage = new Adage();
+	adage.setWords(aphorisms[new Random().nextInt(aphorisms.length)]);
+	return adage;
+    }
+
+    // Java object as XML/JSON document
+    @XmlElementDecl(namespace = "http://aphorism.adage", name = "adage")
+    private JAXBElement<Adage> transform2Document(Adage adage) {
+	return new JAXBElement<Adage>(new QName("adage"), Adage.class, null, adage);
+    }
+} 
+----
+====
+

@@ -500,7 +500,7 @@ to the <code class="literal">sendResponse</code> method:</p><pre class="screen">
       throw new HTTPException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
    }
 }</pre><p>The deployed WAR file <span class="emphasis"><em>cliches2.war</em></span> includes a lightweight, third-party JSON library in the
-JAR file <span class="emphasis"><em>json.jar</em></span>. (See URL) If the client prefers JSON over XML, then the response <code class="literal">payload</code>
+JAR file <span class="emphasis"><em>json.jar</em></span> (see <span class="emphasis"><em>http://www.json.org/java</em></span>). If the client prefers JSON over XML, then the response <code class="literal">payload</code>
 is converted to JSON. If anything goes awry in sending the response back to the client,
 the servlet throws an <code class="literal">HTTPException</code>, which in this case generates a resonse with
 HTTP status code 500 for <span class="emphasis"><em>Internal Server Error</em></span>, a catch-all for server-side
@@ -512,7 +512,7 @@ the <code class="literal">id</code> of the <code class="literal">Prediction</cod
 <code class="literal">doPost</code> and <code class="literal">doPut</code> differ significantly because neither Tomcat nor Jetty generates a
 usable parameter map, the <code class="literal">HttpServletRequest</code>, on a PUT request; both web servers do
 generate a usable parameter map on a POST request. As a result, the <code class="literal">doPut</code> implementation
-needs to get close to the HTTP metal.</p><p>To begin, here is the straightforward <code class="literal">doPost</code> implementation, without the comments:</p><pre class="screen">public void doPost(HttpServletRequest request, HttpServletResponse response) {
+needs to get close to the HTTP metal.</p><p>To begin, here is the <code class="literal">doPost</code> implementation, without the comments:</p><pre class="screen">public void doPost(HttpServletRequest request, HttpServletResponse response) {
    String who = request.getParameter("who");
    String what = request.getParameter("what");
 
@@ -529,7 +529,7 @@ needs to get close to the HTTP metal.</p><p>To begin, here is the straightforwar
 }</pre><p>The two calls to the <code class="literal">getParameter</code> method extract the required data. A new <code class="literal">Prediction</code>
 is then constructed, its <code class="literal">who</code> and <code class="literal">what</code> properties are set, and a confirmation is
 generated for the client.</p><p>In the <code class="literal">doPut</code> method, the <code class="literal">getParameter</code> method does not work correctly because neither
-Tomcat nor Jetty builds an appropriate parameter map inside of the <code class="literal">HttpServletRequest</code> object.
+Tomcat nor Jetty builds an appropriate parameter map inside of the <code class="literal">HttpServletRequest</code>.
 The workaround is to access directly the input stream encapsulated in the
 <code class="literal">HttpServletRequest</code></p><pre class="screen">BufferedReader br =
    new BufferedReader(new InputStreamReader(request.getInputStream()));
@@ -608,7 +608,8 @@ original version. Here is a sample JSON response from a GET request on the <code
 There are more recent APIs, among them JAX-RS (Java API for XML-RESTful Web Services). JAX-RS relies upon Java annotations to
 advertise the RESTful role that a class and its encapsulated methods play. Jersey (<span class="emphasis"><em>http://jersey-java.net</em></span>) is the
 <span class="emphasis"><em>reference implementation</em></span> (RI) of JAX-RS and includes Grizzly, a development-oriented web server and
-container that can be used to publish JAX-RS services. JAX-RS works well with Tomcat and Jetty (see the sidebar).
+container that can be used to publish JAX-RS services. RESTEasy, a JBoss project (<span class="emphasis"><em>http://www.jboss.org/resteasy</em></span>), is
+another implementation. JAX-RS works well with Tomcat and Jetty (see the sidebar).
 The Jersey distribution can be download in various ways, including as a bundled JAR file for convenience. My examples
 assume that Jersey is available as this single JAR file, at this writing <span class="emphasis"><em>jersey-bundle-1.17.jar</em></span>.</p><div class="sidebar" title="Deploying JAX-RS web services with Tomcat"><p class="title"><b>Deploying JAX-RS web services with Tomcat</b></p><p>The Jersey packages do not ship with core Java. These packages must be available to Tomcat (or Jetty)
 in order for the web server to publish a JAX-RS service. Further, the service’s deployed WAR file
@@ -636,4 +637,96 @@ of such a <span class="emphasis"><em>web.xml</em></span> with <span class="empha
     &lt;url-pattern&gt;/cliches3/*&lt;/url-pattern&gt;
   &lt;/servlet-mapping&gt;
 &lt;/web-app&gt;</pre></li></ul></div><p>This <span class="emphasis"><em>web.xml</em></span> instructs Tomcat to forward any request whose URI begins with <span class="emphasis"><em>/cliches3/</em></span> to the
-Jersey servlet, which then interacts with the web service deployed in <span class="emphasis"><em>cliches3.war</em></span>.</p></div></div></div></div></body></html>
+Jersey servlet, which then interacts with the web service deployed in <span class="emphasis"><em>cliches3.war</em></span>.</p></div><p>This section has two examples. The first example introduces the look and feel of JAX-RS; the second
+example, a port of the <span class="emphasis"><em>sayings</em></span> service to JAX-RS, illustrates various service-side features of this API.</p><div class="section" title="1.3.1. A First JAX-RS Web Service"><div class="titlepage"><div><div><h4 class="title"><a id="_a_first_jax_rs_web_service"></a>1.3.1. A First JAX-RS Web Service</h4></div></div></div><p>Example 5 is the <code class="literal">Adage</code> class, which has an <code class="literal">import</code> for the JAX-B (Java API for XML-Binding)
+annotation <code class="literal">XmlRootElement</code>. The term <span class="emphasis"><em>binding</em></span> refers, in this context, to linking a
+Java data type such as <code class="literal">String</code> to an XML type, in this case <span class="emphasis"><em>xsd:string</em></span>.</p><div class="example"><a id="Ex5"></a><p class="title"><b>Example 5. The <code class="literal">Adage</code> class annotated for XML generation through JAX-B</b></p><div class="example-contents"><pre class="screen">package aphorism;
+
+import javax.xml.bind.annotation.XmlRootElement;
+
+@XmlRootElement(name = "adage")
+public class Adage {
+    private String words;
+    private int wordCount;
+
+    public Adage() { }
+
+    // overrides
+    @Override
+    public String toString() {
+        return words + " -- " + wordCount + " words";
+    }
+
+    // properties
+    public void setWords(String words) {
+        this.words = words;
+        this.wordCount = words.trim().split("\\s+").length;
+    }
+    public String getWords() { return this.words; }
+
+    public void setWordCount(int wordCount) { }
+    public int getWordCount() { return this.wordCount; }
+}</pre></div></div><br class="example-break" /><p>The <code class="literal">XmlRootElement</code> annotation signals that an <code class="literal">Adage</code> object can be transformed into an XML document
+whose <span class="emphasis"><em>document</em></span> or <span class="emphasis"><em>root</em></span> (that is, outermost) element is named <code class="literal">adage</code>. For example,
+the XML document</p><pre class="screen">&lt;?xml version="1.0" encoding="UTF-8" standalone="yes"?&gt;
+&lt;adage&gt;
+  &lt;wordCount&gt;7&lt;/wordCount&gt;
+  &lt;words&gt;What can be shown cannot be said.&lt;/words&gt;
+&lt;/adage&gt;</pre><p>results from the JAX-B transformation of an in-memory <code class="literal">Adage</code> object to an XML document.</p><p>The <code class="literal">Adages</code> class (see Example 6) is a JAX-RS <span class="emphasis"><em>resource</em></span> that accepts RESTful requests, in
+this case only GET requests, and responds with payloads of three MIME types: <code class="literal">text/plain</code>,
+<code class="literal">application/json</code>, and <code class="literal">application/xml</code>.</p><div class="example"><a id="Ex6"></a><p class="title"><b>Example 6. The <span class="emphasis"><em>Adages</em></span> class as a JAX-RS resource</b></p><div class="example-contents"><pre class="screen">package aphorism;
+
+import javax.xml.bind.annotation.XmlElementDecl;
+import javax.xml.bind.JAXBElement;
+import javax.xml.namespace.QName;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
+import java.util.Random;
+
+@Path("/")
+public class Adages {
+    // Add aphorisms to taste...
+    private String[ ] aphorisms =
+       {"What can be shown cannot be said.",
+        "If a lion could talk, we could not understand him.",
+        "Philosophy is a battle against the bewitchment of our intelligence by means of language.",
+        "Ambition is the death of thought.",
+        "The limits of my language mean the limits of my world."};
+
+    public Adages() { }
+
+    @GET
+    @Produces({MediaType.APPLICATION_XML}) // could use "application/xml" instead
+    public JAXBElement&lt;Adage&gt; getXml() {
+        return transform2Document(createAdage());
+    }
+
+    @GET
+    @Produces({MediaType.APPLICATION_JSON})
+    @Path("/json")
+    public String getJson() {
+        return "json\n";
+    }
+
+    @GET
+    @Produces({MediaType.TEXT_PLAIN})
+    @Path("/plain")
+    public String getPlain() {
+        return createAdage().toString() + "\n";
+    }
+
+    // Java object
+    private Adage createAdage() {
+        Adage adage = new Adage();
+        adage.setWords(aphorisms[new Random().nextInt(aphorisms.length)]);
+        return adage;
+    }
+
+    // Java object as XML/JSON document
+    @XmlElementDecl(namespace = "http://aphorism.adage", name = "adage")
+    private JAXBElement&lt;Adage&gt; transform2Document(Adage adage) {
+        return new JAXBElement&lt;Adage&gt;(new QName("adage"), Adage.class, null, adage);
+    }
+}</pre></div></div><br class="example-break" /></div></div></div></div></body></html>
