@@ -60,10 +60,14 @@ there must be an intermediary layer that handles the differences in data types
 between the service and the client languages. XML technologies, which
 support structured document interchange and processing, act as one such
 intermediary level. Another intermediary level is JSON (JavaScript Object Notation).
+XML and JSON are both data-interchange formats but JSON clearly has the upper hand 
+with data-receivers written in JavaScript because a JSON document is the
+string representation of a native JavaScript object. 
 Web service clients are increasingly JavaScript programs embedded in
-HTML documents and executing in a browser.  For a JavaScript
-consumer of a web service, JSON has obvious appeal because a JSON document represents 
-a native JavaScript object. Chapter 3 focuses on XML and JSON payloads from
+HTML documents and executing in a browser; and such clients process
+JSON with less fuss than they do XML. Even among non-JavaScript clients, JSON has gained
+in popularity; for one thing, most programmers find JSON more readable than XML.
+Chapter 3 focuses on XML and JSON payloads from
 RESTful web services. In SOAP-based services, XML remains the dominant format, although 
 the DotNet framework is especially good at giving JSON equal status. 
 

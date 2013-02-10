@@ -632,7 +632,7 @@ private void sendResponse(HttpServletResponse res, String payload, boolean json)
 }
 ----
 The deployed WAR file 'cliches2.war' includes a lightweight, third-party JSON library in the
-JAR file 'json.jar'. (See URL) If the client prefers JSON over XML, then the response +payload+
+JAR file 'json.jar' (see 'http://www.json.org/java'). If the client prefers JSON over XML, then the response +payload+
 is converted to JSON. If anything goes awry in sending the response back to the client,
 the servlet throws an +HTTPException+, which in this case generates a resonse with
 HTTP status code 500 for 'Internal Server Error', a catch-all for server-side
@@ -648,7 +648,7 @@ usable parameter map, the +HttpServletRequest+, on a PUT request; both web serve
 generate a usable parameter map on a POST request. As a result, the +doPut+ implementation
 needs to get close to the HTTP metal.
 
-To begin, here is the straightforward +doPost+ implementation, without the comments:
+To begin, here is the +doPost+ implementation, without the comments:
 
 ----
 public void doPost(HttpServletRequest request, HttpServletResponse response) {
@@ -673,7 +673,7 @@ is then constructed, its +who+ and +what+ properties are set, and a confirmation
 generated for the client. 
 
 In the +doPut+ method, the +getParameter+ method does not work correctly because neither
-Tomcat nor Jetty builds an appropriate parameter map inside of the +HttpServletRequest+ object.
+Tomcat nor Jetty builds an appropriate parameter map inside of the +HttpServletRequest+.
 The workaround is to access directly the input stream encapsulated in the 
 +HttpServletRequest+
 
@@ -800,7 +800,8 @@ The servlet API, the grizzled workhorse for Java web sites, is still nimble enou
 There are more recent APIs, among them JAX-RS (Java API for XML-RESTful Web Services). JAX-RS relies upon Java annotations to 
 advertise the RESTful role that a class and its encapsulated methods play. Jersey ('http://jersey-java.net') is the 
 'reference implementation' (RI) of JAX-RS and includes Grizzly, a development-oriented web server and 
-container that can be used to publish JAX-RS services. JAX-RS works well with Tomcat and Jetty (see the sidebar).
+container that can be used to publish JAX-RS services. RESTEasy, a JBoss project ('http://www.jboss.org/resteasy'), is
+another implementation. JAX-RS works well with Tomcat and Jetty (see the sidebar).
 The Jersey distribution can be download in various ways, including as a bundled JAR file for convenience. My examples
 assume that Jersey is available as this single JAR file, at this writing 'jersey-bundle-1.17.jar'.
 
@@ -842,3 +843,11 @@ This 'web.xml' instructs Tomcat to forward any request whose URI begins with '/c
 Jersey servlet, which then interacts with the web service deployed in 'cliches3.war'.
 
 ****
+
+This section has two examples. The first is has very simple logic so that the focus stays on the
+JAX-RS artifacts, in particular the annotations. The second example is a port of the 'sayings' service
+to JAX-RS.
+
+==== A First JAX-RS Web Service
+
+xxxxx
