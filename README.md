@@ -17,3 +17,13 @@ Best of luck with the code. Make it better.
 
 mgk
 
+______
+A "Mavenized" version of the code exists on the branch 'jwsur2-maven'. It started as a contribution from a reader of the book and is not actively maintained by Martin Kalin. Although very similar, it is not an exact replica of the main branch. The code is a work-in-progress and is solely meant for educational purposes; the author of the code assumes no responsibility for it's correctness, completeness or quality. The same usage agreements apply to the Maven branch as the main one.
+
+<dl>
+  <dt>System Requirements for the Maven branch:</dt>
+  <dd>Java 1.7.0 or above</dd>
+  <dd>Maven 3.0 or above</dd>
+</dl>
+
+The Maven branch uses embedded Jetty for deployment.
