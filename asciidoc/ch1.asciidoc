@@ -1,0 +1,1786 @@
+[[jwsur_2nd_chapter_1]]
+== Web Services Quickstart
+
+Although the term _web service_ has various, imprecise, and evolving meanings, 
+a working definition should be enough for the upcoming code example, which consists
+of a service and a client, also known as a consumer or requester. As the name suggests, 
+a web service is a kind of webified application, that is, an application typically 
+delivered over HTTP (HyperText Transport Protocol). HTTPS (HTTP Secure) adds a security
+layer to HTTP; hence, a service delivered over HTTPS likewise counts as web service. Until the
+main topic of interest is web service security, HTTP should be understood to include HTTPS.
+
+Amazon, a pioneer in web services, is well-known for its various web sites, among which
+is the E-Commerce site for shopping. Amazon has other popular web sites as well. Of interest here
+is that the data and functionality available at Amazon web sites are likewise available as
+Amazon web services. For example, someone can use a browser to shop interactively at the Amazon E-Commerce site; but
+this person also could write a program, as later examples show, to do the shopping through the corresponding
+Amazon E-Commerce web service. Amazon is particularly good at pairing off its web sites with web services.
+
+Web services
+can be programmed a variety of languages, old and new. 
+The obvious way to publish a web service is with a web server; and a web service 
+client needs to execute on a machine that has network access, usually over HTTP, to the 
+web server. In more technical 
+terms, a web service is a distributed software system whose components can be deployed and executed on physically
+distinct devices. Consider, for example, a web server 'host1' that hosts a web service and a mobile device 'host2', which 
+hosts an application that issues
+requests against the service on 'host1' (see Figure 1-1). 
+Web services may be more architecturally more complicated than this, of course; for one thing, a service may
+have many clients issuing requests against it and the service itself may be composed of other services.
+For instance, a stock-picking web service might consist of several code components, 
+each hosted on a separate commercial-grade web server; and any mix of PCs, handhelds, and other 
+networked devices might host programs that consume the service. Although the building blocks of web services
+are relatively simple, the web services themselves can be arbitrarily complex.
+
+[[fig1_1]]
+.Figure 1-1. A web service and one of its clients.
+-----
+   +---------+    HTTP request     +---------+
+   |   web   |<--------------------| service |
+   | service |-------------------->| client  |
+   +---------+    HTTP response    +---------+
+  host1: server                 host2: mobile device
+-----
+
+An HTTP request goes, by definition, from client to server; and an HTTP response goes, also 
+by definition, from server to client. For web services over HTTP, the HTTP messages are the
+infrastructure; and these HTTP messages can be combined into basic conversational
+patterns that characterize a web service. For example, if the web service conversation starts with an HTTP request that
+expects an HTTP response, the pattern is the familiar 'request/response' conversation.
+By contrast, if the
+conversation starts with an HTTP message from the server, a message that expects a message from
+the client in return, then the pattern is 'solicit/response'. Richer conversational patterns can
+be composed out of such basic two-message patterns. Indeed, these two-message patterns are composed of
+even more primitive ones: a message from client to server without a response is 
+a pattern known as 'one-way'; and the reverse pattern, from server to client without a 
+client response, is known as 'notification'. Web services tend to be simple in structure. The four
+conversational patterns enumerated just now cover most modern web services; and request/response is
+the pattern that still dominates.
+
+Web services come in two popular flavors: SOAP-based and REST-style. SOAP is an XML dialect with
+a grammar that specifies the structure that a document must have in order to count as SOAP. In a
+typical SOAP-based service, the client sends SOAP messages to the service and the service 
+responds in kind, that is, with SOAP messages. REST-style services are hard to characterize in a 
+sentence or two but, with respect to pattern, these services tend to be request/response; and the same holds
+for SOAP-based services. For now, a REST-style service is one that treats HTTP
+not only as transport infrastructure also but as a set of guidelines for designing service requests 
+and service responses. In a REST-style service, HTTP itself can be seen as an API. SOAP has standards, tool-kits, and 
+bountiful software libraries. REST has no 
+official standards, comparatively few tool-kits, and uneven software libraries among programming languages. Yet there is growing
+support for REST-style services across programmings languages; hence, it seems only a matter of time until 
+tool-kits and libraries for REST-style services mature.
+
+From an historical perspective, the
+RESTful approach to web services can be viewed as an antidote to the creeping complexity of SOAP-based web services. 
+SOAP-based services are designed to be transport neutral; as a result, SOAP messaging may seem overly complicated
+if the transport is, in fact, HTTP.
+This book covers SOAP-based and REST-style web services, starting with REST-style ones. This chapter
+ends with a sample REST-style service and sample client calls against the service.
+At present, the distinction between the two flavors of web service is not sharp because a SOAP-based service delivered over 
+HTTP can be seen as a special case of a REST-style service; and HTTP remains the dominant transport for 
+SOAP-based services. 
+
+SOAP originally stood for Simple Object 
+Access Protocol and then, by serendipity but never officially, might have stood for Service
+Oriented Architecture (SOA) Protocol. (SOA is discussed in Section 1.4.) 
+The World Wide Web Consortium (hereafter, W3C) currently
+oversees SOAP; and SOAP officially is no longer an acronym.
+
+=== Web Service Miscellany
+
+Except in test mode, the client of either a SOAP-based or REST-style
+service is rarely a web browser but, rather, usually an application without a
+graphical user-interface. The client may be written in any language with
+the appropriate support libraries. Indeed, a major appeal of web services
+is language transparency: the service and its clients need not be written
+in the same language. Language transparency is a key contributor to web service
+interoperability, that is, the ability of web
+services and their consumers to interact seamlessly despite differences in
+programming languages, support libraries, operating systems, and hardware platforms. 
+To underscore this appeal, my examples use a mix of languages besides Java, among them 
+C#, JavaScript, and Perl. My sample clients in Java consume services written in languages other
+than Java, indeed, sometimes in languages unknown. 
+
+There is no magic in language transparency, of course. If a
+web service written in Java can have a Python or a Ruby consumer,
+there must be an intermediary layer that handles the differences in data types
+between the service and the client languages. XML technologies, which
+support structured document interchange and processing, act as one such
+intermediary level. Another intermediary level is JSON (JavaScript Object Notation).
+XML and JSON are both data-interchange formats but JSON clearly has the upper hand 
+with data-receivers written in JavaScript because a JSON document is the
+text representation of a native JavaScript object. 
+Web service clients are increasingly JavaScript programs embedded in
+HTML documents and executing in a browser; and such clients process
+JSON with less fuss than they do XML. Even among non-JavaScript clients, JSON has gained
+in popularity; for one thing, JSON is more readable than XML because JSON has relatively less markup.
+Chapter 2 illustrates various ways in which REST-style services can generate XML and 
+JSON payloads; then Chapter 3 focuses on consuming XML and JSON payloads from
+RESTful web services. In SOAP-based services, XML remains the dominant format, although 
+the DotNet framework is especially good at giving JSON equal status. 
+
+Several features distinguish web services from other distributed
+software systems. Here are three:
+
+Open infrastructure:: Web services are deployed using industry-standard,
+vendor-independent protocols and languages such as HTTP, XML, and JSON, 
+all of which are ubiquitous and well understood. Web services can 
+piggy-back on
+networking, data formatting, security, and other infrastructures
+already in place, which lowers entry costs and promotes
+interoperability among services. Organizations that publish web sites
+with production-grade web servers such as Apache2, IIS, and Nginx can
+publish web services with these very web servers. Firewalls and other
+security mechanisms that defend web sites thereby defend web services as well.
+
+Platform and language transparency:: Web services and their clients can interoperate even if
+written in different programming languages. Languages such as C,
+C#, Go, Java, JavaScript, Perl, Python, Ruby, and others provide libraries,
+utilities, and even frameworks in support of web services. Web services
+can be published and consumed on various hardware platforms and under
+different operating systems. 
+Web services are an excellent way to 
+integrate diverse software systems while allowing the  programmer to work in the
+programmer's language of choice. The web-service approach to software development is not to rewrite but,
+rather, to integrate.
+
+Modular design:: Web services are meant to be modular in design so that new
+services can be composed out of existing ones.
+Imagine, for example, an inventory-tracking
+service integrated with an on-line ordering service to compose a
+service that automatically orders the appropriate products in
+response to inventory levels. Web services are the small software parts
+out of which arbitrarily large systems can be built. A guiding principle in web-service design
+is to begin with very simple service operations, essentially uncomplicated functions, and to
+group these operations into services, which in turn can be orchestrated to work with other
+services, and so on indefinitely.
+
+=== What Good are Web Services?
+
+This obvious question has no simple answer but the benefits and promises of web 
+services can be clarified with examples. The first example underscores how the distinction
+between 'web sites' and 'web services' continues to blur: the data and functionality available at one
+can be available at the other. (One web framework that emphasizes the blurring is Rails, which is 
+discussed in more detail later.)
+The second example focuses on how
+web services can be used to integrate diverse software systems and to make legacy systems more
+widely accessible.
+
+A visit to a web site such as the Amazon E-Commerce site ('www.amazon.com') is often interactive: 
+a shopper uses a browser to search
+the Amazon site for desired items, places some of these in a shopping cart, checks out the cart, finalizes the order with
+a credit card or the equivalent, and receives a confirmation page and usually an email.
+Pioneers in web services, 
+such as Amazon, expose the information and functionality of web sites through web services as well. Searching and shopping against 
+Amazon, as code examples in later chapters illustrate, are tasks that are automated readily because Amazon makes a point of 
+coordinating its web sites with its web services. In any case, here is a sketch of how a search-and-shop experience might be
+automated.
+
+* A shopper has a database table or even a simple text file, 'wishList.txt', that contains items of interest 
+such as books, movies, or any other search-and-shop category that Amazon supports.
+
+* The database table or text file, which acts as a wish list with constraints, provides pertinent information such as the ISBN number of 
+a desired book, the maximum price the shopper is willing to pay, the number of items to order, and so on. 
+
+* The shopper programs a client, in whatever language the shopper prefers, that reads the database table or text file,  
+opens a connection to Amazon, searches Amazon for
+wish-list items, checks whether the items are available under the constraints in the wish-list, and orders the
+items that meet the constraints.
+
+* The client program checks an email account for the confirming email; and, if all goes well, the client places confirmation 
+information in a data store such as database table or another simple text file.
+
+An interactive shopping experience thus gives way to an automated one. Of course, some shoppers derive as much pleasure from the 
+activity as from the outcome. The point is not that shopping should be automated but, rather, that web services open up this
+possibility for many tasks, shopping included. At one time, 'HTML screen scraping' was a popular way to have applications
+other than browsers hit a web site, download HTML documents, and then parse the HTML for its informational content. As more
+sites follow the Amazon practice of exposing the same or, at least, nearly the same data and functionality as both web sites
+and web services, this screen scraping becomes increasingly unnecessary.
+Later chapters illustrate, with code examples, the close relationship between web sites and web services.
+
+The second example of what makes web services attractive focuses on a major challenge in modern software development:
+systems integration. Modern
+software systems are written in a variety of languages, a variety that
+seems likely to increase. These software systems will continue to be
+hosted on a variety of platforms. Institutions large and small have
+significant investment in legacy software systems whose functionality is
+useful and perhaps mission critical; and few of these institutions have
+the will and the resources, human or financial, to rewrite their legacy
+systems. How are such disparate software systems to interact? That these
+systems must interact is taken for granted nowadays; it is a rare software
+system that gets to run in splendid isolation.
+
+A challenge, then, is to have a software system interoperate with others,
+which may reside on different hosts under different operating systems and be written in different
+languages. Interoperability is not just a long-term challenge but also a
+current requirement of production software. Web services provide a
+relatively simple answer to question of how diverse software systems,
+written in many languages and executing on various platforms under
+different operating systems, can interoperate. In short, web services are
+an excellent way to integrate software systems.
+
+Web services address the problem of interoperability directly because such services
+are, first and foremost, language and platform neutral. If a legacy
+COBOL system is exposed through a web service, the system is thereby
+interoperable with service clients written in other, currently more
+widely used languages. Exposing a legacy COBOL system as a web service should be
+significantly less expensive than, say, rewriting the system from scratch. Legacy
+database systems are an obvious source of data and functionality; and these systems, too, 
+can be made readily accessible, beyond the local machine that hosts the database, 
+through web services.
+[[web_service_data_store]]
+.Figure 1-2. A web service as the front-end of a datastore.
+----
+                   +-------------+            +----------+
+         API calls |  Front-end  |            | Database |
+clients<---------->| web service |<---------->| system   |
+                   +-------------+            +----------+
+----
+In the past, data sources for applications were usually 'data stores' such as relational database management
+systems (RDBMS) or even local file systems. Nowadays web services also serve as data sources, at least
+as intermediate ones that are backed up ultimately with persistent data stores.
+Indeed, web services integrate 
+readily with RDBMS and other data-storage systems as front-ends that are easier conversational partners than the 
+data-storage systems themselves--because web services, at least well-designed ones, have APIs that 
+publish their functionality in high-level, language-neutral, and platform-independent terms. 
+A web service thus can be viewed as uniform access mechanism for divergent data stores.
+A web service can act as the front-end of a database system, a front-end that
+exposes, through a published API, the data and the functionality of the database system (see Figure 1-2).
+
+Web services are inherently distributed systems that communicate mostly over HTTP but 
+can communicate over other popular transports as well. The communication payloads of web services
+are typically structured text, usually XML or JSON documents, which can be inspected,
+transformed, persisted, and otherwise processed with widely and even
+freely available tools. When efficiency demands it, however, web
+services also can deliver compact binary payloads. Finally, web services are a
+work in progress with real-world distributed systems as their test bed.
+For all of these reasons, web services are an essential tool in any
+modern programmer's toolbox.
+
+The examples that follow, in this and later chapters, are
+simple enough to isolate critical features of web services such as security
+but also realistic enough to illustrate the power and flexibility that
+such services bring to software development. The main service examples have an accompanying Ant 
+script to compile and then publish the web service on a production-grade web server
+such as Tomcat or Jetty; and many of the Java clients against web services are packaged as
+executable JAR files in order to reduce hassle.
+
+As noted earlier, web services come in different flavors, SOAP-based and REST-style. SOAP and
+SOA, although related, remain distinct. The next section goes into detail about the relationship
+between SOA and web services, REST-style and SOAP-based.
+
+=== Web Services and Service Oriented Architecture
+
+Web services and _service-oriented architecture_ (hereafter, SOA) are related but distinct.
+SOA, like REST, is more an architectural style--indeed, a mindset--than a body of 
+precisely defined rules for the design and implementation of distributed systems; and web services are a 
+natural, important way to provide the services at the core of any SOA system. A fundamental idea in
+SOA is that an application results from integrating network-accessible services, which are 
+interoperable because each has an interface that clearly defines the operations encapsulated in the
+service: per operation, the interface specifies the number and type of each argument
+passed to the service operation together with the number and type of values returned from each service
+operation. The very point of a service interface is to publish the invocation syntax of each operation
+encapsulated in the service. One attraction of the SOA approach is that the ultimate building blocks of
+even large, complicated systems are structurally simple components; and this simplicity at the base level
+makes it relatively easy to test, debug, deploy, extend, and otherwise maintain
+a software system.
+
+In an SOA system, services as building-block components may be characterized as 'unassociated' and
+'loosely coupled'. Consider, for example, two primitive services 'S~1~' and 'S~2~' in an SOA application. The
+two services are 'unassociated' in that neither 'S~1~' nor 'S~2~' depends on the other: 'S~1~'
+is not required to use 'S~2~' or vice-verse.
+The services are mutually independent but can be used together or orchestrated as parts of 
+a larger software system. Following the same theme, components such as 'S~1~' and 'S~2~' are 'loosely coupled'
+in that neither needs to know anything about the internal structure of the other in order for both of these services to
+work together as parts of a larger distributed system. A persistent theme in the many discussions of SOA is
+the modularity of SOA-based systems.
+
+At the implementation level, a service operation is a function call: the function takes zero or more arguments and
+returns zero or more values. Although functions in many languages such as C and even Java technically return, at most, only a
+single value and therefore must resort to an aggregate data structures such as a lists to return multiple values, newer languages
+such as Go have uncomplicated syntax for functions to return arbitrarily many values including, of course, none. This fact underscores the
+inherent richness and flexibility of the function as a system building-block. Programmers fluent in virtually an language
+are thereby knowledgeable about the syntax and semantics of functions.
+
+In an SOA system, a very simple service may consist of a single function.
+The implementation model is thus uncomplicated and familiar to programmers; and
+the simplicity of service operations promotes code reuse through the composition of new services out of 
+existing ones. This ground-level simplicity also enables relatively straightforward troubleshooting because services reduce to
+primitive function calls. An SOA system can be quite complicated, of course, but the complication arises from
+the composition and not from the simple services into which the system ultimately decomposes.
+
+Web services are well suited as components in an SOA system. Following best practices, a web service should 
+consist of operations, each of which is implemented as a stateless function call: the call is 'stateless'
+in that the return value(s) depend only on the arguments passed to the call. In an object-oriented language such 
+as a Java, a well-designed web service is a class that has instance methods as service operations but no
+instance fields that impact the value returned from a particular method. In practice, 'statelessness' is
+easier said than done, as the many examples in this book illustrate. In the context of SOA, it is 
+common to distinguish between 'providers' and 'consumers' of web services: the provider furnishes the service's
+functionality and the consumer is a client that issues requests against the service's operations. The
+provider/consumer pair is commonly used to describe web services and their clients, respectively.
+
+Perhaps the best way to clarify SOA in the concrete is to contrast this approach to distributed systems with a quite different 
+approach, DOA (Distributed Object Architecture). Web services came to fore as a reaction against the 
+complexity of DOA systems. The next section provides a short history of web services,
+with emphasis on the kinds of software challenges that web services are meant to address.
+
+=== A Very Short History of Web Services
+
+Web services evolved from the RPC (Remote Procedure Call) mechanism in
+DCE (Distributed Computing Environment), a framework for software development
+from the early 1990s. DCE includes a distributed file system
+(DCE/DFS) and a Kerberos-based authentication system. Although DCE has its
+origins in the Unix world, Microsoft quickly did its own implementation
+known as MSRPC, which in turn served as the infrastructure for interprocess communication in Windows. 
+Microsoft's COM/OLE (Common Object Model/Object Linking and Embedding) technologies and services 
+were built on a DCE/RPC foundation. There is irony here. DCE designed RPC as a way to do
+distributed computing, that is, computing across distinct physical devices; and Microsoft cleverly
+adapted RPC to support interprocess communication, in the form of COM infrastructure, on a single
+device--a PC running Windows.
+
+The first-generation frameworks for distributed-object systems, 
+CORBA (Common Object Request Broker Architecture) and Microsoft's DCOM (Distributed COM), are anchored 
+in the DCE/RPC procedural framework. Java RMI (Remote Method Invocation) also derives from DCE/RPC; and the 
+method calls in Java EE (Enterprise Edition), specifically in Session and Entity EJBs (Enterprise Java Bean), 
+are Java RMI calls. Java EE (formerly J2EE) and Microsoft's DotNet are second-generation frameworks for 
+distributed-object systems; and these frameworks, like CORBA and DCOM before them, trace
+their ancestry back to DCE/RPC. By the way, DCE/RPC is not dead. Various popular system utilities (for 
+instance, the Samba file and print service for Windows clients) use DCE/RPC.
+
+==== From DCE/RPC to XML-RPC
+
+DCE/RPC has the familiar client/server architecture in which a
+client invokes a procedure that executes on the server. Arguments can be
+passed from the client to the server and return values can be passed from
+the server to the client. The framework is platform and language neutral in principle,
+although strongly tilted towards C in practice. DCE/RPC includes
+utilities for generating client and server artifacts (stubs and skeletons,
+respectively). DCE/RPC also provides software libraries that hide the transport details. Of
+interest now is the IDL (Interface Definition Language) document that acts as the 
+service contract and is an input to utilities that generate artifacts in support
+of the DCE/RPC calls. An IDL document can be short and to the point (see <<Ex_idl>>).
+[[Ex_idl]]
+.A sample IDL document that declares the +echo+ function.
+====
+----
+/* echo.idl */
+[uuid(2d6ead46-05e3-11ca-7dd1-426909beabcd), version(1.0)]
+interface echo {
+    const long int ECHO_SIZE = 512;
+    void echo(
+        [in]             handle_t h,
+        [in,  string]    idl_char from_client[ ],
+        [out, string]    idl_char from_server[ECHO_SIZE]
+    );
+}
+----
+====
+The IDL interface named +echo+, identified with a machine-generated UUID (Universally Unique IDentifier), 
+declares a single function with the same name, +echo+. The names are arbitrary and need not be the same. 
+The +echo+ function expects three arguments, two of which are
++in+ parameters (that is, inputs into the remote procedure) and one of which is an +out+ parameter (that
+is, an output from the remote procedure). The first argument, of built-in
+type +handle_t+, is required and points to an RPC data structure. The function +echo+ could but does
+not return a value because the echoed string is returned instead as an +out+ parameter. The IDL specifies 
+the invocation syntax for the +echo+ function, which is the one and only operation in the service. 
+Except for annotations in square brackets to the left of the three +echo+ parameters, the syntax of the
+IDL is essentially C syntax. The 
+IDL document is a precursor of the WSDL (Web Service Definition Language) document that provides a
+formal specification of a web service and its operations. The WSDL document is discussed at length in
+Chapter 4 on SOAP-based services.   
+
+There is a Microsoft twist to the IDL story as well. An ActiveX control under Windows is a
+DLL (Dynamic Link Library) with an embedded _typelib_, which in turn is a compiled IDL file. For 
+example, suppose that a calendar ActiveX control is plugged into a browser. The browser can read the
+_typelib_, which contains the invocation syntax for each operation (_e.g._, displaying the next month) 
+in the control. An ActiveX control is thus a chunk of software that embeds its own interface.
+This is yet another inspired local use of a technology designed for distributed computing.
+
+In the late 1990s, Dave Winer of UserLand Software developed XML-RPC, a technology innovation that has 
+as good a claim as any to mark
+the birth of web services. XML-RPC is a very lightweight RPC system with support for
+elementary data types (basically, the built-in C types together with a
++boolean+ and a +datetime+ type) and a few simple commands. The original specification is about seven 
+pages in length. The two key features are the use of XML marshaling/unmarshaling
+to achieve language neutrality and reliance on HTTP (and, later, SMTP)
+for transport. The term _marshaling_ refers to the conversion of an in-memory object (for instance, an
++Employee+ object in Java) to some other format (for instance, an XML document); and _unmarshaling_
+refers to the inverse process of generating an in-memory object from, in this example,
+an XML document. The marshal/unmarshal distinction is somewhere between close to and identical
+with the serialize/deserialize distinction. My habit is to use the distinctions interchangeably.
+In any case, the O'Reilly open-wire Meerkat service and the WordPress publishing platform are based on
+XML-RPC.
+
+Two key differences separate XML-RPC, on the one side, from DCE/RPC and its off-shoots, on the other 
+side:
+
+* XML-RPC payloads are text, whereas DCE/PRC payloads are binary. Text is relatively easy to inspect
+and process with standard, readily available tools such as editors and parsers.
+
+* XML-RPC transport uses HTTP rather than a proprietary system. To support XML-RPC, a programming language
+requires only a standard HTTP library together with libraries to generate, parse, transform, and otherwise process
+XML.
+
+As an RPC technology, XML-RPC supports the request/response pattern. Here is the XML request to
+invoke, on a remote machine, the Fibonacci function with an argument of 11. This
+argument is passed as a four-byte integer, as the XML start tag +<i4>+ indicates:
+----
+<?xml version="1.0">
+<methodCall>
+   <methodName>fib<methodName>
+   <params>
+     <param><value><i4>11</i4></value></param>
+   </params>
+</methodCall>
+----
+The integer 11 occurs in the XML-RPC message as text. An XML-RPC library on the receiving end needs to
+extract 11 as text and then to convert the text into a 4-byte integer in the receiving language such as Go or Java.
+Even this short example illustrates the idea of having XML--in particular, data types expressed in XML--serve
+as the leveling mechanism between two different languages involved in an XML-RPC exchange.
+
+XML-RPC is deliberately low fuss and lightweight. SOAP, an XML dialect derived 
+straight from XML-RPC, is considerably heavier in weight. From inception, XML-RPC faced 
+competition from second-generation DOA systems such as Java EE (J2EE) and AspNet. 
+The next section considers the challenges inherent in DOA systems, challenges that sustained and
+eventually intensified interest in lighter-weight approaches to distributed computing--modern web services.
+
+==== Distributed Object Architecture: A Java Example
+What advantages do web services have over DOA technologies such as Java RMI? This section addresses the
+question with an example. Java RMI (including the Session and Entity EJB constructs built on
+Java RMI) and DotNet Remoting are examples of second-generation distributed
+object systems. Consider what a Java RMI client requires in order to invoke a
+method declared in a service interface such as this:
+----
+import java.util.List;
+public interface BenefitsService extends java.rmi.Remote {
+   public List<Benefit> getBenefits(Emp emp) throws RemoteException;
+}
+----
+The interface appears deceptively simple in that it declares only the
+method named +getBenefits+; yet the interface likewise hints at what makes
+a distributed-object architecture so tricky. 
+A client against this +BenefitsService+ requires a Java RMI stub, an instance
+of a class that implements the +BenefitsService+ interface. The stub is downloaded automatically 
+from the server to the client as part of the Java RMI set-up (see Figure 1-3).
+[[stub_download]]
+.Figure 1-3. Downloading a stub in Java RMI.
+----
++------------+   BenefitsService stub download  +------------+
+| RMI client |<---------------------------------| RMI server |
++------------+                                  +------------+
+----
+Once the stub set-up is done, 
+the +getBenefits+ method then is executed as a stub method; that is, the stub acts as the
+client-side object making a remote method call through one of stub's encapsulated methods.
+The call thus has the syntax:
+----
+Emp fred = new Emp();
+//...
+List<Benefit> benefits = rmiStub.getBenefits(fred); // rmiStub = reference
+----
+Invoking the +getBenefits+ method
+requires that the byte codes for various Java classes, standard and
+programmer-defined, be downloaded to the client machine. To begin, the client
+needs the class +Emp+, the argument type for the +getBenefits+ method, and the class
++Benefit+, the member type for the +List+ that the method +getBenfits+ returns.
+Suppose that the class +Emp+ begins like this:
+----
+public class Emp {
+   private Department                   department;
+   private List<BusinessCertification>  certifications;
+   private List<ClientAccount>          accounts;
+   private Map<String, Contact>         contacts;
+   ...
+}
+----
+The standard Java types such as +List+ and +Map+ already are available on the client side because
+the client is, by assumption, a Java application. The challenge involves the 
+additional, programmer-defined types such as +Department+,
++BusinessCertification+, +ClientAccount+, and +Contact+ that are needed
+to support the client-side invocation of a remotely executed method. The
+set-up on the client side to enable a remote call such as
+----
+Emp fred = new Emp();
+// set properties, etc.
+List<EmpBenefits> fredBenefits = rmiStub.getBenefits(fred); 
+----
+is significant, with lots and lots of bytes required to move from the server down to
+the client just for the set-up. Anything this complicated is, of course, prone to problems such as 
+versioning issues and outright errors in the remote method calls.
+
+Java RMI uses proprietary marshaling/unmarshaling and proprietary transport; and DotNet does the 
+same. There are third-party libraries for interoperability between the two frameworks. Yet a 
+Java RMI service can be expected to have mostly
+Java clients; and a DotNet Remoting service can be expected to have mostly DotNet clients. 
+Web services represent a move towards standardization, simplicity, and
+interoperability.
+
+==== Web Services to the Rescue
+Web services simplify matters in distributed computing. For one thing, the client and service typically 
+exchange XML or equivalent documents, that is, 'text'. If needed, non-text bytes can be exchanged
+instead but the preferred payloads are text. The exchanged text can be inspected, validated, 
+transformed, persisted, and otherwise processed using readily available,
+non-proprietary, and often free tools. Each side, client and service,
+simply needs a local software library that binds language-specific types
+such as the Java +String+ to XML Schema or comparable
+types, in this case +xsd:string+. (In the qualified name +xsd:string+, +xsd+ is a namespace
+abbreviation 
+and +string+ is a local name. Of interest here is that +xsd:string+ is an XML type rather
+than a Java type.) Given these Java/XML bindings, relatively uncomplicated library modules can 
+convert from one to the other, that is, from Java to XML or from XML to
+Java (see Figure 1-4).
+[[fig_java_xml]]
+.Figure 1-4. Java/XML conversions.
+-----            
+                  +----------------+  XML   +-----------------+
+non-Java types--->| convert to XML |------->| convert to Java |--->Java types
+                  +----------------+        +-----------------+
+----                                
+Processing on the client side, as on the service side,
+requires only locally available libraries and
+utilities. The complexities, therefore, can be isolated at the endpoints--the service and the
+client applications together with their supporting libraries--and need not
+seep into the exchanged messages. Finally, web services are available over HTTP, a 
+non-propriety protocol that has become standard, ubiquitous infrastructure; and HTTP
+in particular comes with a security extension, HTTPS, that provides multi-faceted security
+services.
+
+In a web service, the requesting client and the service need not be coded in
+the same language or even in the same style of language. Clients and
+services can be implemented in object-oriented, procedural, functional,
+and other language styles. The languages on either end may be statically
+typed (for instance, Java and Go) or dynamically typed (for example, JavaScript
+and Ruby). The complexities of stubs and skeletons, the serializing and
+deserializing of objects encoded in some proprietary format, gives way to relatively
+simple text-based representations of messages exchanged over standard transports such
+as HTTP. The messages themselves are neutral; they have no bias towards a particular
+language or even family of languages.
+
+The first code example in this chapter, and all of the code examples in Chapter 2 and
+Chapter 3, involve REST-style services. Accordingly, the next section looks
+at what REST means and why the REST-style service has become so popular. From an
+historical perspective, REST-style services can be viewed as a reaction to the 
+growing complexity of SOAP-based ones.
+
+=== What is REST?
+Roy Fielding (_roy.gbiv.com_) coined the acronym REST in his PhD dissertation. The
+acronym, which stands for REpresentational State Transfer, is clarified shortly.
+Chapter 5 of Fielding's dissertation lays out the guiding principles for what have come to be 
+known as REST-style or RESTful web services. Fielding has an impressive resume. He is, among
+other things, a principal author of the HTTP 1.1 specification and a
+co-founder of the Apache Software Foundation.
+
+REST and SOAP are quite different. SOAP is a messaging protocol in which the messages
+are XML documents, whereas REST is a style of software architecture for distributed
+hypermedia systems, that is, systems in which text, graphics, audio, and
+other media are stored across a network and interconnected through
+hyperlinks. The World Wide Web is the obvious example of such a system. As
+the focus here is on 'web' services, the World Wide Web is the
+distributed hypermedia system of interest. In the web, HTTP is both a
+transport protocol and a messaging system because HTTP requests and
+responses are messages. The payloads of HTTP messages can be typed using
+the MIME (Multipurpose Internet Mail Extension) type system. MIME has 
+types such as +text/html+, +application/octet-stream+, and +audio/mpeg3+.
+HTTP also provides response status codes to inform
+the requester about whether a request succeeded and, if not, why. Table 1-1
+lists some common status codes.
+
+.Sample HTTP status codes and their meanings
+[options="header"]
+|=======
+|Status code|In English|Meaning
+|200|OK|Request OK.
+|303|See Other|Redirect.
+|400|Bad Request|Request malformed.
+|401|Unauthorized|Authentication error.
+|403|Forbidden|Request refused.
+|404|Not Found|Resource not found.
+|405|Method Not Allowed|Method not supported.
+|415|Unsupported Media Type|Content type not recognized.
+|500|Internal Server Error|Request processing failed.
+|=======
+
+REST stands for REpresentational State Transfer, which requires clarification because the
+central abstraction in REST—the resource—does not
+occur in the acronym. A _resource_ in the RESTful sense is something that is accessible
+through HTTP because this thing has a name, a URI (Uniform Resource Identifier). A URI has
+two subtypes: the familiar URL, which specifies a 'location'; and the URN, which is a 
+symbolic name but not a location.
+URIs are 'uniform' because they must be structured in a certain way; there is a 
+syntax ('tools.ietf.org/html/rfc3986') for URIs.
+In summary, a URI is a standardized name for a resource and, in this sense, a URI acts as noun.
+
+In practical terms, a resource is a web-accessible, informational item that may have
+hyperlinks to it. Hyperlinks use URIs to do the linking. Examples of
+resources are plentiful but likewise misleading in suggesting that
+resources must have something in common other than identifiability through
+URIs. The gross national product of Lithuania is a resource as is
+the Modern Jazz Quartet. Ernie Bank’s baseball accomplishments count as a
+resource as does the maximum flow algorithm. The concept of a resource is
+remarkably broad but, at the same time, impressively simple and
+precise.
+
+As web-based informational items, resources are pointless unless
+they have at least one representation. In the web, representations are
+MIME typed. The most common type of resource representation is probably
+still +text/html+ but nowadays resources tend to have
+multiple representations. For example, there are various interlinked HTML
+pages that represent the Modern Jazz Quartet but there are also audio and
+audiovisual representations of this resource.
+
+Resources have state. For example, Ernie Bank’s baseball
+accomplishments changed during his career with the dismal Chicago Cubs from 1953
+through 1971 and culminated in his 1977 induction into the Baseball Hall
+of Fame. A useful representation must capture a resource’s state. For
+example, the current HTML pages on Ernie at the Baseball Reference Web
+site (_www.baseball-reference.com_) need to
+represent all of his major league accomplishments, from his rookie year in
+1953 through his induction into the Hall of Fame.
+
+A RESTful request targets a resource but the resource itself typically
+is created on the service machine and remains there. A resource may be persisted in
+a data store such as a database system. Some mix of humans and applications 
+may maintain the state of the resource. In the usual case of web-service access to
+a resource, the requester receives a
+representation of the resource if the request
+succeeds. It is the representation that transfers from the service machine
+to the requester machine. In a REST-style web service, a client does two things in
+an HTTP request:
+
+* Names the targeted resource by giving its URI, typically as part of a URL.
+
+* Specifies a 'verb' (HTTP method), which indicates what the client
+wishes to do, for example, 'read' an existing resource, 'create' a new
+resource from scratch, 'edit' an existing resource, or 'delete' an 
+existing resource.
+
+One of the basic cases is a 'read' request. If a 'read' request succeeds, a
+typed representation (for instance, +text/html+) of the
+resource is transferred from the server that hosts and maintains the resource to the
+client that issues the request. The client is an arbitrary application written in 
+some language with support for REST-style requests. The representation returned from
+the service is a good one only if
+the representation captures the resource’s state in some appropriate way. Figure 1-5 depicts a resource
+with its identifying URI, together with a RESTful client and some typed
+representations sent back to the client in response to client requests.
+
+[[fig_ch1_rest]]
+.A small slice of a RESTful system
+image::images/jwsu_0401.png[]
+
+In summary, RESTful web services involve not just resources to
+represent but also client-invoked operations on such resources. At the
+core of the RESTful approach is the insight that HTTP, despite the
+occurrence of Transport in its name, acts as an API and
+not simply as a transport protocol. HTTP has its well-known
+verbs, officially known as _methods_. Table 2 lists the HTTP verbs that correspond to
+the CRUD (Create, Read, Update, Delete)
+operations so familiar throughout computing:
+
+.HTTP verbs and their CRUD operations
+[options="header"]
+|==========
+|HTTP Verb|CRUD Operation
+|POST     |Create
+|GET      |Read
+|PUT      |Update
+|DELETE   |Delete
+|==========
+
+Although HTTP is not case sensitive, the HTTP verbs are
+traditionally written in uppercase. There are additional verbs. For
+example, the verb HEAD is a variation on GET that requests only the HTTP
+headers that would be sent to fulfill a GET request. 
+
+HTTP also has standard response codes such as 404 to signal that the
+requested resource could not be found and 200 to signal that the request
+was handled successfully. In short, HTTP provides request verbs and MIME
+types for client requests and status codes (and MIME types) for service
+responses.
+
+Modern browsers generate only GET and POST requests. If a user enters a URL into the
+browser's input window, the browser generates a GET request. A
+browser ordinarily generates a POST request for an HTML form with a _submit_ 
+button. It goes against the spirit of REST to treat GET and POST interchangeably. In
+Java, for example, an +HttpServlet+ instance has callback methods such
+as +doGet+ and +doPost+ that handle GET
+and POST requests, respectively. Each callback has the same parameter
+types, the type +HttpServletRequest+ (the key/value pairs from the
+request) and the type +HttpServletResponse+ (effectively a channel to communicate back to
+the requester). It is not unknown for a programmer to have the two callbacks execute the same
+code (for instance, by having one invoke the other), thereby conflating
+the original HTTP distinction between 'read' and
+'create'. A key guiding principle of the RESTful style
+is to respect the original meanings of the HTTP verbs. In particular, any
+GET request should be side-effect free ('idempotent') because a GET is a
+'read' rather than a 'create',
+'update', or 'delete' operation. A
+GET as a 'read' with no side effects is called a
+_safe_ GET. 
+
+The REST approach does not imply that either resources or the
+processing needed to generate adequate representations of them are simple.
+A REST-style web service might be every bit as subtle and complicated, in its
+functionality, as a
+SOAP-based service or a DOA application. The RESTful approach tries to simplify 
+a service's implementation by
+taking what HTTP and the MIME type system already offer: built-in CRUD
+operations, uniformly identifiable resources, typed representations
+that can capture a resource’s state, and status codes to summarize the outcome of
+a request. REST as a design philosophy tries to
+isolate application complexity at the endpoints, that is, at the client
+and at the service. A service may require lots of logic and computation to
+maintain resources and to generate adequate representation of resources,
+for instance, large and subtly formatted XML documents; and a client may
+require significant XML processing to extract the desired information from
+the XML representations transferred from the service to the client. Yet
+the RESTful approach keeps the complexity out of the transport level, as a
+resource representation is transferred to the client as the body of an
+HTTP response message. For the record, RESTful web services are Turing complete; that is,
+these services are equal in power to any computational system, including
+a system that consists of SOAP-based web services or DOA stubs and skeletons.
+
+==== Verbs and Opaque Nouns
+
+In HTTP a URI is meant to be opaque, which means that the URI
+----
+http://bedrock/citizens/fred
+----
+has no inherent connection to the URI
+----
+http://bedrock/citizens
+----
+although Fred happens to be a citizen of Bedrock. These are simply
+two different, independent identifiers. Of course, a good URI designer
+will come up with URIs that are suggestive about what they are meant to
+identify. The point is that URIs have no intrinsic hierarchical
+structure. URIs can and should be interpreted but these interpretations
+are imposed on URIs, not inherent in them. Although URI syntax looks
+like the syntax used to navigate a hierarchical file system, this
+resemblance is misleading. A URI is an opaque identifier, a logically
+proper name that should denote exactly one resource.
+
+=== Review of HTTP Requests and Responses
+
+The next section has a REST-style sample service whose URL is
+----
+http://localhost:8080/predictions/
+----
+
+If this URL were typed into a browser's window, the browser 
+would generate an HTTP request similar to 
+
+----
+GET /predictions/ HTTP/1.1
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) Chrome/24.0.1312.56
+Host: localhost:8080
+Accept: text/html
+----
+
+The browser parses the entered URL into these parts, with clarifications
+below:
+
+* +GET /predictions/ HTTP/1.1+
++
+This is the HTTP request 'start line':
+
+** GET is the HTTP method (verb).
+
+** +/predictions/+ is the URI (resource's name).
+
+** +HTTP/1.1+ is the HTTP version that the requester is using.
+
+* +User-Agent: Mozilla/5.0 (X11; Linux x86_64) Chrome/24.0+
++
+Immediately after the 'start line' come the HTTP request header elements or
+'headers' for short. Each such element is a key/value pair with a colon +:+
+separating the key on the left from the value on the right. In this element,
++User-Agent+ is the key and everything to the right of colon is the value.
+Chrome is the browser used in this request and Mozilla/5.0 specifies
+a browser-compatibility type. The +User-Agent+ information also
+includes the operating system in use, 64-bit Linux.
+Of interest here is that key +User-Agent+ captures
+the intended meaning: it is the application (agent) that a user employs
+to make a request.
+
+* +Host: localhost:8080+
++
+In +localhost:8080+, the network address of the machine that hosts
+the resource is to the left of the colon; and the port number, in this case +8080+, is to the
+right. In this example, the network address is +localhost+ and its dotted-decimal 
+equivalent is 127.0.0.1.
+Because the network address is +localhost+, the web server and
+the requesting application are on the same machine, which is convenient during development.
+In a production environment, the web server might have a network address such as
++dcequip.cti.depaul.edu+. Port numbers range from 0 to roughly 65,000, with
+port numbers from 0 through 1023 typically reserved for standard applications 
+such as web servers (port 80 for HTTP and port 443 for HTTPS), SMTP (email, port 25), 
+SSH (secure shell, port 22), and so on. For convenience, the web servers Tomcat and Jetty use port 8080 by
+default but the number can be changed (for example, to the standard HTTP port number 80). Under HTTP 1.1,
+the key/value pair, with +Host+ as the key, is required. The other header elements are optional, although the
+ones shown here are typical.
+
+* +Accept: text/html+
++
+This is the MIME type (+text+) and subtype (+html+), which the browser 
+is ready to accept. The application running on web server may not honor the requested 
+type and respond instead with, for example, +text/plain+ or +text/xml+.
+
+In summary, the key/value pairs such as 
+
+----
+Accept: text/html
+----
+
+make up the HTTP request headers. These pairs
+may occur in any order and only the 
+----
+Host: <network address>
+----
+pair is mandatory under HTTP 1.1. 
+
+Two newlines terminate the headers section. A GET request has no body; hence, a GET request
+consists only of the start line and the headers. A POST request always has a body, which may
+be empty. In a POST request, two newlines also mark the end of the headers.
+
+Because a GET request has no body, such a request often includes, in the URI, a 
+query string that consists of key/value pairs. For example, this GET request
+----
+http://.../products?id=27&category=boots
+----
+includes a query-string with two key/value pairs: +id+ is the first key and +27+ is the value;
++category+ is the second key and +boots+ is the value. The query string thus provides a way
+for a body-less GET request to include information within the request. The query string data
+are encapsulated in the HTTP request headers. POST requests always have a body, which is
+usually non-empty. The body of a POST request holds key/value pairs as well.
+
+If all goes well, sending an HTTP request to the URL
+----
+http://localhost:8080/predictions/
+----
+leads to an HTTP response, which is similar to <<http_response>>.
+
+[[http_response]]
+.The HTTP response message from the 'predictions' service.
+====
+----
+HTTP/1.1 200 OK
+Server: Apache-Coyote/1.1
+Set-Cookie: JSESSIONID=35B1E3AA21EB7242FD2FC50044D2166A; Path=/predictions/; 
+Content-Type: text/html;charset=ISO-8859-1
+Transfer-Encoding: chunked
+
+<?xml version="1.0" encoding="UTF-8"?> 
+<java version="1.7.0" class="java.beans.XMLDecoder"> 
+ <array class="predictions.Prediction" length="32"> 
+  <void index="0"> 
+   <object class="predictions.Prediction"> 
+    <void property="what"> 
+     <string>
+        Managed holistic contingency will grow killer action-items.
+     </string> 
+    </void> 
+    <void property="who"> 
+     <string>
+        Cornelius Tillman
+     </string> 
+    </void> 
+   </object> 
+  </void> 
+  ...
+</java>
+----
+====
+
+The start line 
+----
+HTTP/1.1 200 OK
+----
+begins with the HTTP version in use on the server. Next comes the HTTP status code (*SC* for short) as
+a number (200) and in English (OK). Status codes in the 200-range signal success. Five
+header elements follow, including the name of the web server that sends the
+response and the content type of the response. Note that the response type is given
+as +text/html+ rather than as what it actually is: +text/xml+. The reason is that 
+my code, which generates the response, does not bother to set the content type;
+hence, the Apache-Coyote (that is, Tomcat) web server uses its default type of +text/html+. Two
+newline characters again separate the headers from the HTTP body, which can be 
+empty. In this case, the body is an XML document that lists corporate predictions
+together with their predictors.
+   
+=== HTTP as an API
+HTTP can be viewed as an API. Among frameworks for developing web sites and RESTful web services, 
+Rails has pioneered this view of HTTP, which deliberately blurs the distinction between web sites that deliver HTML 
+and web services that deliver XML or JSON. In a well-designed Rails application, a GET request 
+for the URI '/products' is equivalent to the same request for '/products.html'; and an HTML
+list of products is returned in response. A GET request against '/products.json' or
+'/products.xml' would return the same list but in JSON or XML, respectively. Rails has an often-copied 
+idiom for combining URIs and HTTP verbs into a 'RESTful route', that is, the route that a request takes
+to the code that handles the request. The Rails routing style
+is an elegant yet practical use of HTTP
+as an API. Table 3 is a summary of the Rails approach. In a URI, a term such as ':id', which
+begins with a colon character, 
+indicates a placeholder or parameter, in this case a placeholder whose intended value is a
+numerical identifier such as 27.
+
+.Rails routing idioms.
+[options="header"]
+|======
+|HTTP Verb  |URI (Name)           |Meaning
+|GET        |/products            |Read all products
+|POST       |/products            |Create a new product from information in the POST body
+|GET        |/products/new        |Read the form to create a new product
+|GET        |/products/:id/edit   |Read the form to edit an existing product
+|GET        |/products/:id        |Read a single product
+|PUT        |/products/:id        |Update a product with information in the POST body
+|DELETE     |/products:id         |Delete the specified product
+|======
+These verb/name pairs are terse, precise, intuitive, and uniform in style. The
+pairs illustrate that RESTful conventions can yield simple, clear
+routing expressions about which operation should be performed on which resource.
+The POST and PUT verbs are used in requests that have an HTTP body;
+hence, the request data are in the HTTP message body. The GET and
+DELETE verbs are used in requests that have no body; hence, the request
+data, if any, are sent as query-string key/value pairs. 
+
+The decision about whether to be RESTful in a particular application depends, as
+always, on practical matters that will come to the fore throughout this book. The current section 
+has looked at REST from on high; it is now time to descend into details with code examples. The next
+section summarizes the overview of HTTP with two Java clients. A first RESTful service follows.
+
+==== Two HTTP Clients in Java
+
+The foregoing descriptions about HTTP can be fleshed out and summarized with two short Java clients, 
+which can be run against any URL--for a web site or a web service. The first client (see <<simple_client>>) takes a deliberately
+low-level approach by building up the HTTP request as a string, one chunk at a time. The second client (see <<url_connection>>)
+uses the Java utility class +URLConnection+, which shortens the code and makes the program more readable.
+
+[[simple_client]]
+.A simple Java client that makes an HTTP GET request.
+====
+----
+import java.net.Socket;
+import java.net.URL;
+import java.net.MalformedURLException;
+import java.net.UnknownHostException;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+
+public class SimpleHttpClient {
+    public static void main(String[ ] args) {
+	// usage
+	if (args.length < 1) {                                             <1>
+	    System.err.println("Usage: SimpleHttpClient <url>");
+	    return;
+	}
+	try {
+	    // Parse the URL.
+	    URL url = new URL(args[0]);                                    <2> 
+	    String host = url.getHost();                                   <3>
+	    String path = url.getPath();                                   <4>
+	    int port = url.getPort();                                      <5>
+	    if (port < 0) port = 80;
+	    // Send the request.
+	    String request = "GET " + path + " HTTP/1.1\n";                <6>
+	    request += "host: " + host;                                    <7>
+	    request += "\n\n";
+	    Socket sock = new Socket(host, port);
+	    PrintWriter writer = new PrintWriter(sock.getOutputStream());
+	    writer.print(request);                                         <8>
+	    writer.flush();
+	    // Read and print the response.
+	    BufferedReader reader =                                        <9>
+		new BufferedReader(new InputStreamReader(sock.getInputStream()));
+	    String next_record = null;
+	    while ((next_record = reader.readLine()) != null)              <10>
+		System.out.println(next_record);
+	    sock.close();
+	}
+	catch(MalformedURLException e) {
+	    throw new RuntimeException("Please try again. Bad URL.\n" + e);
+	}
+	catch(UnknownHostException e) {
+	    throw new RuntimeException("Please try again. Unknown host.\n" + e);
+	}
+	catch(IOException e) {
+	    throw new RuntimeException("Please try again. Something's wrong.\n" + e);
+	}
+    }
+}
+----
+====
+The +SimpleHttpClient+ expects, as a command-line argument (line 1), a URL such as
+'http://www.amazon.com/index.html'. After constructing a +URL+ instance from the 
+string URL (line 2), the client extracts the 'host', the 'path' (URI), and the 
+'port number' (lines 3, 4, and 5) so that an HTTP GET request can be built in chunks.
+Line 6, for example, builds the start-line
+----
+GET /index.html HTTP/1.1
+----
+given the sample Amazon URL. Only the required HTTP header is generated (line 7), with
++host+ as the key and the IP address of the server (in this case, +www.amazon.com+) as
+the value. After the request is sent (line 8), the response is read (lines 9 and 10)
+and the connection is closed.
+
+[[url_connection]]
+.A Java HTTP client that uses the utility +URLConnection+ class.
+====
+----
+import java.net.URL;
+import java.net.URLConnection;
+import java.net.MalformedURLException;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.BufferedReader;
+
+public class UrlConnectionClient {
+    public static void main(String[ ] args) {
+	// usage
+	if (args.length < 1) {
+	    System.err.println("Usage: UrlConnectionClient <url>");
+	    return;
+	}
+
+	try {
+	    // Parse the URL.
+	    URL url = new URL(args[0].trim());                                     <1>
+
+	    // Connect.
+	    URLConnection sock = url.openConnection();                             <2>
+	    
+	    // Read and print.
+	    BufferedReader reader =
+		new BufferedReader(new InputStreamReader(sock.getInputStream()));
+	    String next_record = null;
+	    while ((next_record = reader.readLine()) != null)                      <3>
+		System.out.println(next_record);
+	    
+	    // Close.
+	    reader.close();                                                        <4>
+	}
+	catch(MalformedURLException e) { throw new RuntimeException(e);	}
+	catch(IOException e) { throw new RuntimeException(e); }
+    }
+}
+----
+====
+The +UrlConnectionClient+ (see Example 1-3) uses the class +URLConnection+, which simplifies the code.
+This client, like the first, expects a URL as a command-line argument. A +URL+ instance (line 1) again
+is constructed but then used immediately (line 2) to open a connection. By default, the opened connection
+is a GET request against the site with the given URL. The response is read chunk by chunk (line 3) and printed.
+The connection then is closed (line 4).
+
+Clients such as these occur throughout the forthcoming chapters, especially in examples that involve
+REST-style services. It is now time to introduce the first RESTful example.
+
+=== A First RESTful Example
+As befits a first example, the implementation is simple but sufficient to highlight key aspects of
+a RESTful web service. The implementation consists of a JSP (Java Server Pages) script and two back-end 
+JavaBeans that the JSP script uses to get the data returned to the client (see <<Ex_predictions_service>>). 
+The data are sage corporate predictions. Here
+is a sample:
+----
+Decentralized 24/7 hub will target robust web-readiness.
+Synergistic disintermediate policy will expedite back-end experiences.
+Universal fault-tolerant architecture will synthesize bleeding-edge channels.
+----
+
+[[Ex_predictions_service]]
+.The organization of the 'predictions' web service.
+====
+----
+                                                             +----------------+
+                                                             | predictions.db |
+                                                             | data file      |--+
+                                                             +----------------+  | initial
+                                                                                 | data 
++--------+   GET requests     +-----------------+   data?  +-----------+         | read
+| client |------------------->| predictions.jsp |--------->| backend   |<--------+
+|        |<-------------------|   JSP script    |<---------| JavaBeans |    
++--------+  service responses +-----------------+   data   +-----------+
+----
+====
+There is an Ant script (see <<sidebar_ant>>) that automates the deployment of this and other service examples. Here is
+a summary of the service parts and of how the Ant script puts the parts together:
+
+* The service consists of a JSP script together with two POJO (JavaBean) classes. The classes
+provide back-end support for the JSP script. There is also a small configuration file, 'web.xml',
+that allows the URI to be shortened from 
++
+----
+/predictions/predictions.jsp
+----
++
+to 
++
+----
+/predictions/
+----
+
+* The Ant script compiles the '.java' files and then packages the JSP script, the compiled
+'.class' files, and--only for convenience--the '.java' files into a JAR file with a '.war'
+extension (hereafter, a WAR file).
+
+* The WAR file is copied to the Tomcat 'webapps' subdirectory, which thereby deploys the service.
+The first sidebar (see <<sidebar_tomcat>>) goes into the details of Tomcat installation and management.
+
+In the 'predictions' service, each prediction has an associated human predictor. The RESTful resource is thus a list of 
+predictor names (_e.g._, Hollis McCullough) and their predictions (Hollis is
+responsible for the third prediction shown above). The resource name or URI is '/predictions/'; 
+and the only allowable HTTP verb is GET, which corresponds to 'read' among the CRUD operations. 
+If the HTTP request is correct, the RESTful service returns an XML representation of the
+predictor/prediction list; otherwise, the service returns the appropriate HTTP 
+status code, _e.g._, 404 for "Not Found", if the URI is incorrect, or
+405 for "Method Not Allowed", if the verb is not GET. <<Ex_xml_response>> shows a slice of
+the XML payload returned upon a successful request.
+
+[[Ex_xml_response]]
+.The XML response from the predictions service
+====
+----
+<?xml version="1.0" encoding="UTF-8"?> 
+<java version="1.7.0" class="java.beans.XMLDecoder"> 
+ <array class="predictions.Prediction" length="32"> 
+  <void index="0"> 
+   <object class="predictions.Prediction"> 
+    <void property="what"> 
+     <string>
+       Managed holistic contingency will grow killer action-items.
+     </string> 
+    </void> 
+    <void property="who"> 
+     <string>Cornelius Tillman</string> 
+    </void> 
+   </object> 
+  </void> 
+  ...
+  <void index="31"> 
+   <object class="predictions.Prediction"> 
+    <void property="what"> 
+     <string>
+       Versatile tangible application will maximize rich e-business.
+     </string> 
+    </void> 
+    <void property="who"> 
+     <string>Hiram Gulgowski</string> 
+    </void> 
+   </object> 
+  </void> 
+ </array> 
+</java> 
+----
+====
+
+==== How the 'predictions' Web Service Works
+When the 'predictions' service is deployed to a web server such as Tomcat, the server translates
+the JSP script 'predictions.jsp' (see <<Ex_predictions_jsp>>) into a servlet instance. For now, this technical detail is 
+overlooked because it is convenient
+to talk about the JSP script itself as the target of a request. 
+
+[[Ex_predictions_jsp]]
+.The JSP script +predictions.jsp+.
+====
+----
+<jsp:useBean id    = "preds"                            <1>
+	     type  = "predictions.Predictions" 
+	     class = "predictions.Predictions"> 
+  <% // Check the HTTP verb: if it's anything but GET, 
+     // return 405 (Method Not Allowed).
+     String verb = request.getMethod();
+     if (!verb.equalsIgnoreCase("GET")) {
+       response.sendError(response.SC_METHOD_NOT_ALLOWED, 
+                          "Only GET requests are allowed.");
+     }
+     // If it's a GET request, return the predictions.
+     else {
+       preds.setServletContext(application);            <2>
+       out.println(preds.getPredictions());
+     }
+  %>
+</jsp:useBean>  
+----
+====
+
+As requests come to the JSP script, the script first checks the request's HTTP method.
+If the method is GET, an XML representation of the predictions is returned to the requester.
+If the verb is not GET, the script returns an
+error message together with the HTTP status code. The relevant code is:
+----
+String verb = request.getMethod();
+if (!verb.equalsIgnoreCase("GET")) {
+  response.sendError(response.SC_METHOD_NOT_ALLOWED, 
+                     "Only GET requests are allowed.");
+}
+----
+JSP scripts have implicit object references such as +request+, +response+, and +out+; each of these is a 
+field or a parameter in the servlet code into which the web server such as Tomcat or Jetty
+translates the JSP script. A JSP script can make the same calls as an
++HttpServlet+. 
+
+On a successful request, the JSP script returns a list of predictions and
+their predictors, a list available from the back-end JavaBean 
++Predictions+. The JSP code is straightforward:
+----
+out.println(preds.getPredictions());
+----
+The object reference +out+, available in every JSP script, refers to an output stream
+through which the JSP script can communicate with the client. In this example,
+the object reference +preds+ (line 1) refers to the back-end JavaBean that maintains
+the collection of predictions; and the +getPredictions+ method in the back-end bean converts the 
+Java list of +Predictions+ into an XML document.
+
+The back-end code consists of two POJO classes, +Prediction+ (see <<Ex_prediction>>) and +Predictions+ (see <<Ex_predictions>>). The
++Prediction+ class is quite simple, consisting of two properties: +who+ (line 1) is the
+person making the prediction and +what+ (line 2) is the prediction.
+[[Ex_prediction]]
+.The back-end +predictions.Prediction+ class.
+====
+----
+package predictions;
+import java.io.Serializable;
+
+public class Prediction implements Serializable {
+    private String who;   // person
+    private String what;  // his/her prediction
+    public Prediction() { }
+    public void setWho(String who) { this.who = who; }      <1>
+    public String getWho() { return this.who; }
+    public void setWhat(String what) { this.what = what; }  <2>
+    public String getWhat() { return this.what; }
+}
+----
+====
+The +Predictions+
+class does the grunt work. For example, its +populate+ method (line 3) reads the prediction
+data from a text file, 'predictions.db', encapsulated in the deployed WAR file; and
+the +toXML+ method serializes a Java +List<Prediction>+ into an XML document, 
+which is sent back to the client. If there were problems reading or formatting the
+data, the 'predictions' service would return +null+ to the client.
+[[Ex_predictions]]
+.The back-end +predictions.Predictions+ class.
+====
+----
+package predictions;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
+import java.beans.XMLEncoder; // simple and effective
+import javax.servlet.ServletContext;
+
+public class Predictions {
+    private int n = 32;
+    private Prediction[ ] predictions;
+    private ServletContext sctx;
+    public Predictions() { }
+    public void setServletContext(ServletContext sctx) { this.sctx = sctx; } <1>
+    public ServletContext getServletContext() { return this.sctx; }
+    // getPredictions returns an XML representation of
+    // the Predictions array
+    public void setPredictions(String ps) { } // no-op
+    public String getPredictions() {                                         <2>
+	// Has the ServletContext been set?
+	if (getServletContext() == null) return null;      
+	// Have the data been read already?
+	if (predictions == null) populate(); 
+	// Convert the Predictions array into an XML document
+	return toXML();
+    }
+    private void populate() {                                                <3>
+	String filename = "/WEB-INF/data/predictions.db";
+	InputStream in = sctx.getResourceAsStream(filename);
+	// Read the data into the array of Predictions. 
+	if (in != null) {
+	    try {
+		InputStreamReader isr = new InputStreamReader(in);
+		BufferedReader reader = new BufferedReader(isr);
+		predictions = new Prediction[n];
+		int i = 0;
+		String record = null;
+		while ((record = reader.readLine()) != null) {
+		    String[] parts = record.split("!");
+		    Prediction p = new Prediction();
+		    p.setWho(parts[0]);
+		    p.setWhat(parts[1]);
+
+		    predictions[i++] = p;
+		}
+	    }
+	    catch (IOException e) { }
+	}
+    }
+    private String toXML() {                                              <4>
+	String xml = null;
+	try {
+	    ByteArrayOutputStream out = new ByteArrayOutputStream();
+	    XMLEncoder encoder = new XMLEncoder(out);
+	    encoder.writeObject(predictions); // serialize to XML
+	    encoder.close();
+	    xml = out.toString(); // stringify
+	}
+	catch(Exception e) { }
+	return xml;
+    }
+}
+----
+====
+On a GET request, the JSP script invokes the method
++setServletContext+ (line 1 in the bean, line 2 in the JSP script) with an argument, 
+the implicit object reference named +application+.
+The back-end bean needs access to the servlet context 
+in order to read data from a
+text file embedded in the deployed WAR file. The +ServletContext+ is a data structure
+through which a servlet/JSP script can interact explicitly with the servlet container.
+The call to the +setServletContext+ method sets up
+the subsequent call to the +getPredictions+ method (line 2), which returns the XML representation shown in
+Example 3. Here is the +getPredictions+ method without the comments:
+----
+public String getPredictions() {
+   if (getServletContext() == null) return null;      
+   if (predictions == null) populate(); <1>
+   return toXML();
+}
+----
+The method +populate+ (line 1 immediately above) reads the data.
+The +predictions+ reference in the code segment above refers to the +Map+ in which +Prediction+ references are values. 
+If the JSP script fails to set the servlet context, there is no way for the back-end
++Predictions+ bean to provide the requested data. The reason is that the 
+the +populate+ method requires the servlet context (the reference is +sctx+, line 1, in the code below)
+in order to access the data:
+----
+private void populate() {
+   String filename = "/WEB-INF/data/predictions.db";
+   InputStream in = sctx.getResourceAsStream(filename); <1>
+   ...
+}
+----
+If the servlet context has been set but the +predictions+ reference is +null+, then the data
+must be read from the 'predictions.db' file into the +Map+ that makes the data available to
+clients. Each entry in the +Map+ is a +Prediction+, which again is a pair: +who+ predicts +what+.
+Finally, the +toXML+ method serializes the
+Java predictions into an XML document using the Java utility class  +XMLEncoder+ (line 1):
+----
+private String toXML() {
+   String xml = null;
+   try {
+      ByteArrayOutputStream out = new ByteArrayOutputStream();
+      XMLEncoder encoder = new XMLEncoder(out);                 <1>
+      encoder.writeObject(predictions); // serialize to XML
+      encoder.close();
+      xml = out.toString(); // stringify
+   }	
+   catch(Exception e) { }
+   return xml;                                                  <2>
+}
+----
+The XML document from the +toXML+ method (line 2) becomes the body of the HTTP response to the client.
+
+Although the XML from the 'predictions' service is generated using the +XMLEncoder+ class,
+Java does provide other ways to generate XML--but perhaps none quite as simple as 
++XMLEncoder+. The +Prediction+ objects must be serializable in order to be encoded as
+XML using the +XMLEncoder+; hence, the +Prediction+
+class implements the empty (or 'marker') +Serializable+ interface and defines the
+'get/set' methods for the properties +who+ (the predictor) and +what+ (the
+prediction). The +Prediction+ properties are serialized into XML elements in the
+response document.
+
+The predictions service can be deployed under the Tomcat web server using a provided 
+Ant script (with +%+ as the command-line prompt):
+----
+% ant -Dwar.name=predictions deploy
+----
+The deployed WAR file would be 'predictions.war' in this case.
+The first sidebar (see <<sidebar_tomcat>>) elaborates on the Apache Tomcat server and explains how to install and use
+this server. The second sidebar (see <<sidebar_ant>>) clarifies the Ant script, which is packaged with the book's
+code examples. The deployed WAR file
+'predictions.war' includes a standard web deployment document, 'web.xml', so that
+the URI can be shortened to '/predictions/'. 
+
+[[sidebar_tomcat]]
+.The Tomcat web server
+[options="header"]
+****
+Apache Tomcat (_tomcat.apache.org/_) is a commercial-grade yet lightweight web server 
+implemented in Java. Tomcat has various subsystems for administration, security, logging,
+and trouble-shooting but its central subsystem is Catalina, a container that executes servlets, 
+including JSP and other scripts (_e.g._, JSF scripts) that Tomcat automatically translates into 
+servlets. Tomcat is the popular name for the web server; and Catalina is the official name for
+the servlet container that comes with Tomcat.
+
+Tomcat also includes a web console, tutorials, and sample code. This note focuses on 
+installing Tomcat and on basic post-installation tasks such as starting and stopping the web server.
+The current version is 7.x, which requires Java SE 6 or higher. Earlier Tomcat versions are
+still available.
+
+There are different ways to download Tomcat, including as a ZIP file. Tomcat can be installed in
+any directory. For convenience, let 'TOMCAT_HOME' be the install directory. The
+directory 'TOMCAT_HOME/bin' has startup and shutdown scripts for Unixy and Windows 
+systems. For instance, the startup script is _startup.sh_ for Unix and _startup.bat_ for
+Windows. Tomcat is written in Java but does not ship with the Java run-time; instead, Tomcat uses 
+the Java run-time on the host system. To that end, the
+environment variable 'JAVA_HOME' should be set to the Java install directory (_e.g._, to
+_/usr/local/java7_, _D:\java7_, and the like). 
+
+In summary, the key commands (with comments
+introduced with two semicolons) are:
+----
+% startup.sh   ;; or startup.bat on Windows to start Tomcat
+% shutdown.sh  ;; or shutdown.bat on Windows to stop Tomcat
+----
+The commands can be given at a command-line prompt. On startup, a message
+similar to
+----
+Using CATALINA_BASE:   /home/mkalin/tomcat7
+Using CATALINA_HOME:   /home/mkalin/tomcat7
+Using CATALINA_TMPDIR: /home/mkalin/tomcat7/temp
+Using JRE_HOME:        /usr/local/java
+Using CLASSPATH:       /home/mkalin/tomcat7/bin/bootstrap.jar
+----
+appears.
+
+Under 'TOMCAT_HOME' there is directory named 'logs', which contains various log 
+files, and several other directories, some of which will be clarified later. A 
+important directory for now is 'TOMCAT_HOME/webapps', which holds JAR files with a '.war' extension
+(hence the name WAR file). Subdirectories under 'TOMCAT_HOME/webapps' can be added as
+needed. Deploying a web service under Tomcat is the same as deploying a web site: a WAR file 
+containing the site or the service is copied to 
+the 'webapps' directory; and a web site or web service is undeployed by removing its WAR file.
+
+Tomcat maintains various log files in 'TOMCAT_HOME/logs', one of which is especially
+convenient for 'ad hoc' debugging. In standard configuration, Tomcat redirects output to 
++System.err+ and +System.out+ to 'logs/catalina.out'. Accordingly, if a servlet executes
+----
+System.err.println("Goodbye, cruel world!");
+----
+the farewell message would appear in the _catalina.out_ log file.
+
+Apache Tomcat is not the only game in town. There is the related TomEE web server, 
+basically Tomcat with support for Java EE beyond servlets. Another popular Java-centric 
+web server is Jetty (_jetty.codehaus.org_). The sample services in this book
+can be deployed, as is, with either Tomcat or Jetty; and the next chapter has a sidebar
+on how to install and run Jetty.
+****
+
+[[sidebar_ant]]
+.An Ant script for service deployment
+[options="header"]
+*****
+The first sample web service is published with a web server such as Tomcat or Jetty. The ZIP
+file with my code examples includes an Ant script to ease the task of deployment. 
+The Ant utility, written in Java, is available on all platforms. My script requires 
+Ant 1.6 or higher.
+
+To begin, let the 'current working directory' ('cwd') be any directory on the local
+file system. The 'cwd' holds the Ant script build.xml:
+----
+cwd: build.xml
+----
+The 'cwd' has a subdirectory named 'src' that holds the web service's artifacts.
+Suppose, for example, that a web service includes a
+JSP script, a back-end JavaBean, the standard Tomcat or Jetty deployment file 'web.xml',
+and a JAR file that holds a JSON library. Here is a depiction:
+----
+cwd: build.xml
+ |
+src: products.jsp, json.jar, web.xml
+----
+Suppose, further, that the back-end JavaBean has the fully qualified name
+----
+acme.Products
+----
+The file structure is now
+----
+cwd: build.xml
+ |
+src: products.jsp, json.jar, web.xml
+ |
+acme: Products.java
+----
+Finally, assume that the 'src' directory also holds the data file 'new_products.db'.
+From the 'cwd' command-line, the command
+----
+% ant -Dwar.name=products deploy
+----
+does the following:
+
+* Creates the directory 'cwd/build', which holds copies of files in directory 'src' and any subdirectories.
+* Compiles any _.java_ files, in this case _acme.Products.java_.
+* Builds the WAR file, whose major contents are:
++
+---- 
+WEB-INF/web.xml
+WEB-INF/classes/acme/Products.class
+WEB-INF/data/new_products.db
+WEB-INF/lib/json.jar
+acme/Products.java
+products.jsp
+----
+In the constructed WAR file,
+
+* Any _.xml_ file winds up in _WEB-INF_.
+* Any _.jar_ file winds up in _WEB-INF/lib_.
+* Any _.db_ file winds up in _WEB-INF/data_. 
+* Any _.java_ or '.class' file winds up in its package/subdirectory.
+* Other files, such as _.jsp_ files, wind up in the WAR file's top level.
+
+For convenience the Ant script includes, in the WAR file, Java source ('.java') and 
+compiled ('.class') files. In production, the source files would be omitted.
+
+Finally, the Ant script copies the constructed WAR file to 'TOMCAT_HOME/webapps' and thereby deploys the web service.
+The script also leaves a copy of the WAR file in 'cwd'.
+
+The command
+----
+% ant
+----
+displays the three most useful commands. The command
+----
+% ant clean
+----
+removes any '.war' files from the 'cwd' and deletes the 'build' directory.
+The command
+----
+% ant compile
+----
+compiles any '.java' files but does not build or deploy a WAR file. The
+command
+----
+% ant -Dwar.name=predictions deploy
+----
+first cleans and compiles; and then the command builds and deploys the WAR
+file 'predictions.war'.
+
+The Ant file 'build.xml' has extensive documentation and explains, in particular,
+what needs to be done to customize this file for your environment. Only one line in 
+the file needs to be edited. Although the Ant script is targeted at Tomcat deployment, 
+the WAR files that the script produces
+can be deployed as is to Jetty as well. As noted earlier, Chapter 2 goes into the details of
+installing and running Jetty.
+*****
+
+==== A Client against the 'predictions' Web Service
+Later examples introduce
+RESTful clients in Java and other languages; but, for now, either a browser or a 
+utility such as 'curl' (see <<sidebar_curl>>) is good enough. 
+On a successful 'curl' request to the service
+----
+% curl -v http://localhost:8080/predictions/
+----
+the response includes not only the XML shown earlier in Example 5 but also a trace (thanks to the '-v' flag) 
+of the HTTP request and response messages. The HTTP request is:
+----
+GET /predictions/ HTTP/1.1
+User-Agent: curl/7.19.7 
+Host: localhost:8080
+Accept: */*
+----
+The HTTP response start line and headers are:
+----
+HTTP/1.1 200 OK
+Server: Apache-Coyote/1.1
+Set-Cookie: JSESSIONID=96C78773C190884EDE76C714728164EC; Path=/test1/;
+Content-Type: text/html;charset=ISO-8859-1
+Transfer-Encoding: chunked
+----
+Recall that an HTTP GET message has no body; hence, the entire message is the
+start line and the headers. The response shows the session identifier (a 128-bit
+statistically unique number, in hex, that Tomcat generates) in the header. In
+the JSP script, the session identifier could be disabled as it is not needed; but, 
+for now, the goal is brevity and simplicity in the code.
+
+[[sidebar_curl]]
+.The 'curl' utility
+[options="header"]
+*****
+The 'curl' utility ('curl.haxx.se') is a command-line tool for requesting data using URL syntax. The
+tool supports a wide variety of protocols, including HTTP(S), SMTP, FTP(S), LDAP(S), and others.
+The tool is available on Unixy systems and there is port for Windows. This tool is useful
+for quick tests to determine whether a service is responding appropriately to requests.
+****
+
+If a POST request were sent to the RESTful predictions service
+----
+% curl --request POST --data "foo=bar" http://localhost:8080/predictions/
+----
+the request message header becomes:
+----
+POST /predictions/ HTTP/1.1
+User-Agent: curl/7.19.7 
+Host: localhost:8080
+Accept: */*
+Content-Length: 7
+Content-Type: application/x-www-form-urlencoded
+----
+The response header now is:
+----
+HTTP/1.1 405 Method Not Allowed
+Server: Apache-Coyote/1.1
+Set-Cookie: JSESSIONID=34A013CDC5A9F9F8995A28E30CF31332; Path=/test1/; 
+Content-Type: text/html;charset=ISO-8859-1
+Content-Length: 1037
+----
+The error message 
+----
+Only GET requests are allowed.
+----
+is in an HTML document that makes up the response message's body. Tomcat generates an HTML response
+because my code does not (but could) stipulate a format other than HTML, the default Tomcat format for a Tomcat response.
+
+This first example illustrates how a JSP script 
+is readily adapted to support web services in addition to
+web sites. The next section goes into more detail on servlets and JSP
+scripts. In summary, the 'predictions' web service is implemented as a JSP script with the two
+back-end JavaBeans in support. This first example highlights key aspects of a REST-style service:
+
+* The service provides access to resource under the URI '/predictions/'.
+* The service filters access on the HTTP request verb. In this example, only GET requests are successful; any other type 
+of request generates a 'bad method' error.
+* The service responds with an XML payload, which the consumer now must process in some appropriate way.
+
+=== Why Use Servlets for RESTful Web Services?
+Chapter 2 explores various ways in which to implement and publish RESTful services in Java, which has a 
+rich set of built-in and third-party APIs.
+The current chapter introduces a tried-and-true way to do RESTful services in Java: the service is implemented as a 
+JSP script, which a web server such as Tomcat or Jetty translates into a servlet; and the servlet then is 
+published with the web server.
+
+An +HttpServlet+ is a natural, convenient way to implement RESTful web services for two 
+main reasons. First, such servlets are close to the HTTP metal. For example,
+the +HttpServlet+ class has methods such as +doGet+, +doPost+, +doPut+, and
++doDelete+ that match up with the HTTP verbs aligned with the CRUD operations. These
+servlet methods execute as callbacks that the servlet container, explained shortly, invokes 
+as needed. The +HttpServlet+ class also provides symbolic constants for HTTP status codes, for 
+example, +SC_NOT_FOUND+ for status code 404 and +SC_METHOD_NOT_ALLOWED+ for status
+code 405. Each +HttpServlet+ _do_-method has the same two arguments:
+an +HttpServletRequest+ and an +HttpServletResponse+. The servlet request contains, as
+key/value pairs, all of the appropriate information encapsulated in the HTTP request, 
+regardless of the request verb: for a GET request, the +HttpServletRequest+ would include
+any key/value pairs in a query string; for a POST request, this data structure would
+include any key/value pairs in the POST request body.
+The +HttpServletRequest+ map is easy to read and, if needed, to update and to forward.
+The +HttpServletResponse+ has methods to adjust the HTTP response message as needed; 
+and this class encapsulates an output stream to communicate back to the
+client.
+
+A second major advantage of servlets is that they execute in a servlet container,
+middleware that mediates between the application code of the servlet and
+the web server that provides the usual types of support: wire-level security in the
+form of HTTPS transport, user authentication and authorization, logging and
+troubleshooting support, server configuration, local or remote database access,
+naming services, application deployment and
+administration, and so on. In the Tomcat web server, the servlet container is named
+Catalina. Because the servlet container is such an integral part of a Java-based
+web server, it is common to conflate the container name (Catalina) and the server
+name (Tomcat), a practice followed here. (In Jetty, the server and the container have
+the same name: 'Jetty'.) In any case, a Java-centric web server 
+such as Tomcat is the natural way to publish real-world web services, including
+RESTful ones, written in Java. A servlet container typically houses several instances of
+executing servlets, each awaiting client requests (see <<fig_servlet_container>>).
+
+[[fig_servlet_container]]
+.A servlet container with servlet instances awaiting requests
+image::images/jwsu_0402.png[]
+
+Here is a short, more technical review of servlets with emphasis on their use to
+deliver RESTful services. The class +HttpServlet+ extends
+the class +GenericServlet+, which in turn implements the
++Servlet+ interface. All three types are in a
+that is not included in core Java. (Tomcat and Jetty provide
+a JAR file 'servlet-api.jar' that contains the required package.) The
++Servlet+ interface declares five methods, the most
+important of which is the +service+  method that a web
+container invokes on every request to a servlet. The
++service+  method has a  +ServletRequest+ and a  +ServletResponse+  parameter. The request 
+is a map that contains the request information from a client and the response
+provides a stream to send responses back to the client. The
++GenericServlet+ class implements the +Servlet+  methods in a transport-neutral fashion, whereas
+the +HttpServlet+  subclass of +GenericServlet+ implements these methods in an
+HTTP-specific way. Accordingly, the +service+ parameters in the
++HttpServlet+  have the types +HttpServletRequest+  and
++HttpServletResponse+. The +HttpServlet+ also provides request filtering that naturally
+supports a REST-style service: in an +HttpServlet+, the overridden +service+ method dispatches a incoming
+GET request to the method +doGet+, an incoming POST
+request to the method +doPost+, and so on. Because HTTP is the dominant transport for web sites and
+web services, the +HttpServlet+ is an excellent choice for implementing either.
+
+In the  +HttpServlet+  class, the _do_-methods such as +doGet+ and +doPost+ are defined as no-ops, that is, 
+as methods with empty
+bodies; and these methods can be overridden as needed in a programmer-derived subclass.
+For example, if the class  +MyServlet+  extends +HttpServlet+  and overrides  +doGet+  but
+not +doPost+ , then  +doPost+ remains a no-op in +MyServlet+ instances. A servlet programmer 
+overrides the 'do'-methods of interest and ignores the rest.
+
+Servlets are written in Java and, therefore, have access to all of the Java libraries, standard and contributed.
+JSP scripts, by contrast, are an arbitrary mix of HTML and code. In the case of web sites, JSP scripts typically serve
+as a HTML templates and, under best practices, the major code segments involve references to back-end JavaBeans.
+In the case of web services, by contrast,
+JSP scripts would consist predominantly or even exclusively of code because service clients do not expect
+HTML payloads as responses.
+The advantage of a JSP script over an +HttpServlet+ is that the programmer does not need to 
+compile a JSP script. The Java-aware web server assumes this responsibility. 
+A JSP script is deployed as a text file but executes as a servlet because the web server automatically 
+translates the script into an +HttpServlet+ before loading one or more instances of the
+resulting servlet into the servlet container. For short examples and for the kind of experimentation
+typical of code development, JSP scripts are attractive. For deployment to production, the
+Java code of a servlet would be best practice. Some of my shorter servlet-based examples use JSP scripts
+but most of the examples use classes that explicitly extend +HttpServlet+.
+
+=== What's Next?
+RESTful services are rich enough to warrant two dedicated chapters. Accordingly, the
+next chapter focuses on the service side by exploring options for implementing
+and publishing RESTful services. The web service APIs include:
+
+* +HttpServlet+ and its equivalents ('e.g.', JSP scripts)
+
+* JAX-RS, which has various implementations
+
+* Restlet, which is similar in style to JAX-RS
+
+* JAX-WS +@WebServiceProvider+, which is a relatively low-level API
+
+Web services using any these APIs can be published with production-grade web server such as Tomcat or Jetty; and 
+there are even command-line options for such publication, although these options vary significantly in ease of use. There are 
+trade-offs among the APIs and the next chapter highlights the pluses and minuses of each API.
+
+The servlet approach represents a base-level API in that servlets have been a part of Java
+since the late 1990s and the remain the foundation for web sites written in Java. The servlet API is close to the HTTP metal in that, for example,
+an +HttpServletRequest+ is a thin but likewise convenient wrapper around an HTTP request; and, in similar fashion, an +HttpServletResponse+ 
+is a thin and equally convenient wrapper around an HTTP response. At the same time, servlets provide high-level filtering of HTTP requests
+and a data structure such as the +HttpServletRequest+ collapses the distinction between the key/value pairs in a query string of a GET
+or DELETE request and the key/value pairs in the body of a POST or PUT request: all such pairs occur, without distinction, in the
++HttpServletRequest+ map. Servlets may seem old hat but they are a hat worth trying on for REST-style services. The remaining APIs build upon
+what servlets offer and, in this sense, represent a layering on top of servlets.
+
+JAX-RS and Restlet are roughly peers, although this comparison might stir heated denials from either camp. 
+Both of these APIs emphasize the use
+of Java annotations to describe the RESTful access to a particular CRUD operation. For example, methods that handle GET requests are
+annotated with +@GET+ or +@Get+, those that handle POST requests are annotated with +@POST+ or +@Post+, and so on. In both frameworks
+there are symbolic constants to specify MIME types and status codes. Further, each framework supports the automated generation of
+XML and JSON payloads. These frameworks have a contemporary look-and-feel; but each represents, at the implementation level,
+a layer above the servlet layer. When published with a web server such as Tomcat or Jetty, JAX-RS and Restlet provide servlet
+interceptors that mediate between the client and the web service. The details are explored in Chapter 2.
+
+JAW-WS is an API used mostly for SOAP-based services but can be used for REST-style services as well. In the latter case, the
++@WebServiceProvider+ annotation is central. The +@WebServiceProvider+ interface is sufficiently flexible that it can be used
+to annotate either a SOAP-based or a REST-style service; however, JAX-WS provides a related but higher-level annotation, +@WebService+,
+for SOAP-based services. The +@WebServiceProvider+ API is deliberately lower level than the servlet, JAX-RS, and Restlet APIs; and
+the +@WebServiceProvider+ API is targeted at XML-based services. For programmers who need a low-level API, Java supports
+the +@WebServiceProvider+ option. JAX-RS, Restlet, and +@WebServiceProvider+ have both service-side and client-side
+APIs that can be used independently of one another. For example, a Restlet client could make calls against a JAX-RS service or vice-versa.
+
+In summary, Chapter 2 focuses on the server side of RESTful services. 
+Chapter 3 shifts the focus to the client or consumer side of such services. The chapter includes client code against commercial 
+RESTful services such as
+Amazon, Twitter, and the Chicago Transit Authority. The chapter also focuses on how the standard JAX-B (Java API for XML-Binding) 
+packages and third-party libraries such as +XStream+ can be put to
+good use by the hiding the XML in the consumption of RESTful services. A dominant trend in contemporary web services is the 
+occurrence of JavaScript clients against RESTful services. Such clients may be written in JavaScript or a dialect such as jQuery. In any
+case, these clients are usually embedded in HTML documents so that the clients execute in the context of a browser. JavaScript clients
+in general prefer JSON over XML payloads for the obvious reason that a JSON document is the text representation of a 
+JavaScript object, even a JavaScript function. Chapter 3 also looks at various Java options for generating JSON as well
+as XML and plain-text responses; and the chapter explores different ways in which JavaScript clients can process the
+JSON payloads.
+
+

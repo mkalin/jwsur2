@@ -1,0 +1,297 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title></title><link rel="stylesheet" href="docbook-xsl.css" type="text/css" /><meta name="generator" content="DocBook XSL Stylesheets V1.75.2" /></head><body><div xml:lang="en" class="article" lang="en"><div class="titlepage"><hr /></div><div class="toc"><p><b>Table of Contents</b></p><dl><dt><span class="section"><a href="#jwsur_2ndEdition">1. Preface</a></span></dt><dd><dl><dt><span class="section"><a href="#_what_8217_s_changed_in_the_second_edition">1.1. What’s Changed in the Second Edition?</a></span></dt><dt><span class="section"><a href="#_web_service_apis_and_publication_options">1.2. Web Service APIs and Publication Options</a></span></dt><dt><span class="section"><a href="#_chapter_by_chapter_overview">1.3. Chapter-by-Chapter Overview</a></span></dt><dt><span class="section"><a href="#_tools_and_ides">1.4. Tools and IDEs</a></span></dt><dt><span class="section"><a href="#_conventions_used_in_this_book">1.5. Conventions Used in This Book</a></span></dt><dt><span class="section"><a href="#_using_code_examples">1.6. Using Code Examples</a></span></dt><dt><span class="section"><a href="#_safari_superscript_superscript_books_online">1.7. Safari<sup>®</sup> Books Online</a></span></dt><dt><span class="section"><a href="#_how_to_contact_us">1.8. How to Contact Us</a></span></dt><dt><span class="section"><a href="#_acknowledgments">1.9. Acknowledgments</a></span></dt></dl></dd></dl></div><div class="section" title="1. Preface"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="jwsur_2ndEdition"></a>1. Preface</h2></div></div></div><p>Welcome to the second edition of <span class="emphasis"><em>Java Web Services: Up and Running</em></span>.
+This edition, like the first, is for programmers interested in
+developing web services and clients against such services.
+This edition, again like the first, emphasizes code.
+My aim is to make web services and
+their clients come alive through focused but realistic programming examples in Java but, of course,
+in other languages as well: web services are designed to be language neutral, a point best illustrated
+through the interaction of services and clients written in different languages. Indeed, the client of
+a well-designed web service can remain agnostic about the service’s implementation details, including
+the language in which the service is written.
+To ease the
+task of compiling and publishing services, the ZIP file with the code samples includes an Ant
+script that compiles, packages, and deploys web services. The major client examples include either
+Ant scripts for compiling and running the clients or executable JAR files with all of the dependencies
+included therein. The code examples are available at <span class="emphasis"><em>https://github.com/mkalin/jwsur2</em></span>.</p><div class="section" title="1.1. What’s Changed in the Second Edition?"><div class="titlepage"><div><div><h3 class="title"><a id="_what_8217_s_changed_in_the_second_edition"></a>1.1. What’s Changed in the Second Edition?</h3></div></div></div><p>In the four years or so since the first edition, there has been continuity as well as change.
+Web services remain a popular and arguably even the dominant approach towards
+<span class="emphasis"><em>distributed software systems</em></span>, that is, systems that require the interaction of software
+on physically distinct devices. The web itself is a prime example of a distributed system; and the
+current trend is to blur the distinction between traditional, HTML-centric <span class="emphasis"><em>web sites</em></span> and
+modern <span class="emphasis"><em>web services</em></span>, which typically deliver XML or JSON payloads instead of HTML ones.
+Web services
+are an appealing way to do distributed systems because these services can piggy-back on existing infrastructure such
+as HTTP(S) transport, web servers, database systems, modern programming languages of various stripes, widespread
+software libraries for JSON and XML processing, security providers, and so on. Indeed, web services are a lightweight and flexible
+way to integrate divergent software systems and to make the functionality of such systems readily accessible.</p><p>Java remains a major player in the web services; and Java support for these services, in the form of
+standard and third-party software libraries and utilities, continues to improve. Yet two important
+and related shifts in emphasis have occurred since this book was first published:</p><div class="itemizedlist"><ul class="itemizedlist" type="disc"><li class="listitem">
+The consumers or clients of web services are increasingly written in JavaScript, particularly in
+the jQuery dialect; and these clients naturally prefer response payloads in JSON (JavaScript Object
+Notation) rather than in XML because a JSON document is the text representation of a native JavaScript
+object. A JavaScript client that receives, for example, an array of products as a JSON rather than an XML
+document can process the array with the usual JavaScript programming constructs. By contrast, a JavaScript client that
+receives an XML payload would face a challenge common across programming languages: the challenge
+of parsing an XML document to extract its informational content before moving on to specific application logic.
+Modern web services and
+web-service frameworks acknowledge the growing popularity of JSON by treating JSON and XML
+formats as equals. In some frameworks, such as Rails, JSON even gets the nod over XML.
+</li><li class="listitem">
+REST-style services are increasingly popular among familiar sites
+such as eBay, Facebook, LinkedIn, Tumblr, and Twitter. Amazon, a web service pioneer, continues to support REST-style and SOAP-based
+versions of its services.
+The services from newer players tend to be REST-style for an obvious reason: REST-style
+services are relatively low fuss and their APIs are correspondingly simple. SOAP-based services
+still are delivered mostly over HTTP(S), although Java and DotNet continue to explore the use of other protocols,
+especially TCP, for transport. The first edition of this book underscored that SOAP-based services over HTTP can be
+seen as a special case of REST-style services; and the second edition pursues the same theme.
+</li></ul></div><p>The two changes in web services are reflected in how the second edition is organized. Chapter 1 begins with an overview of web
+services, including the link between such services and Service Oriented Architecture (SOA); and the chapter
+includes a code-based contrast of SOA and the competing Distributed Object Architecture (DOA). The discussion then
+turns to REST: what the acronym means, why HTTP can be treated as an API and not just a transport, and how the RESTful
+mindset continues to impact the design and implementation of modern
+web services. The first chapter includes sample HTTP clients in Java, clients that can be targeted at either web sites
+or web services.
+The first chapter
+ends with a RESTful service implemented as a JSP script with
+support from two back-end POJO classes; the service is published with the Tomcat web server. The first chapter goes into the
+details of installing and running Tomcat; and the second chapter does the same for the Jetty web server. The aforementioned
+Ant script is also clarified so that the sample web services can be packaged and deployed automatically.</p><p>Although this edition of
+the book starts with REST-style services, SOAP-based ones are treated thoroughly. One chapter covers
+SOAP-based services at the <span class="emphasis"><em>application level</em></span>, a level in which the SOAP remains transparent; another chapter explores the
+<span class="emphasis"><em>handler</em></span> and the <span class="emphasis"><em>transport</em></span> levels at which the SOAP is exposed for inspection and manipulation.
+Starting with REST-style services helps
+to explain the advantages that come with SOAP-based services, in particular the benefit of having the
+XML remain mostly under the hood. Issues such as security cut across the REST/SOAP boundary; and there is a chapter dedicated
+to practical web-security security, from wire-level security through users/roles security up to WS-Security.</p></div><div class="section" title="1.2. Web Service APIs and Publication Options"><div class="titlepage"><div><div><h3 class="title"><a id="_web_service_apis_and_publication_options"></a>1.2. Web Service APIs and Publication Options</h3></div></div></div><p>In the first edition, the JAX-WS APIs and their Metro implementation were dominant. In this edition, the two are important
+but less dominant. For REST-style services, the book has examples based on the following APIs:</p><div class="variablelist"><dl><dt><span class="term">
+<code class="literal">HttpServlet</code>
+</span></dt><dd>
+The <code class="literal">HttpServlet</code> is well designed for REST-style services
+because the API is so close to the HTTP metal. Servlet instances encapsulate callbacks such as <code class="literal">doPost</code>, <code class="literal">doGet</code>, <code class="literal">doPut</code>,
+and <code class="literal">doDelete</code>, which cover the familiar CRUD operations: <span class="emphasis"><em>create</em></span> (POST), <span class="emphasis"><em>read</em></span> (GET), <span class="emphasis"><em>update</em></span> (PUT), and <span class="emphasis"><em>delete</em></span>
+(DELETE). There are symbolic versions of HTTP status codes to signal the outcome of an HTTP request; support for
+MIME types; utilities to access HTTP headers and bodies; and so on.  JSP and other Java-based scripts execute as
+servlet instances and, therefore, fall under the servlet umbrella.
+The <code class="literal">HttpServlet</code> is grizzled but
+hardly obsolete. Servlets are still an excellent way to deliver REST-style services.
+</dd><dt><span class="term">
+JAX-RS
+</span></dt><dd>
+This is a relatively recent and increasingly popular API for delivering REST-style services. The API centers
+on annotations such as <code class="literal">@GET</code> and <code class="literal">@POST</code> to route HTTP requests to particular Java methods. There is likewise a
+convenient <code class="literal">@Path</code> annotation to identify the particular resource targeted in a request. JAX-RS can be configured to
+generate automatically XML and JSON responses. This API, like the Restlet API described next, has a
+contemporary look-and-feel. At the implementation level, JAX-RS represents a layering atop servlets. The same options
+for publishing servlet-based services are available for their JAX-RS cousins.
+</dd><dt><span class="term">
+Restlet
+</span></dt><dd>
+This API is similar in style to JAX-RS, although the claim is likely to upset proponents of both. The
+Restlet API also centers on annotations for routing HTTP requests to designated Java methods and for
+generating payloads. Restlet encourages interplay with other APIs. It is possible, for example, to
+use JAX-RS annotations in a Restlet-based service. Restlet offers an easy-to-use publisher for development and
+testing. Restlet services, like their JAX-RS counterparts, represent an implementation level on top of servlets.
+Programmers should be able to move easily between the JAX-RS and Restlet APIs.
+</dd><dt><span class="term">
+JAX-WS <code class="literal">@WebServiceProvider</code>
+</span></dt><dd>
+This is a deliberately XML-centric and low-level API that could be used for
+either SOAP-based or REST-style services. However, JAX-WS has the <code class="literal">@WebService</code> annotation precisely for
+SOAP-based services; hence, the most obvious use of the <code class="literal">@WebServiceProvider</code> annotation is for XML-based REST-style
+services. This API is well suited for services that require granular control over XML generation and processing.
+</dd></dl></div><p>For SOAP-based services, most of the examples use the reference implementation of JAX-WS, which is Metro.
+However, this edition now covers Axis2 as well. Axis2 implements JAX-WS but has additional features.</p><div class="section" title="1.2.1. The Publication Options"><div class="titlepage"><div><div><h4 class="title"><a id="_the_publication_options"></a>1.2.1. The Publication Options</h4></div></div></div><p>Each of these APIs, whether for REST-style or SOAP-based services, honors the separation-of-concerns principle with respect
+to publishing a web service. The web service
+is one concern; its publication is quite another concern. Services developed with any of these APIs can be published
+with a standalone web server such as Tomcat, a Java Application Server (JAS) such as GlassFish, or even with a simple command-line
+utility such as the standard <code class="literal">Endpoint</code> publisher. To underscore the separation-of-concerns principle and to emphasize the
+production-grade options, my examples are published in the following ways:</p><div class="variablelist"><dl><dt><span class="term">
+Standalone web servers
+</span></dt><dd>
+The two obvious choices in Java are Tomcat and Jetty, although other choices are available. The
+aforementioned Ant script automatically compiles and packages web services, REST-style and SOAP-based alike,
+for publication. Although the Ant script is tailored for Tomcat publication, a generated WAR file can be deployed, as is,
+to Jetty, Tomcat, or one of the many JASes.
+Tomcat and Jetty provide the usual services such as
+wire-level and users/roles security, logging/debugging, and administration that one expects from a
+production-grade web server.
+</dd><dt><span class="term">
+Java application servers
+</span></dt><dd>
+The reference implementation is still GlassFish, which is part of the community-based Metro
+project. GlassFish can be used to publish either <span class="emphasis"><em>servlet-based</em></span> services, which are the type that Tomcat and Jetty
+can publish, or <span class="emphasis"><em>EJB-based</em></span> services, which are <code class="literal">@Stateless</code> Session Enterprise Java Beans. TomEE, which is
+essentially Tomcat7 with OpenEJB extensions, is an emphatically lightweight publisher of both <span class="emphasis"><em>servlet-based</em></span> and
+<span class="emphasis"><em>EJB-based</em></span> services. Under TomEE, even an <span class="emphasis"><em>EJB-based</em></span> service can be deployed as a standard WAR (Web ARchive) file.
+TomEE includes an implementation of JAX-RS.
+</dd><dt><span class="term">
+Command-line publishers
+</span></dt><dd>
+Examples are the standard <code class="literal">Endpoint</code> utility class and the Restlet <code class="literal">Component</code> class. These
+publishers are useful for development, testing, and even low-volume production.
+</dd></dl></div><p>Java in general draws strength from the many options that the language and the run-time offer; and this strength carries
+over to web services as well. There are many ways to program web services and web-service clients in Java; and there are
+various attractive options for publishing such services.
+There is no need to claim any particular way in web services as the best way. My aim is to examine and clarify the choices so that, in the end, the
+challenges and resources at hand can decide which API, which implementation, and which method of publication is best suited
+for the challenge at hand.</p></div></div><div class="section" title="1.3. Chapter-by-Chapter Overview"><div class="titlepage"><div><div><h3 class="title"><a id="_chapter_by_chapter_overview"></a>1.3. Chapter-by-Chapter Overview</h3></div></div></div><p>The second edition has seven chapters. The following subsections offer a summary of each chapter.</p><div class="section" title="1.3.1. Chapter 1, Web Services Quickstart"><div class="titlepage"><div><div><h4 class="title"><a id="_chapter_1_web_services_quickstart"></a>1.3.1. Chapter 1, Web Services Quickstart</h4></div></div></div><p>Chapter 1 begins the code-driven tour of web services with an overview of the
+differences—and the similarities—between REST and SOAP. Why are web services of any use? This question
+is addressed with examples: one example focuses on using web services to automate access to the data and
+functionality available on the web; the other example focuses on web services as a way to integrate
+diverse software systems. The theme of <span class="emphasis"><em>interoperability</em></span> is pursued throughout the book with examples.
+Chapter 1 includes a short history of
+web services, with emphasis on how the SOA (Service Oriented Architecture) approach to distributed
+systems differs significantly from the DOA (Distributed Object Architecture) approach that pre-dates
+yet continues to compete with web services. The chapter then focuses on how HTTP itself is at the
+center of the RESTful way to web-based, distributed software systems. XML and JSON are
+introduced as document-exchange formats of special interest in RESTful services. The chapter includes
+code examples: a pair of Java HTTP clients used to illustrate key features of HTTP; and a first
+RESTful service, which consists of a JSP script and two back-end POJO classes. The <span class="emphasis"><em>curl</em></span> utility is used to
+make sample client calls, including failed ones, against the first service. The chapter covers practical
+matters such as installing the Tomcat web server and using the provided Ant script to compile, package, and deploy
+a web service.</p></div><div class="section" title="1.3.2. Chapter 2, RESTful Web Services: The Service Side"><div class="titlepage"><div><div><h4 class="title"><a id="_chapter_2_restful_web_services_the_service_side"></a>1.3.2. Chapter 2, RESTful Web Services: The Service Side</h4></div></div></div><p>Chapter 2 introduces various APIs and implementations available for
+programming and delivering RESTful web services in Java. The <code class="literal">HttpServlet</code>, JAX-RS, Restlet, and JAX-WS
+<code class="literal">@WebServiceProvider</code> APIs are explored through full code examples. The chapter clarifies various ways of
+generating XML and JSON payloads, using both standard Java classes and different third-party ones. The code
+examples adhere to RESTful principles such as honoring the intended meaning of each CRUD verb; of
+using intuitive URIs to name resources; of relying upon MIME data types to describe resource representations;
+and of taking full advantage of that HTTP status codes that
+report on the outcome of an HTTP request against a RESTful service.
+Chapter 2, along with later chapters,
+looks at options for publishing RESTful services. The options include standalone web servers such
+as Tomcat and Jetty together with command-line publishers such as <code class="literal">Endpoint</code>, <code class="literal">HttpServer</code>, and
+Restlet <code class="literal">Component</code>. The chapter goes into the technical details of multithreading and thread
+synchronization in services deployed with a web server such as Tomcat or Jetty. The installation
+and management of Jetty is also covered. Chapter 2 also takes a first look at the powerful
+JAX-B (Java API for XML-Binding) and JAX-P (Java API for XML-Processing) utilities, which are especially
+important in the Chapter 3 coverage
+of the client side in RESTful services.</p></div><div class="section" title="1.3.3. Chapter 3, RESTful Web Services: The Client Side"><div class="titlepage"><div><div><h4 class="title"><a id="_chapter_3_restful_web_services_the_client_side"></a>1.3.3. Chapter 3, RESTful Web Services: The Client Side</h4></div></div></div><p>Chapter 3 shifts focus from the service to the client side of
+RESTful services. There are sample clients written with the weathered but still trusty <code class="literal">URLConnection</code>
+class and also clients written using REST-specific APIs. (JAX-RS, Restlet, and JAX-WS provide both
+service-side and client-side APIs.) As evidence of interoperability, the chapter offers jQuery and Perl
+clients against Java services and Java clients against commercial services whose implementation language
+is officially unknown. The code samples explore various possibilities for dealing with XML and JSON
+payloads, in particular the standard JAX-B packages and third-party contributions such as <code class="literal">XStream</code>. These
+utilities are especially useful in transforming XML documents into native Java objects, which obviates
+the need for explicit parsing. Most RESTful services now furnish a grammar, in the form of an XML Schema
+or equivalent, for the service; and core Java has utilities such as <span class="emphasis"><em>xjc</em></span> that convert an XML Schema
+into Java classes. Chapter 3 has clients against real-world RESTful services at Twitter, Amazon, and
+the Chicago Transit Authority. This chapter pays special attention to the growing importance of
+JavaScript clients, which are highlighted in several examples using jQuery. Finally, the chapter shows how
+distinct web
+services can be orchestrated to form a single, composite service.</p></div><div class="section" title="1.3.4. Chapter 4, SOAP-Based Web Services"><div class="titlepage"><div><div><h4 class="title"><a id="_chapter_4_soap_based_web_services"></a>1.3.4. Chapter 4, SOAP-Based Web Services</h4></div></div></div><p>Chapter 4 turns from REST-style to SOAP-based services, in particular to the
+JAX-WS API and its central annotation <code class="literal">@WebService</code>. The chapter opens by converting a REST-style service
+from earlier chapters to a SOAP-based service. The emphasis in this chapter is on the
+<span class="emphasis"><em>application level</em></span>, a level in which the XML in SOAP-based messaging remains transparent. Indeed, a chief
+attraction of SOAP-based services is that neither the services nor their clients require
+any attention to the underlying XML: service operations are, in Java, <code class="literal">public</code> methods preferably
+annotated with <code class="literal">@WebMethod</code>; and remote clients invoke the operations straightforwardly.
+The data types of arguments and return values include all of the
+primitive types and their wrappers, the <code class="literal">String</code> and <code class="literal">Calendar</code> types, various other standard types,
+arrays of any acceptable type,
+and programmer-defined
+classes whose properties reduce ultimately to any of these. The chapter explains in detail the programmer-friendly
+<span class="emphasis"><em>wsimport</em></span> utility, which generates client-side support code from the web service contract, the WSDL (Web
+Service Definition Language) document. The structure, purpose, and various uses of the WSDL are clarified
+through coding examples. The role of XML Schema or equivalent in a WSDL document is given particular
+emphasis.
+The chapter includes two Java clients against the Amazon E-Commerce service together with
+C# and Perl clients against a Java service. These examples underscore that SOAP-based services, like their
+REST-style cousins, are language neutral. The clients against the SOAP-based version of the Amazon E-Commerce
+service introduce but do not explore the <span class="emphasis"><em>handler level</em></span>
+of SOAP-based services; these examples also provide a first look at security issues.</p></div><div class="section" title="1.3.5. Chapter 5, SOAP Handlers and Faults"><div class="titlepage"><div><div><h4 class="title"><a id="_chapter_5_soap_handlers_and_faults"></a>1.3.5. Chapter 5, SOAP Handlers and Faults</h4></div></div></div><p>Chapter 5 examines the <span class="emphasis"><em>handler</em></span> and <span class="emphasis"><em>transport</em></span> levels in SOAP messaging, levels
+at which the XML in a SOAP message comes to fore for inspection and manipulation. The chapter begins with a look at the
+SOAP message architecture, which distinguishes among a message <span class="emphasis"><em>sender</em></span>, an <span class="emphasis"><em>intermediary</em></span> that should confine
+its activity to the SOAP header rather the SOAP body or attachments in a message, and an ultimate <span class="emphasis"><em>receiver</em></span>,
+which should have access to the entire SOAP message. The distinct parts of SOAP messages, the raw XML and
+any attachments, are accessible to SOAP handlers, which come in two flavors: <span class="emphasis"><em>message</em></span> handlers have access to
+the entire SOAP message (header, body,
+and attachments), whereas <span class="emphasis"><em>logical</em></span> handlers have access only to the payload in the body. WS-Security and
+related extensions of SOAP beyond the <span class="emphasis"><em>basic profile</em></span> may use such access to inject or inspect security
+elements in SOAP headers. Handlers are akin to <code class="literal">Filter</code> instances in web sites, although handlers
+are inherently bi-directional and can occur on either the client or the service side. The chapter covers
+both individual handlers and handler chains, in this case a chain consisting of a message and a logical handler.
+The handler-chain example mimics the user authentication at work in Amazon’s web services.
+The chapter likewise examines the related topic of SOAP <span class="emphasis"><em>faults</em></span>, special error messages that can be generated
+at either the application or the handler level. The chapter also looks at how SOAP messages can transport
+arbitrary binary data as attachments. A final topic is the <span class="emphasis"><em>transport</em></span> level, usually HTTP; and this level is
+especially useful in the users/roles security examined in Chapter 6.</p></div><div class="section" title="1.3.6. Chapter 6, Web Services Security"><div class="titlepage"><div><div><h4 class="title"><a id="_chapter_6_web_services_security"></a>1.3.6. Chapter 6, Web Services Security</h4></div></div></div><p>Chapter 6 covers security, a topic that cuts across the REST/SOAP boundary, at three levels:
+wire-level security of the type that HTTPS provides; users/roles security; and WS-Security in SOAP-based messaging. The
+chapter begins with wire-level security and its constituent services of <span class="emphasis"><em>peer authentication</em></span>, <span class="emphasis"><em>message confidentiality</em></span>,
+and <span class="emphasis"><em>message integrity</em></span>. The clarification of these terms requires, in turn, an examination of concepts such as
+<span class="emphasis"><em>symmetric</em></span> and <span class="emphasis"><em>asymmetric</em></span> encryption/decryption, <span class="emphasis"><em>public-key security</em></span>, <span class="emphasis"><em>cryptographic hash function</em></span>, and <span class="emphasis"><em>cryptographic
+suite</em></span>. HTTPS is examined in detail through coding examples: two HTTPS clients against the Google site and a lightweight
+HTTPS server built with the <code class="literal">HttpsServer</code> class that comes with the core Java JDK. There is also a sample HTTPS client
+against a RESTful service. These and other coding examples clarify additional security
+artifacts such as the <span class="emphasis"><em>keystore</em></span> and the <span class="emphasis"><em>truststore</em></span>, <span class="emphasis"><em>digital certificates</em></span>, and <span class="emphasis"><em>certificate authority</em></span>. There is
+a sidebar to explain how a web server such as Tomcat can be set up to handle and even to enforce HTTPS connections.
+Chapter 6 also covers
+<span class="emphasis"><em>container-managed</em></span> users/roles security, again with coding examples that involve a production-grade web server such
+as Tomcat. The two-phased user-authentication and
+roles-authorization process is studied in detail and includes examples of HTTP BASIC and DIGEST
+authentication. The chapter ends with a code example focused on WS-Security and its end-to-end approach to security.</p></div><div class="section" title="1.3.7. Chapter 7, Web Services and Java Application Servers"><div class="titlepage"><div><div><h4 class="title"><a id="_chapter_7_web_services_and_java_application_servers"></a>1.3.7. Chapter 7, Web Services and Java Application Servers</h4></div></div></div><p>Chapter 7 introduces the Java Application Server (JAS) as an alternative to
+the standalone web server for deploying REST-style and SOAP-based services. The JAS as a service publisher also brings
+the option of deploying a web service as an EJB, in particular a web service as a <code class="literal">@Stateless</code> Session EJB. The
+chapter begins with a list of the popular JASes and then clarifies the core components and attendant functionalities
+of a JAS. There is a review of how sample services from previous chapters—from <code class="literal">HttpServlet</code> examples through
+JAX-RS, Restlet, <code class="literal">@WebServiceProvider</code>, and <code class="literal">@WebService</code> examples—can be ported to a JAS. In all cases, almost no
+change is required. Chapter 7 also motivates the option of a JAS, in particular the benefits that come with
+deploying a service in the thread-safe EJB container. A typical JAS is not only a publisher but also a development,
+testing, and management environment. This chapter has a further coding example of how web services and web sites
+can interact; and the excellent JPA (Java Persistence API) is introduced with two coding
+examples that persist data in different databases, HSQLDB and Java Derby.
+The chapter introduces two JASes through code examples: GlassFish,
+which is the reference implementation, and TomEE, which is an emphatically lightweight option among JASes. Various
+sidebars explain installation and management details. The chapter ends with a review and a recommendation that
+programmers embrace the many excellent choices of API and implementation that Java offers in the area of
+web services.</p></div></div><div class="section" title="1.4. Tools and IDEs"><div class="titlepage"><div><div><h3 class="title"><a id="_tools_and_ides"></a>1.4. Tools and IDEs</h3></div></div></div><p>Java programmers have a wide choice of productivity tools. Among the build tools are Ant, Maven, and Meister; among the
+many testing tools are EasyMock, JMockit, JUnit, Mockito, and TestNG. Java likewise offers choices among IDEs, including
+Eclipse, IntelliJ IDEA, and NetBeans. In a production environment, tools and IDEs are the way to go as they hide the
+grimy details that slow the journey from initial design through deployment and maintenance. In a learning environment,
+a build tool makes sense because it facilitates experimentation. My Ant script is meant to serve this purpose: it allows
+a web service, with all of the dependencies, to be compiled, built, and deployed with a single command:</p><pre class="screen">% ant deploy -Dwar.name=myFirstService</pre><p>Chapter 1 goes into the set-up details, which are minimal.</p><p>With respect to IDEs, this second edition is, like the first, neutral. The very grimy details that are an obstacle in
+a production environment are critical in a learning environment. For that reason, my code examples include all of the
+<code class="literal">import</code> statements so that dependencies are clear. Package/directory structure is explained whenever third-party
+libraries are used. The code listings usually have numbered statements and expressions for ease of reference and
+explanation. The examples themselves are designed to highlight the challenges inherent in any serious programming; but
+these examples also focus on patterned approaches to meeting the challenges. Web services and their clients are, in the
+end, code—and this book focuses on code.</p></div><div class="section" title="1.5. Conventions Used in This Book"><div class="titlepage"><div><div><h3 class="title"><a id="_conventions_used_in_this_book"></a>1.5. Conventions Used in This Book</h3></div></div></div><p>The following typographical conventions are used in this book:</p><div class="variablelist"><dl><dt><span class="term">
+<span class="emphasis"><em>Italic</em></span>
+</span></dt><dd>
+Indicates new terms, URLs, filenames, file extensions, and emphasis.
+</dd><dt><span class="term">
+<code class="literal">Constant width</code>
+</span></dt><dd>
+Used for program listings as well as
+within paragraphs to refer to program elements such as variable or method names, data types, environment variables,
+statements, and keywords.
+</dd><dt><span class="term">
+Sidebars
+</span></dt><dd>
+The book uses sidebars (see <a class="xref" href="#sample_sidebar" title="This is a sidebar.">This is a sidebar.</a>) to focus a topics, often practical ones about installing and running
+applications such as a standalone web server or a Java Application Server.
+</dd></dl></div><div class="sidebar" title="This is a sidebar."><a id="sample_sidebar"></a><p class="title"><b>This is a sidebar.</b></p><p>A topic of special interest</p></div></div><div class="section" title="1.6. Using Code Examples"><div class="titlepage"><div><div><h3 class="title"><a id="_using_code_examples"></a>1.6. Using Code Examples</h3></div></div></div><p>This book is here to help you get your job done. In general, you may use the code in this book in your programs and documentation.
+You do not need to contact us for permission unless you are reproducing a significant portion of the code.
+For example, writing a program that uses several chunks of code from this book does not
+require permission. Selling or distributing a CD-ROM of example
+s from O’Reilly books does require permission. Answering a question by citing this book and quoting example code does not
+require permission. Incorporating a significant amount of example cod
+e from this book into your product’s documentation does require permission.</p><p>We appreciate, but do not require, attribution. An attribution usually includes the title, author, publisher, and ISBN.
+For example: “_Java Web Services: Up and Running_, by Martin Kalin. Cop
+yright 2009 Martin Kalin, 978-0-596-52112-7.”</p><p>If you feel your use of code examples falls outside fair use or the permission given above, feel free to contact us at <a class="ulink" href="mailto:permissions@oreilly.com" target="_top">permissions@oreilly.com</a>.</p></div><div class="section" title="1.7. Safari® Books Online"><div class="titlepage"><div><div><h3 class="title"><a id="_safari_superscript_superscript_books_online"></a>1.7. Safari<sup>®</sup> Books Online</h3></div></div></div><div class="note" title="Note" style="margin-left: 0; margin-right: 10%;"><table border="0" summary="Note"><tr><td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="/etc/asciidoc/images/icons//note.png" /></td><th align="left"></th></tr><tr><td align="left" valign="top"><p>When you see a Safari<sup>®</sup> Books Online icon on the cover of your favorite technology book, that means the book is available
+online through the O’Reilly Network Safari Bookshelf.</p></td></tr></table></div><p>Safari offers a solution that’s better than e-books. It’s a virtual library that lets you easily
+search thousands of top tech books, cut and paste code samples, download chapters, and f
+ind quick answers when you need the most accurate, current information. Try it for free at <a class="ulink" href="http://safari.oreilly.com" target="_top">http://safari.oreilly.com</a>.</p></div><div class="section" title="1.8. How to Contact Us"><div class="titlepage"><div><div><h3 class="title"><a id="_how_to_contact_us"></a>1.8. How to Contact Us</h3></div></div></div><p>Please address comments and questions concerning this book to the publisher:</p><p>O’Reilly Media, Inc.
+1005 Gravenstein Highway North
+Sebastopol, CA 95472
+800-998-9938 (in the United States or Canada)
+707-829-0515 (international or local)
+707-829-0104 (fax)</p><p>We have a web page for this book, where we list errata, examples, and any additional information. You can access this page at:</p><p><a class="ulink" href="http://www.oreilly.com/catalog/9780596521127/" target="_top">http://www.oreilly.com/catalog/9780596521127/</a></p><p>To comment or ask technical questions about this book, send email to:</p><p><a class="ulink" href="mailto:bookquestions@oreilly.com" target="_top">bookquestions@oreilly.com</a></p><p>For more information about our books, conferences, Resource Centers, and the O’Reilly Network, see our website at:</p><p><a class="ulink" href="http://www.oreilly.com/" target="_top">http://www.oreilly.com/</a></p></div><div class="section" title="1.9. Acknowledgments"><div class="titlepage"><div><div><h3 class="title"><a id="_acknowledgments"></a>1.9. Acknowledgments</h3></div></div></div><p>Edward Yue Shung Wong and Ken Yu were generous enough to review this book and
+to offer many insightful suggestions for its improvement. They made the book better than it otherwise
+would have been. I thank them heartily for the time and effort that they invested in this project.
+The remaining shortcomings are mine alone, of course.
+Meghan Blanchette,
+my editor, has provided invaluable support and the book would not be without her help. My thanks go as well to the many
+behind-the-scenes people at O’Reilly Media who worked on this project.</p><p>This edition, like the first, is dedicated to Janet.</p></div></div></div></body></html>

@@ -1,0 +1,2165 @@
+[[jwsur_2nd_chapter_5]]
+== SOAP Handlers and Faults
+
+SOAP messages have some similarity to the HTTP messages that commonly transport them. Each type of message, SOAP and HTTP, 
+can have a header and a body, although the
+header in a SOAP message is optional. In HTTP 1.1, there must be a header with at least the one key/value pair, with +Host+ as
+the key; but HTTP headers usually contain at least a half dozen or so header elements. A SOAP message must have a body, which can be
+but typically is not empty. Not every HTTP message has a body, of course, with GET and DELETE messages as two body-less examples. In each kind of
+message, the header, if present, is meant to contain 'meta-data'; and the body, if present, is meant to contain 'data'. 
+
+SOAP has a messaging architecture that centers on the different uses envisioned for the SOAP header and the SOAP body. At the base 
+level of this architecture is the SOAP message, a one-way transmission from a sender to a receiver. The fundamental 'message exchange
+pattern' (MEP) is thus one way. SOAP-based applications such as web services are free to establish conversational patterns that
+combine one-way messaging in richer ways, for example, in the familiar request/response pattern that involves two one-way messages
+in the opposite direction. Even request/response and solicit/response are brief conversational patterns but these, too, can be
+combined to construct even richer patterns. There is no limit to how complex a SOAP conversational pattern may become.
+
+A SOAP message has a 'sender' and targets a 'receiver'; but the SOAP messaging architecture allows for 'intermediaries', which 
+are non-terminal recipients along the route from the sender to the ultimate receiver. The sender, the receiver, and the
+intermediaries are alike in being 'nodes' along the path from the sender to the receiver. <<fig_ch4_soap>> depicts
+this architecture with a sender, a receiver, and two intermediaries.
+[[fig_ch4_soap]]
+.SOAP message architecture: sender, intermediary, and receiver nodes.
+image::images/jwsu_0302.png[]
+Along the route from sender to receiver, an intermediary node is supposed to inspect and otherwise process elements in the SOAP
+message's header, known as 'header blocks'; the SOAP message's body, which contains the data, is supposed to be reserved for the receiver alone. 
+By contrast, the sender and 
+the receiver are meant to enjoy access
+to the entire SOAP message, including the body. The SOAP specification does not prescribe how an intermediary node is to process 
+a header block, as this is an application-specific rather than a SOAP requirement. Consider, for example, an application in which
+a sender inserts a security credential into the SOAP message's header. An intermediary node might access this credential in order
+to verify it: if the verification succeeds, the intermediary node might add a verification block to the SOAP message's header and then send the
+message on its way; if the verification fails, the intermediary node might throw a SOAP fault, thereby terminating the message. The
+intermediaries thus can function as filters that screen out messages that should not make their way to the terminal receiver.
+
+In summary, the header/body distinction plays a key role in SOAP's message architecture; and JAX-WS has an API that supports
+this architecture. This chapter focuses on the JAX-WS 'handler' API, which gives the nodes in the SOAP messaging architecture 
+low-level access to the entire SOAP message: header, body, and 
+attachments. The chapter also covers SOAP faults and SOAP attachments 
+
+Chapter 4 introduced but did not clarify handlers. In the SOAP-based API for Amazon's E-Commerce service, a handler is used
+in order to insert critical information into a SOAP request: an HMAC hash value generated from the user's 'secretKey' and a properly formatted
+timestamp. Although such information counts as meta-data, Amazon requires that it be inserted into a SOAP request's 'body', in 
+particular as two children of the wrapper element, which names the operation (for instance, 'look-up' or 'search') that the
+request targets. 
+If the information is not inserted into the request body, then Amazon generates a SOAP fault, that is,
+an error message sent back to the client in place of a normal response. Figure 2 depicts this situation.
+
+.A SOAP fault versus a normal SOAP response.
+====
+----
++-------------------+  request    +-------------------------+
+|   client calls    +------------>| request ok?             |
+|                   |  response   |                         |
+|                   |<------------| If so, normal response. |
+|                   |             |                         |
+|                   |<------------| If not, fault.          |
++-------------------+  fault      +-------------------------+
+  E-Commerce client                  E-Commerce service
+----
+====
+SOAP faults can be generated in two different contexts: from within the service code itself or from within a handler. 
+Examples of both are presented in this chapter.
+
+=== The Handler Level in SOAP-based Services and Clients
+
+<<fig_ch5_soapmessage>> shows the structure of a SOAP message. In SOAP over HTTP, such a message
+is itself the body of either an HTTP request, typically a POST request, or an HTTP
+response. The message consists of:
+
+* The 'SOAP part', which comprises the SOAP 'envelope', which in turn consists of
+an optional 'header' and a required 'body'. The body can be but typically is not empty.
+The header and the body are 'text', in particular XML.
+
+* Arbitrarily many 'attachments', including none. Attachments are an efficient way to
+transport media types such as audio or video as binary payloads belonging to a SOAP message.
+
+[[fig_ch5_soapmessage]]
+.The structure of a SOAP message.
+image::images/jwsu_0301.png[]
+
+SOAP attachments are covered later in this chapter. For now, the distinction between the SOAP header and the SOAP
+body is of interest because this difference is a way to focus on two related but separate SOAP APIs: an API for what might be called the
+'application level' and a separate API for what might be called the 'handler level'. (This distinction roughly mirrors, 
+in Java-based web sites, the distinction between the 'servlet' API and the 'filter' API, although servlets and filters occur
+only on the server-side.) The application and handler levels occur
+on the service side and on the client side. In the examples so far, the focus has been on the application level with 
+the use of annotations such as +@WebService+ and +@WebMethod+. The Amazon E-Commerce clients in Chapter 4 touched on the
+'handler' level because a hash generated from the user's 'secretKey' together with a timestamp had to be inserted in a 
+specified location within a SOAP message; and
+a handler did the required work.
+This section introduces the handler level in two steps: first, by examining
+the +AwsHandlerResolver+ class used in the two SOAP-based E-Commerce clients of Chapter 4; second, with an 
+example that has code
+at the handler level on both the client and the service side.
+
+A quick look at how the application and handler levels interact may be useful before a full code example. Recall
+the +RandClient+ from Chapter 4, in particular these three lines of code:
+----	
+RandServiceService service = new RandServiceService(); 
+RandService port = service.getRandServicePort();       
+System.out.println(port.next1());  // invoke next1    
+----
+The first two lines set up the call to +next1+, which returns a randomly generated integer. When this call executes, 
+the underlying SOAP libraries
+generate the appropriate SOAP envelope and send it, over HTTP, to the +RandService+. The three lines of
+code are at the 'application level'. The +RandClient+ does not use any handlers; hence, nothing happens
+at the handler level. Suppose that there
+were a handler; for now, the code details can be ignored but a depiction (see <<handler_assumed>>) may be helpful.
+
+[[handler_assumed]]
+.The +RandClient+ with an assumed handler.
+====
+----
+ +------------+           +---------+     HTTP     +-------------+
+ | RandClient |<--------->| handler |<------------>| RandService |
+ +------------+           +---------+      |       +-------------+
+     \_________client side_________/   transport    service side
+----
+====
+A handler is inherently bi-directional: on either side, client or service, a handler handles
+incoming and outgoing messages. A handler can detect whether a given SOAP message is coming in
+or going out and react accordingly. The figure depicts a single handler but multiple ones, a 'handler chain', 
+are possible on either side. The service side in the figure has no handlers. 
+
+Handlers come in two types:
+
+* A +SOAPHandler+, abbreviated as a 'message handler', has access to the entire SOAP message: headers, body, and attachments.
+* A +LogicalHandler+ has access only to the payload in the body of a SOAP message.
+
+A +SOAPHandler+ can do anything that a +LogicalHandler+ can do because the former has access to the entire SOAP
+message; but a +LogicalHandler+ is convenient if the handler code requires access only to the payload in the body of a
+SOAP message. Examples of both +LogicalHandler+ code and +SOAPHandler+ code are forthcoming.
+How handlers of different types can be chained together also is covered in the examples. 
+
+Handlers are close to the metal in that they have access to either the entire SOAP message or just the payload in the body.
+In <<handler_assumed>>, the SOAP libraries that underlie the +RandClient+ generate a SOAP request
+message in calls to +next1+ or +nextN+. By default, these libraries create a message without
+a SOAP header. The message then goes to the handler 'before' being handed over to HTTP for
+transport to the service. The handler can perform arbitrary logic on the SOAP message. For example,
+the handler could add a SOAP header if the SOAP message did not have one already. The handler could
+add, edit, remove, and otherwise process elements in the SOAP message--header, body, and attachments. 
+JAX-WS confines such low-level processing to the handler level so that the application level remains a high level
+at which service operations are invoked and response values are processed. In short, the handler/application
+distinction represents a separation of concerns.
+
+[[awsh]]
+.The +AwsHandlerResolver+ and +AwsSoapHandler+ classes.
+====
+----
+package amazon; 
+
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.List;
+import java.util.Set;
+import java.util.TimeZone;
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
+import javax.xml.namespace.QName;
+import javax.xml.soap.SOAPBody;
+import javax.xml.soap.SOAPMessage;
+import javax.xml.ws.handler.Handler;
+import javax.xml.ws.handler.HandlerResolver;
+import javax.xml.ws.handler.MessageContext;
+import javax.xml.ws.handler.PortInfo;
+import javax.xml.ws.handler.soap.SOAPHandler;
+import javax.xml.ws.handler.soap.SOAPMessageContext;
+import org.apache.commons.codec.binary.Base64;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+
+public class AwsHandlerResolver implements HandlerResolver {
+    private String awsSecretKey;
+    
+    public AwsHandlerResolver(String awsSecretKey) {
+	this.awsSecretKey = awsSecretKey;
+    }
+    public List<Handler> getHandlerChain(PortInfo portInfo) {
+	List<Handler> handlerChain = new ArrayList<Handler>();
+	QName serviceQName = portInfo.getServiceName();
+	if(serviceQName.getLocalPart().equals("AWSECommerceService")) {
+	    handlerChain.add(new AwsSoapHandler(awsSecretKey));
+	}
+	return handlerChain;
+    }
+}
+
+class AwsSoapHandler implements SOAPHandler<SOAPMessageContext> {
+    private byte[ ] secretBytes;
+    
+    public AwsSoapHandler(String awsSecretKey) {
+	secretBytes = getBytes(awsSecretKey);
+    }
+    public void close(MessageContext mCtx) { }
+    public Set<QName> getHeaders() { return null; }
+    public boolean handleFault(SOAPMessageContext mCtx) {
+	return true;
+    }
+    public boolean handleMessage(SOAPMessageContext mCtx) {
+	Boolean outbound = 
+           (Boolean) mCtx.get(MessageContext.MESSAGE_OUTBOUND_PROPERTY);
+	if (outbound) {
+	    try {
+		SOAPMessage soapMessage = mCtx.getMessage();
+		SOAPBody soapBody = soapMessage.getSOAPBody();
+		Node firstChild = soapBody.getFirstChild(); // operation name
+		String timeStamp = getTimestamp();
+		String signature = getSignature(firstChild.getLocalName(), 
+		                                timeStamp, 
+                                                secretBytes);
+		append(firstChild, "Signature", signature);
+		append(firstChild, "Timestamp", timeStamp);
+	    } 
+	    catch(Exception e) {
+		throw new RuntimeException("SOAPException thrown.", e);
+	    }
+	}
+	return true; // continue down the handler chain
+    }
+    private String getSignature(String operation, String timeStamp, 
+                                byte[ ] secretBytes) {
+	try {
+	    String toSign = operation + timeStamp;
+	    byte[] toSignBytes = getBytes(toSign);
+	    Mac signer = Mac.getInstance("HmacSHA256");
+	    SecretKeySpec keySpec = new SecretKeySpec(secretBytes, "HmacSHA256");
+	    signer.init(keySpec);
+	    signer.update(toSignBytes);
+	    byte[ ] signBytes = signer.doFinal();
+	    String signature = new String(Base64.encodeBase64(signBytes));
+	    return signature;
+	} 
+	catch(Exception e) { throw new RuntimeException(e); } 
+    }
+    private String getTimestamp() {
+	Calendar calendar = Calendar.getInstance();
+	SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+	dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+	return dateFormat.format(calendar.getTime());
+    }
+    private void append(Node node, String elementName, String elementText) {
+	Element element = node.getOwnerDocument().createElement(elementName);
+	element.setTextContent(elementText);
+	node.appendChild(element);
+    }
+    private byte[ ] getBytes(String str) {
+	try {
+	    return str.getBytes("UTF-8");
+	}
+	catch(Exception e) { throw new RuntimeException(e); }
+    }
+}
+----
+====
+
+The +AwsHandlerResolver+ and +AwsSoapHandler+ classes (see <<awsh>>) make up the
+the handler-level code mentioned but not explained in Chapter 4. 
+The code in the +AwsHandlerResolver+ class registers handlers with the
+run-time; and the +AwsSoapHandler+ is the 'message' rather than a 'logical' handler that
+gets registered. The handler API is event-driven: the application registers a handler chain,
+which may be a chain with just one handler, with the Java run-time; and the run-time then invokes
+the appropriate handler methods on incoming and outgoing messages. The handler itself can detect
+a message's direction and react accordingly.
+
+In the E-Commerce clients of Chapter 4, the +AwsHandlerResolver+ class is used in this context (line 1):
+----
+AWSECommerceService service = new AWSECommerceService();                  
+service.setHandlerResolver(new AwsHandlerResolver(secretKey));  <1>         
+AWSECommerceServicePortType port = service.getAWSECommerceServicePort();
+----
+Line 1 links the +service+ with an +AwsHandlerResolver+ instance that encapsulates
+the user's +secretKey+.
+As the name
+suggests, the +AwsHandlerResolver+ resolves which handlers, if any, are to be in play.
+
+To implement the +HandlerResolver+ interface, a class must define one method:
+----
+public List<Handler> getHandlerChain(PortInfo portInfo);
+----
+In this case, the implementation is short because there is only one handler to put into the
+chain:
+----
+public List<Handler> getHandlerChain(PortInfo portInfo) {
+   List<Handler> handlerChain = new ArrayList<Handler>();          <1>
+   QName serviceQName = portInfo.getServiceName();
+   if (serviceQName.getLocalPart().equals("AWSECommerceService"))  <2>
+      handlerChain.add(new AwsSoapHandler(awsSecretKey));          <3>
+   return handlerChain;
+}
+----
+The +getHandlerChain+ method creates an empty +List<Handler>+ (line 1) and then
+checks whether the service in question is Amazon's +AWSECommerceService+,
+the official name for the E-Commerce service (line 2). If so, an instance of the 
++AwsSoapHandler+ class, initialized with the user's 'secretKey', is
+constructed (line 3). The Java run-time now ensures that the handlers in
+the list, in this case just one, are invoked 'after' the SOAP message
+has been built but 'before' this message is handed off to HTTP for
+transport to the service. 
+
+The handler class +AwsSoapHandler+, which the resolver registers with the run-time, is a +SOAPHandler+ 
+rather than a +LogicalHandler+:
+----
+class AwsSoapHandler implements SOAPHandler<SOAPMessageContext> {
+ ...
+----
+The reason is that the +AwsSoapHandler+ needs to add elements to the message body; and
+a +LogicalHandler+ provides access only to the current 'payload' in the body. The methods 
+in the +AwsSoapHandler+ class
+add to this initial payload.
+To implement the
++SOAPHandler+ interface and its superinterface +Handler+, 
+the +AwsSoapHandler+ class must define four methods:
+
+* +getHeaders+: This is a convenience method that gives the handler
+access to the SOAP header elements or 'headers' for short. The run-time
+invokes this method first. In the current example, the method is minimally defined
+but not used. Later examples use the +getHeaders+ method.
+
+* +close+: As the name suggests, this method is the last one that the
+run-time invokes. Once again, the current example minimally defines but does not
+use this method.
+
+* +handleMessage+ and +handleFault+: The run-time invokes exactly one of
+these. For example, the two E-Commerce clients in Chapter 4 send a search request to the
+Amazon service with one of two results: the Amazon service accepts the
+request, conducts the search, and returns the results; or the Amazon
+service generates a SOAP fault. Either a
+standard SOAP response message or a fault message returns to the client:
+if a standard response, then the run-time invokes +handleMessage+ in the
+handler; if a SOAP fault, then the run-time invokes +handleFault+ in the handler.
+
+The return type for the methods +handleMessage+ and +handleFault+ is +boolean+. 
+A return value of +true+ means 
+'continue executing other handlers, if any, in the chain'; and a return value of
++false+ means 'do not execute other handlers, if any, in the chain'. The
+logic is similar to the logic of 'filters' in servlet-based web sites. In this
+example, +handleFault+ is minimally defined (that is, the method simply
+returns +true+) but +handleMessage+ has logic to make the SOAP request 
+comply with the requirements of the E-Commerce service.
+
+The +handleMessage+ method deserves a closer look. Here is the main part of the code, 
+slightly re-formatted:
+----	
+Boolean outbound = (Boolean) mCtx.get(MessageContext.MESSAGE_OUTBOUND_PROPERTY);
+if (outbound) {                                                      <1>
+   try {
+      SOAPMessage soapMessage = mCtx.getMessage();
+      SOAPBody soapBody = soapMessage.getSOAPBody();                 <2>
+      Node firstChild = soapBody.getFirstChild(); // operation name  <3>
+      String timeStamp = getTimestamp();
+      String signature = getSignature(firstChild.getLocalName(),
+                                      timeStamp, 
+                                      secretBytes);
+      append(firstChild, "Signature", signature);                    <4>
+      append(firstChild, "Timestamp", timeStamp);                    <5>
+   } 
+   ...
+----
+The +handleMessage+ method first checks, in line 1, whether it is being invoked on an outgoing (that is, request)
+or incoming (that is, response) SOAP message. Incoming messages are of no interest 
+to this handler. For an outgoing or request SOAP message, the method uses the +mCtx+
+argument (of type +SOAPMessageContext+) to get the full SOAP message from which the +SOAPBody+ is extracted (line 2). The
+'first child' in the SOAP body is the 'wrapper' element, the name of the
+E-Commerce service operation (in this example, the 'search' operation), because the E-Commerce service uses 'wrapped document'
+style (line 3). Two utility methods provide the current time in the required format and 
+an +HmacSHA256+ digest generated from the user's 'secretKey' and other information (lines
+4 and 5).
+These low-level operations are not of particular interest right now but they are required
+in any SOAP-based request to E-Commerce service. (Chapter 6, on security, goes into the
+details of a hash such as +HmacSHA256+; and the next example in this chapter clarifies +HmacSHA256+ further.) 
+
+Once the required timestamp and hash value
+are in hand, the
++handleMessage+ method appends two XML elements to the wrapper element in the SOAP body:
+one with the so-called signature, which is the message digest or hash value, and another with the
+timestamp. After +handleMessage+ returns +true+, the run-time invokes the +close+
+method--and then hands the amended SOAP message off to the HTTP transport. <<before_after>> depicts
+the before and after situation with respect to the work of the +AwsSoapHandler+: this
+handler adds lines 1 and 2 to the already created SOAP request message.
+
+[[before_after]]
+.A before/after depiction of how the +AwsSoapHandler+ works.
+====
+----
+   <Soap:Envelope>                     <Soap:Envelope>
+     <Soap:Body>           handler       <Soap:Body>
+        <ItemSearch>     ==========>        <ItemSearch>
+          ...                                 <Signature>...</Signature> <1>
+        </ItemSearch>                         <Timestamp>...</Timestamp> <2>
+     </Soap:Body>                                ...
+   <Soap:Envelope>                          </ItemSearch>
+                                         </Soap:Body>
+                                       </Soap:Envelope>  
+
+   # Before handler runs               # After handler runs
+----
+====
+
+The SOAP-based version of Amazon's E-Commerce service enforces strict conditions on the
+structure of a SOAP request message. In particular, this service requires that a message digest (the
+signature) and a timestamp
+be in the request body as children of the wrapper element. 
+
+JAX-WS handlers are a way to separate low-level concerns, which require inspection and
+even manipulation of SOAP messages, from the high-level concerns of invoking, as transparently
+as possible, web service operations. At the application level, the SOAP is completely hidden;
+at the handler level, the SOAP is exposed for whatever processing is required.
+The next example uses handlers on the client and on the
+service side; this example also introduces SOAP 'faults', which can be thrown at either the
+application or the handler level.
+
+=== Handlers and Faults in the 'predictionsSOAP' Service
+
+This section ports the various REST-style versions of the 'predictions' web service to a SOAP-based version. The
+new version is 'predictionsSOAP', whose structure can be summarized as follows:
+
+* There is a service client and a client-side message handler. The handler inserts an HMAC hash into
+every client request against the 'predictionsSOAP' service. However, the handler departs 
+from the Amazon practice by inserting the hash into the SOAP 'header' rather than the SOAP body.
+
+* The client,  built atop 'wsimport'-generated classes, invokes various CRUD operations in the 'predictionsSOAP' service. 
+
+* There is a service-side message handler whose job is to verify the HMAC hash from the client. 
+
+* The service implements the standard CRUD operations.
+
+* The service throws SOAP 'faults' from both the handler and the application level in order
+to contrast the two different APIs. As the name suggests, a SOAP 'fault' signals an
+error condition; the fault is a special message sent back to the client in place of a error-free SOAP response. The
+service WSDL indicates, in the +portType+ section, that a client request may result in a 
+fault message rather than a standard response. The architecture of the 'predictionsSOAP' service is
+sketched in <<pred_soap>>.
+
+[[pred_soap]]
+.The architecture of the 'predictionsSOAP' service.
+====
+----
+ Put hash value into outgoing message   Verify hash value from incoming message
+                     /                        /
++--------+      +---------+     HTTP    +---------+      +---------+
+| client |<---->| handler |<----------->| handler |<---->| service | 
++--------+      +---------+             +---------+      +---------+
+\________client side_____/              \______service side_______/
+----
+====
+
+The 'predictionsSOAP' service mirrors, in its structure, the SOAP-based version of Amazon's E-Commerce service. In each
+case, a client-side handler modifies an outgoing SOAP message by inserting a security credential; and a service-side
+handler then verifies the credential before dealing with the request itself.
+
+[[predictionsSOAP]]
+.The +PredictionsSOAP+ class with two methods that throw SOAP faults.
+====
+----
+package predictions;
+
+import javax.annotation.Resource;
+import javax.jws.WebService;
+import javax.jws.WebMethod;
+import javax.jws.HandlerChain;
+import javax.xml.ws.WebServiceContext;
+import javax.xml.ws.handler.MessageContext;
+import java.util.List;
+import javax.servlet.ServletContext;
+
+@WebService
+@HandlerChain(file = "../../../WEB-INF/serviceHandler.xml")
+public class PredictionsSOAP {
+    @Resource
+    private WebServiceContext wsCtx;
+    private ServletContext sCtx;
+    private static final Predictions predictions= new Predictions();
+    private static final int maxLength = 16;
+
+    @WebMethod
+    public List<Prediction> getAll() {
+	init();
+	return predictions.getPredictions();
+    }
+    @WebMethod
+    public Prediction getOne(int id) {
+	init();
+	return predictions.getPrediction(id);
+    }
+    @WebMethod
+    public String create(String who, String what) throws VerbosityException {       <1>
+	int count = wordCount(what);
+	if (count > maxLength)
+	    throw new VerbosityException(count + " is too verbose!",
+					 "Max words: " + maxLength);
+	init();
+	Prediction p = new Prediction();
+	p.setWho(who);
+	p.setWhat(what);
+	int id = predictions.addPrediction(p);
+	String msg = "Prediction " + id + " created.";
+	return msg;
+    }
+    @WebMethod
+    public String edit(int id, String who, String what) throws VerbosityException { <2>
+	int count = wordCount(what);
+	if (count > maxLength)
+	    throw new VerbosityException(count + " is too verbose!",
+					 "Max words: " + maxLength);
+	init();
+	String msg = "Prediction " + id + " not found.";
+	Prediction p = predictions.getPrediction(id);
+	if (p != null) {
+	    if (who != null) p.setWho(who);
+	    if (what != null) p.setWhat(what);
+	    msg = "Prediction " + id + " updated.";
+	}
+	return msg;
+    }
+    @WebMethod
+    public String delete(int id) {
+	init();
+	String msg = "Prediction " + id + " not found.";
+	Prediction p = predictions.getPrediction(id);
+	if (p != null) {
+	    predictions.getMap().remove(id);
+	    msg = "Prediction " + id + " removed.";
+	}
+	return msg;
+    }
+    private void init() {
+	if (wsCtx == null) throw new RuntimeException("DI failed on wsCtx!");
+	if (sCtx == null) { // ServletContext not yet set?
+	    MessageContext mCtx = wsCtx.getMessageContext();
+	    sCtx = (ServletContext) mCtx.get(MessageContext.SERVLET_CONTEXT);
+	    predictions.setServletContext(sCtx);
+	}
+    }
+    private int wordCount(String words) {
+	if (words == null) return -1;
+	return words.trim().split("\\s+").length;
+    }
+}
+----
+====
+
+The +PredictionsSOAP+ class (see Example 6), the main class for the 
+'predictionsSOAP' service, has five service operations: +getAll+,
++getOne+, +create+, +edit+, and +delete+. Two of the implementing methods, +create+
+and +edit+ (lines 1 and 2), throw an exception named +VerbosityException+ if the creation of a new 
++Prediction+ or the editing of an existing one results in a candidate prediction
+that exceeds the maximum length, currently set to 16 words. Each of the methods
++create+ and +edit+ is annotated as a +@WebMethod+ and each throws
+a +VerbosityException+, which becomes a 'fault' at the SOAP level. As a result,
+the service's WSDL now contains an extra message in the +portType+ section for
+the +create+ and +edit+ operations. Here is a WSDL segment that includes 
+the portion for +create+ and, for contrast, +delete+:
+----
+<portType name="PredictionsSOAP">
+  <operation name="delete">
+    <input wsam:Action="http://predictions/PredictionsSOAP/deleteRequest" <1>
+        message="tns:delete" />
+    <output wsam:Action="http://predictions/PredictionsSOAP/deleteResponse" 
+        message="tns:deleteResponse" />
+  </operation>
+  <operation name="create">
+    <input wsam:Action="http://predictions/PredictionsSOAP/createRequest" 
+        message="tns:create" />
+    <output wsam:Action="http://predictions/PredictionsSOAP/createResponse" 
+        message="tns:createResponse" />
+    <fault message="tns:VerbosityException"                               <2>
+        name="VerbosityException" 
+        wsam:Action=
+        "http://predictions/PredictionsSOAP/create/Fault/VerbosityException"/>
+   </operation>
+   ...
+----
+The +delete+ operation has the usual +input+ and +output+ messages (line 1), whereas the
++create+ operation now has, in addition to the usual two, a +fault+ message as well (line 2); and
+the fault message, like all of the other messages, is defined in the XML Schema.
+
+A +VerbosityException+ is thrown at the 'application' rather than at the 'handler' level. Accordingly,
+the underlying SOAP libraries handle the details of converting a Java +Exception+ into a SOAP 'fault'
+message. The +VerbosityException+ class is standard Java:
+----
+package predictions;
+public class VerbosityException extends Exception {
+    private String details;
+    public VerbosityException(String reason, String details) {
+	super(reason);                                      <1>
+	this.details = details;
+    }
+    public String getFaultInfo() { return this.details; }   <2>
+}
+----
+A +VerbosityException+ has a +reason+ (line 1) to explain why the fault occurred together with +details+ (line 2) 
+that provide additional information.
+Both the +reason+ and the +details+ become part of the SOAP fault message. 
+
+Generating a +VerbosityException+
+is standard Java, that is, a +throw+ clause is used to generate an exception.
+The bodies of the +create+ and +edit+ methods begin in the same way, that is,
+with a check of whether the submitted +Prediction+ (the parameter name is +what+)
+is too long:
+----
+int count = wordCount(what);
+if (count > maxLength)
+   throw new VerbosityException(count + " is too verbose!",  <1>
+                                "Max words: " + maxLength);
+----
+If a candidate +Prediction+ exceeds the maximum length,
+a +VerbosityException+ is thrown (line 1) with the regular Java syntax.
+Generating a SOAP fault at the 'application' level requires just two conditions:
+
+* A service operation (that is, a +@WebMethod+) throws a customized +Exception+, in this
+case a +VerbosityException+. 
+
+* The customized +Exception+ should invoke the superclass
+constructor with the reason for the fault (line 1 in the full listing) and also should implement
+the method +getFaultInfo+ (line 2 in the full listing), which can provide additional detail about the fault.
+
+For the fault message returned from the +PredictionsSOAP+ service when a
+submitted prediction is 18 words in length, see <<fault_msg>>.
+
+[[fault_msg]]
+.A fault generated from a verbose prediction.
+====
+----
+<S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
+  <S:Header/>
+  <S:Body>
+    <S:Fault xmlns:ns4="http://www.w3.org/2003/05/soap-envelope">
+      <faultcode>S:Server</faultcode>
+      <faultstring>18 is too verbose!</faultstring>
+      <detail>
+        <ns2:VerbosityException xmlns:ns2="http://predictions/">
+	  <faultInfo>Max words: 16</faultInfo>
+	  <message>18 is too verbose!</message>
+	</ns2:VerbosityException>
+      </detail>
+    </S:Fault>
+  </S:Body>
+</S:Envelope>
+----
+====
+
+==== The Back-end Support Classes
+
+The +PredictionsSOAP+ class has back-end classes in support, in particular +Prediction+ (see <<Ex19>>)
+and +Predictions+ (see <<Ex20>>). Neither the +PredictionsSOAP+ class nor any of the backend classes does any 
+explicit XML processing, of course, 
+because the underlying 
+SOAP libraries handle the serialization and deserialization automatically. 
+
+[[Ex19]]
+.The +Prediction+ supporting class.
+====
+----
+package predictions;
+
+import java.io.Serializable;
+
+public class Prediction implements Serializable, Comparable<Prediction> {
+    private String who;   // person
+    private String what;  // his/her prediction
+    private int    id;    // identifier used as lookup-key
+    public Prediction() { }
+    public void setWho(String who) { this.who = who; }
+    public String getWho() { return this.who; }
+    public void setWhat(String what) { this.what = what; }
+    public String getWhat() { return this.what; }
+    public void setId(int id) {	this.id = id; }
+    public int getId() { return this.id; }
+    public int compareTo(Prediction other) {
+	return this.id - other.id;
+    }	
+}
+----
+====
+The +Prediction+ class implements +Comparable+ and, therefore, defines the +compareTo+
+method so that a client against the 'predictionsSOAP' service can get a sorted list 
++Predictions+ on a +getAll+ request. Otherwise, the +Prediction+ class is a POJO class
+with three properties: +id+, which identifies a +Prediction+; +who+, which names the
+author of the +Prediction+; and +what+, which consists of the actual words in the
++Prediction+.
+
+[[Ex20]]
+.The +Predictions+ supporting class.
+====
+----
+package predictions;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
+import java.util.Arrays;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
+import javax.servlet.ServletContext;
+
+public class Predictions {
+    private ConcurrentMap<Integer, Prediction> predictions;           <1>
+    private ServletContext sctx;
+    private AtomicInteger mapKey;
+
+    public Predictions() { 
+	predictions = new ConcurrentHashMap<Integer, Prediction>();
+	mapKey = new AtomicInteger();
+    }
+    public void setServletContext(ServletContext sctx) {
+	this.sctx = sctx;
+    }
+    public ServletContext getServletContext() { return this.sctx; }
+    public void setMap(ConcurrentMap<String, Prediction> predictions) { } 
+    public ConcurrentMap<Integer, Prediction> getMap() {
+	if (good2Go()) return this.predictions;
+	else return null;
+    }
+    public int addPrediction(Prediction p) {                          <2>
+	int id = mapKey.incrementAndGet();
+	p.setId(id);
+	predictions.put(id, p);
+	return id;
+    }
+    public Prediction getPrediction(int id) {
+	return predictions.get(id);
+    }
+    public List<Prediction> getPredictions() {                        <3>
+	List<Prediction> list;
+	if (good2Go()) {
+	    Object[] preds = predictions.values().toArray();
+	    Arrays.sort(preds);
+	    list = new ArrayList<Prediction>();
+	    for (Object obj : preds) list.add((Prediction) obj);
+	    return list;
+	}
+	else
+	    return null;
+    }
+    private boolean good2Go() {
+	if (getServletContext() == null) return false;
+	if (predictions.size() < 1) populate(); 
+	return true;
+    }
+    private void populate() {
+	String filename = "/WEB-INF/data/predictions.db";
+	InputStream in = sctx.getResourceAsStream(filename);
+	// Read the data into the array of Predictions. 
+	if (in != null) {
+	    try {
+		InputStreamReader isr = new InputStreamReader(in);
+		BufferedReader reader = new BufferedReader(isr);
+		int i = 0;
+		String record = null;
+		while ((record = reader.readLine()) != null) {
+		    String[] parts = record.split("!");
+		    Prediction p = new Prediction();
+		    p.setWho(parts[0]);
+		    p.setWhat(parts[1]);
+		    addPrediction(p);
+		}
+	    }
+	    catch (IOException e) { }
+	}
+    }
+}
+----
+=====
+The +Predictions+ class provides the supporting data structures, in particular a thread-safe
++ConcurrentMap+ (line 1), together with convenience methods such as the method +getPredictions+ (line 3), which
+returns a sorted +List<Prediction>+, and the method +addPrediction+ (line 2), which adds a newly
+created +Prediction+ to the existing collection. The +PredictionsSOAP+ service
+invokes these methods as needed. As in the earlier versions, the 
+service initializes the +Prediction+ collection from the 'predictions.db' file
+in the deployed WAR file.
+
+==== From the Client to the Service
+
+There remains one more service-side class to discuss, the +ServiceHashHandler+. Perhaps the
+best way to clarify this handler, however, is to switch first to the client side. The
+reason is that the service-side handler extracts and verifies a credential that a 
+client-side handler needs to inject into every SOAP request message. One motivation behind the
+'predictionsSOAP' example is to
+mimic the authentication scheme used in Amazon's E-Commerce service.
+[[pred_client]]
+.The +PredictionsClient+ against the +PredictionsSOAP+ service.
+====
+----
+import clientSOAP.PredictionsSOAP;
+import clientSOAP.PredictionsSOAPService;
+import clientSOAP.Prediction;
+import clientSOAP.ClientHandlerResolver;
+import java.util.List;
+
+public class PredictionsClient {
+    public static void main(String[ ] args) {
+	if (args.length < 2) {
+	    System.err.println("Usage: PredictionsClient <name> <key>");   <1>
+	    return;
+	}
+	new PredictionsClient().runTests(args[0], args[1]);
+    }
+    private void runTests(String name, String key) {
+	PredictionsSOAPService service = new PredictionsSOAPService();
+	service.setHandlerResolver(new ClientHandlerResolver(name, key));  
+	PredictionsSOAP port = service.getPredictionsSOAPPort();
+
+	getTests(port);
+	postTest(port);
+	getAllTest(port);     // confirm the POST
+	deleteTest(port, 33); // delete the just POSTed prediction
+	getAllTest(port);     // confirm the POST
+	putTest(port);
+    }
+    private void getTests(PredictionsSOAP port) {
+	getAllTest(port);
+	getOneTest(port);
+    }
+    private void getAllTest(PredictionsSOAP port) {
+	msg("getAll");
+	List<Prediction> preds = port.getAll();
+	for (Prediction pred : preds) 
+	    System.out.println(String.format("%2d: ", pred.getId()) +
+			       pred.getWho() + " predicts: " + pred.getWhat());
+    }
+    private void getOneTest(PredictionsSOAP port) {
+	msg("getOne (31)");
+	System.out.println(port.getOne(31).getWhat());
+    }
+    private void postTest(PredictionsSOAP port) {
+	msg("postTest");
+	String who = "Freddy";
+	String what = "Something bad may happen.";
+	String res = port.create(who, what);
+	System.out.println(res);
+    }
+    private void putTest(PredictionsSOAP port) {
+	msg("putTest -- here's the record to be edited");
+	getOneTest(port);
+	msg("putTest results");
+	String who = "FooBar";
+	String what = null;  // shouldn't change
+	int id = 31;
+	String res = port.edit(id, who, what);
+	System.out.println(res);
+	System.out.println("Confirming:");
+	Prediction p = port.getOne(31);
+	System.out.println(p.getWho());
+	System.out.println(p.getWhat());
+    }
+    private void deleteTest(PredictionsSOAP port, int id) {
+	msg("deleteTest");
+	String res = port.delete(id);
+	System.out.println(res);
+    }
+    private void msg(String s) {
+	System.out.println("\n" + s + "\n");
+    }
+}
+----
+====
+The +PredictionsClient+ class (see <<pred_client>>) is a client against the 'predictionsSOAP' service. 
+As usual, the +PredictionsClient+ uses 'wsimport'-generated artifacts, which are in the +clientSOAP+ package. This client, together
+with dependencies, is packaged in the executable JAR file 'PredictionsClient.jar':
+----
+% java -jar PredictionsClient.jar
+Usage: PredictionsClient <name> <key>
+----
+The client expects two command-line arguments (line 1): a 'name' (in Amazon E-Commerce, the 'accessId') and a 'key' (in Amazon
+E-Commerce, the 'secretKey'). The 'predictionsSOAP' service includes a +DataStore+ class that mimics a database with a
+map with 'names' as the look-up keys and secret 'keys' as their values. Accordingly, the command
+----
+% java -jar PredictionsClient.jar moe MoeMoeMoe
+----
+provides the required pair of command-line arguments, with 'moe' as the name and 'MoeMoeMoe' as the key. 
+
+The +PredictionsClient+ dynamically sets the client-side handler whose job is to turn the 
+command-line arguments into a credential that the service-side handler can verify. Here is the
+relevant code segment:
+-----
+PredictionsSOAPService service = new PredictionsSOAPService();
+service.setHandlerResolver(new ClientHandlerResolver(name, key)); <1>
+PredictionsSOAP port = service.getPredictionsSOAPPort();
+----
+In line 1, +name+ and +key+ are the two command-line arguments. After setting the handler, the
++PredictionsClient+ runs the expected tests against the CRUD operations that the
++PredictionsSOAP+ service implements: +getAll+, +getOne+, +create+, +edit+, and +delete+. It should
+be noted that the +PredictionsClient+, like the +PredictionsSOAP+ service, does absolutely no
+XML processing but instead works exclusively with Java data structures such as +List<Prediction>+.
+
+[[handler_resolver]]
+.The +ClientHandlerResolver+ and +ClientHashHandler+ classes.
+====
+----
+package clientSOAP;
+
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.List;
+import java.util.Set;
+import java.util.TimeZone;
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
+import javax.xml.namespace.QName;
+import javax.xml.soap.SOAPMessage;
+import javax.xml.soap.SOAPEnvelope;
+import javax.xml.soap.SOAPHeader;
+import javax.xml.ws.handler.Handler;
+import javax.xml.ws.handler.HandlerResolver;
+import javax.xml.ws.handler.MessageContext;
+import javax.xml.ws.handler.PortInfo;
+import javax.xml.ws.handler.soap.SOAPHandler;
+import javax.xml.ws.handler.soap.SOAPMessageContext;
+import org.apache.commons.codec.binary.Base64;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+
+public class ClientHandlerResolver implements HandlerResolver {
+    private String name;
+    private String key;
+    
+    public ClientHandlerResolver(String name, String key) {
+	this.name = name;
+        this.key = key;
+    }
+    public List<Handler> getHandlerChain(PortInfo portInfo) {
+        List<Handler> handlerChain = new ArrayList<Handler>();
+	handlerChain.add(new ClientHashHandler(this.name, this.key));
+        return handlerChain;
+    }
+}
+
+class ClientHashHandler implements SOAPHandler<SOAPMessageContext> {
+    private byte[ ] secretBytes;
+    private String name;
+
+    public ClientHashHandler(String name, String key) {
+	this.name = name;
+        this.secretBytes = getBytes(key);
+    }
+    public void close(MessageContext mCtx) { }                                  <1>
+    public Set<QName> getHeaders() { return null; }                             <2>
+    public boolean handleFault(SOAPMessageContext mCtx) {                       <3>
+	try {
+	    SOAPMessage msg = mCtx.getMessage();
+	    msg.writeTo(System.err);
+	}
+	catch(Exception e) { throw new RuntimeException(e); }
+	return true;
+    }
+    public boolean handleMessage(SOAPMessageContext mCtx) {                     <4>
+        Boolean outbound = 
+	    (Boolean) mCtx.get(MessageContext.MESSAGE_OUTBOUND_PROPERTY);
+        if (outbound) {                                                         <5> 
+            try {
+                SOAPMessage soapMessage = mCtx.getMessage();
+		SOAPEnvelope envelope = soapMessage.getSOAPPart().getEnvelope();
+		// Ensure there is a header and add a 'wrapper' element.
+		if (envelope.getHeader() == null) envelope.addHeader();         <6>
+		SOAPHeader header = envelope.getHeader();
+		QName qn = new QName("http://predictionsSOAP", "credentials");
+		header.addHeaderElement(qn);                                    <7>
+		// Now insert credentials into the header.
+                String timeStamp = getTimestamp();
+                String signature = getSignature(this.name,
+                                                timeStamp,
+                                                this.secretBytes);
+		Node firstChild = header.getFirstChild();
+		append(firstChild, "Name",      this.name);                     <8>
+                append(firstChild, "Signature", signature);                     <9> 
+                append(firstChild, "Timestamp", timeStamp);                     <10>
+		soapMessage.saveChanges();
+            }
+            catch(Exception e) {
+                throw new RuntimeException("SOAPException thrown.", e);
+            }
+        }
+        return true; // continue down the handler chain
+    }
+    private String getSignature(String name, String timestamp, byte[ ] secretBytes) {
+        try {
+	    System.out.println("Name ==      " + name);
+	    System.out.println("Timestamp == " + timestamp);
+            String toSign = name + timestamp;
+            byte[] toSignBytes = getBytes(toSign);
+            Mac signer = Mac.getInstance("HmacSHA256");
+            SecretKeySpec keySpec = new SecretKeySpec(secretBytes, "HmacSHA256");
+            signer.init(keySpec);
+            signer.update(toSignBytes);
+            byte[] signBytes = signer.doFinal();
+            String signature = new String(Base64.encodeBase64(signBytes));
+            return signature;
+        }
+        catch(Exception e) {
+            throw new RuntimeException("NoSuchAlgorithmException thrown.", e);
+        }
+    }
+    private String getTimestamp() {
+        Calendar calendar = Calendar.getInstance();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+        dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+        return dateFormat.format(calendar.getTime());
+    }
+    private void append(Node node, String elementName, String elementText) {
+        Element element = node.getOwnerDocument().createElement(elementName);
+        element.setTextContent(elementText);
+        node.appendChild(element);
+    }
+    private byte[ ] getBytes(String str) {
+        try {
+            return str.getBytes("UTF-8");
+        }
+        catch(Exception e) { throw new RuntimeException(e); }
+    }
+}
+----
+====
+The +ClientHandlerResolver+ class (see <<handler_resolver>>) registers an instance of the class +ClientHashHandler+ 
+with the
+run-time system. Before digging into the details, it may be helpful to do a before/after
+comparison with respect to the handler. As an example, consider the first test
+that the +PredictionsClient+ runs: the client invokes +getAll+ on the service to get a
+list of all of the predictions. Here is what happens:
+
+* The underlying SOAP libraries generate the appropriate SOAP message:
++
+----
+<S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
+  <S:Body><ns2:getAll xmlns:ns2="http://predictions/"/></S:Body>
+</S:Envelope>
+----
++
+This automatically generated SOAP message has no header.
+
+* Before this message is handed over to HTTP for transport to the service, the run-time
+invokes the +ClientHashHandler+, which amends the outgoing message to:
++
+----
+<S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
+  <S:Header>
+    <credentials xmlns="http://predictionsSOAP">
+      <Name xmlns="">moe</Name>
+      <Signature xmlns="">
+         vkIQm8isdpomHeQ1aFqckzQawlZakj+hWOQaxsQcPgU=
+      </Signature>
+      <Timestamp xmlns="">2014-03-26T01:12:47Z</Timestamp>
+    </credentials>
+  </S:Header>
+  <S:Body>
+    <ns2:getAll xmlns:ns2="http://predictions/"/>
+  </S:Body>
+</S:Envelope>
+----
+A SOAP header together with a +credentials+ element is added; and the +credentials+ element
+has three sub-elements tagged +Name+, +Signature+, and +Timestamp+ in that 
+lexicographical order. The +Name+ is the command-line argument +moe+ and the
++Signature+ is an +HmacSHA256+ hash encoded in base64, the same kind of hash
+used in Amazon's E-Commerce service. The +Signature+ hash is generated from the
+provided key value +MoeMoeMoe+ but this 'secretKey' cannot be recovered from the
+hash. (Chapter 6, on security, explains why.) Accordingly, Moe's secret key 
+is not in jeopardy of being hijacked when the SOAP request is sent over the wire.
+
+The +ClientHashHandler+ class implements the +SOAPHandler+ interface and, therefore,
+defines the four methods +getHeaders+, +close+, +handleFault+, and
++handleMessage+ (lines 1 through 4 in the code listing). Only +handleFault+ and
++handleMessage+ are of interest here. Recall that handlers are inherently
+bi-directional, that is, they handle incoming and outgoing messages alike; and
+only one of these methods is invoked in either case: if there is a fault, the
+run-time invokes +handleFault+; otherwise, the run-time invokes +handleMessage+.
+
+The +handleMessage+ method has work to do only on outgoing messages, that is, 
+requests; hence, this method checks the direction of the message (line 5). If
+the message is indeed outgoing, the handler does the following:
+
+* Checks whether there is a SOAP header and, if not, adds one (line 6).
+
+* Adds, as the first child of the SOAP header, an element tagged +credentials+ (line 7).
+
+* Adds, as children of the +credentials+ element, three elements tagged +Name+ (with a 
+value such as +moe+), +Signature+ (whose value is an +HmacSHA256+ hash generated with, 
+in this case, Moe's secret key), and +Timestamp+ (whose value is a properly formatted
+timestamp).
+
+The outgoing SOAP message, a request, is now properly structured. The SOAP body names
+the operation of interest (for instance, +getOne+) and includes any required
+arguments (in this example, the integer identifier of the +Prediction+ to get). The SOAP
+header contains the requester's name, a hash value that serves as a signature, and a 
+timestamp.
+
+The handler method +handleFault+ does not check the message direction because a
+fault would arrive, in any case, as a response from the +PredictionsSOAP+ service: this
+service generates a SOAP fault as a +VerbosityException+ if a candidate +Prediction+
+is excessively wordy.
+At present, +handleFault+ simply prints the SOAP fault to the standard error; in a production
+environment, more elaborate logic might be brought into play, for instance, the fault might be
+saved in a data store for later analysis.
+
+Handlers, especially SOAP handlers, are powerful in that they can amend the SOAP message
+created at the application level. In this example, a +SOAP+ rather than a +Logical+ handler is
+needed because the handler needs access to the SOAP 'header'.
+On the service side, the handler also
+needs to be a SOAP handler.
+
+[[Exservice_handler]]
+.The service-side +ServiceHashHandler+, which verifies the credentials in a request.
+====
+----
+package predictions;
+
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.List;
+import java.util.Set;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.TimeZone;
+import java.util.Iterator;
+import java.util.Arrays;
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
+import javax.xml.namespace.QName;
+import javax.xml.soap.SOAPHeader;
+import javax.xml.soap.SOAPBody;
+import javax.xml.soap.SOAPFault;
+import javax.xml.soap.SOAPMessage;
+import javax.xml.ws.soap.SOAPFaultException;
+import javax.xml.soap.SOAPException;
+import javax.xml.ws.handler.Handler;
+import javax.xml.ws.handler.MessageContext;
+import javax.xml.ws.handler.soap.SOAPHandler;
+import javax.xml.ws.handler.soap.SOAPMessageContext;
+import org.apache.commons.codec.binary.Base64;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+public class ServiceHashHandler implements SOAPHandler<SOAPMessageContext> {
+    private byte[ ] secretBytes;
+
+    public ServiceHashHandler() { }
+    public void close(MessageContext mCtx) { }
+    public Set<QName> getHeaders() { return null; }
+    public boolean handleFault(SOAPMessageContext mCtx) {       
+	return true;
+    }
+    public boolean handleMessage(SOAPMessageContext mCtx) {
+        Boolean outbound = 
+	    (Boolean) mCtx.get(MessageContext.MESSAGE_OUTBOUND_PROPERTY);
+        if (!outbound) {
+            try {
+                SOAPMessage msg = mCtx.getMessage();
+                SOAPHeader soapHeader = msg.getSOAPHeader();
+		if (soapHeader == null)                                              <1>
+		    generateFault(msg, "No header!");
+		Node node = soapHeader.getFirstChild();   // credentials
+		NodeList nodeList = node.getChildNodes(); // Name, Timestamp, Signature
+		if (nodeList.getLength() < 3)                                        <2>
+		    generateFault(msg, "Too few header nodes!");
+		// Extract the required attributes.
+		String name = nodeList.item(0).getFirstChild().getNodeValue();
+		String signature = nodeList.item(1).getFirstChild().getNodeValue();
+		String timestamp = nodeList.item(2).getFirstChild().getNodeValue();
+		if (name == null || timestamp == null || signature == null)          <3>
+		    generateFault(msg, "Missing header key/value pairs!");
+		// Generate comparison signature and compare against what's sent.
+		String secret = DataStore.get(name);
+		if (secret == null) 
+		    generateFault(msg, name + " not registered!");                   <4>
+		byte[ ] secretBytes = getBytes(secret);
+		String localSignature = getSignature(name, timestamp, secretBytes);
+		if (!verify(signature, localSignature))
+		    generateFault(msg, "HMAC signatures do not match.");             <5>
+            }
+            catch(Exception e) {
+                throw new RuntimeException("SOAPException thrown.", e);
+            }
+        }
+        return true; // continue down the handler chain
+    }
+    private boolean verify(String sig1, String sig2) {
+	return Arrays.equals(sig1.getBytes(), sig2.getBytes());
+    }
+    private String getSignature(String name, String timestamp, byte[ ] secretBytes) {
+        try {
+	    System.err.println("Name ==      " + name);
+	    System.err.println("Timestamp == " + timestamp);
+            String toSign = name + timestamp;
+            byte[] toSignBytes = getBytes(toSign);
+            Mac signer = Mac.getInstance("HmacSHA256");
+            SecretKeySpec keySpec = new SecretKeySpec(secretBytes, "HmacSHA256");
+            signer.init(keySpec);
+            signer.update(toSignBytes);
+            byte[] signBytes = signer.doFinal();
+            String signature = new String(Base64.encodeBase64(signBytes));
+            return signature;
+        }
+        catch(Exception e) {
+            throw new RuntimeException("NoSuchAlgorithmException thrown.", e);
+        }
+    }
+    private String getTimestamp() {
+        Calendar calendar = Calendar.getInstance();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+        dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+        return dateFormat.format(calendar.getTime());
+    }
+    private byte[ ] getBytes(String str) {
+        try {
+            return str.getBytes("UTF-8");
+        }
+        catch(Exception e) { throw new RuntimeException(e); }
+    }
+    private void generateFault(SOAPMessage msg, String reason) {
+	try {
+	    SOAPBody body = msg.getSOAPBody();
+	    SOAPFault fault = body.addFault();
+	    fault.setFaultString(reason);
+	    throw new SOAPFaultException(fault);
+	}
+	catch(SOAPException e) { }
+    }
+}
+----
+====
+The +ServiceHashHandler+ (see <<Exservice_handler>>) is a service-side SOAP handler. On any incoming message,
+this handler checks for the following:
+
+* Does the message include a SOAP header? If not, generate a SOAP fault (line 1).
+
+* Are there at least three children of the element tagged +credentials+? If not,
+generate a SOAP fault (line 2).
+
+* Are the +Name+, +Signature+, and +Timestamp+ values all non-null? If not,
+generate a SOAP fault (line 3).
+
+* Does the +Name+, used as a look-up key in the service-side data store, have a value? (The value
+should be the user's secret key.) If not, generate a SOAP fault (line 4).
+
+* Does the +Signature+ generated on the service side match the
++Signature+ sent in the client request? If not, generate a SOAP fault (line 5).
+
+==== Signature Verification
+
+The 'predictionsSOAP' service does signature verification in basically the same way that Amazon does.
+To make a request against the 'predictionsSOAP' service, a client needs a 'key'. How this is distributed
+to the client is ignored in this example. In the Amazon case, the 'secretKey' is provided when a user
+registers with Amazon; and, of course, Amazon maintains a copy of the 'secretKey'. In the 'predictionsSOAP'
+example, the service-side +DataStore+ has a map whose look-up keys are user names (for instance, 'Moe') and
+whose values are the users' secret keys (in this case, 'MoeMoeMoe'). On an incoming message, the +ServiceHashHandler+
+recomputes the hash value--generated on the client-side with the user's key--and then does a
+byte-by-byte comparison of the sent signature and the signature computed on the service side. The
+code is in the +verify+ utility method:
+----
+private boolean verify(String sig1, String sig2) {
+   return Arrays.equals(sig1.getBytes(), sig2.getBytes());
+}
+----
+The argument +sig1+ is the sent signature and the argument +sig2+ is the signature computed on the service side.
+
+==== Faults from the Application and Handler Levels
+
+The API for generating a SOAP fault at the 'handler' level differs significantly from the API
+for generating a SOAP fault at the 'application' level. At the 'application' level, the
+regular Java syntax of 
+----
+throw new VerbosityException(...);
+----
+suffices; at the 'handler' level, 
+by contrast, the SOAP fault needs to be constructed and then thrown. Here again is the 
++generateFault+ method in the +ServiceHashHandler+:
+----
+private void generateFault(SOAPMessage msg, String reason) {
+   try {
+      SOAPBody body = msg.getSOAPBody();   <1>
+      SOAPFault fault = body.addFault();   <2>
+      fault.setFaultString(reason);        <3>
+      throw new SOAPFaultException(fault); <4>
+   }
+   catch(SOAPException e) { }
+}
+----
+The +generateFault+ method uses the incoming SOAP message (+msg+ is the reference) to
+get the SOAP body (line 1). A SOAP fault then is added to body (line 2), the +reason+ for the fault is
+given, and a +SOAPFaultException+, initialized with the fault information (line 3), is thrown--which 
+in turn causes a SOAP fault message to be sent back to 
+the requester (line 4). If desired, additional +Detail+ could be added to the +SOAPFault+, which has
+an +addDetail+ method.
+
+==== Linking the Service-Side Handler to the Service
+
+The service-side handler +ServiceHashHandler+ needs to be linked to the service itself, whose 
++@WebService+-annotated class is +PredictionsSOAP+. On the client side, the linking is dynamic. Here, for
+review, are the two critical lines of code in the +PredictionsClient+:
+----
+PredictionsSOAPService service = new PredictionsSOAPService();    <1>
+service.setHandlerResolver(new ClientHandlerResolver(name, key)); <2>
+----
+Line 2 in the listing performs the dynamic linking. With Tomcat deployment, this option is
+not available. Instead, the +PredictionsSOAP+ service and the +ServiceHashHandler+
+are linked through an XML configuration file encapsulated in the deployed WAR file:
+----
+<handler-chains xmlns="http://java.sun.com/xml/ns/javaee">
+  <handler-chain>                                                      <1>
+    <handler>
+      <handler-name>predictions.ServiceHashHandler</handler-name>      <2>
+      <handler-class>predictions.ServiceHashHandler</handler-class>
+    </handler>
+  </handler-chain>
+</handler-chains>
+----
+The name of the configuration file is arbitrary. A +handler-chain+ (line 1) can include
+arbitrarily many +handler+ instances but, in this case, there is but one +handler+
+in the +handler-chain+, the handler +ServiceHashHandler+ (line 2). This configuration file
+then is referenced with a +@HandlerChain+ annotation in the +PredictionsSOAP+ class:
+----
+@WebService
+@HandlerChain(file = "../../../WEB-INF/serviceHandler.xml")
+public class PredictionsSOAP {
+...
+----
+The 'serviceHandler.xml' file winds up in the 'WEB-INF' directory of the deployed WAR file
+because the usual Ant script is used to deploy the 'predictionsSOAP' service to Tomcat.
+
+The configuration document 'serviceHandler.xml' shown above indicates, with its +handler-chain+ tag,
+that multiple handlers might be in play on either the service or the client side. <<fig_ch4_handlerchain>>
+depicts the structure of such a chain. For an outgoing message, logical handlers come into
+play first. This is appropriate because such handlers have limited scope, that is, they have
+access only to the payload in the SOAP body. The (SOAP) message handlers then come into play 
+and these handlers, as noted earlier, have access to the entire SOAP message. For an incoming
+message, the order is reversed: the (SOAP) message handlers have first access and the 
+logical handlers have last access. Message handlers are sufficient for any handler logic
+precisely because they have access to the entire SOAP message; but logical handlers are
+convenient in that the run-time makes available only the SOAP body's payload.
+[[fig_ch4_handlerchain]]
+.The handler-chain structure.
+image::images/jwsu_0303.png[]
+The next section adds a second handler, in this case a +LogicalHandler+, to the 
+client-side of the 'predictionsSOAP' service. The result is a true chain of handlers.
+
+=== A Handler Chain with Two Handlers
+
+In the 'predictionsSOAP' service, three of the operations require the +id+ of a +Prediction+: the +getOne+,
++edit+, and +delete+ operations. The +id+ is a positive integer. What happens if the client, through
+oversight or mischief, submits a negative integer or zero as the +id+? The service
+throws a SOAP fault. A SOAP request with a bad +id+ is a waste of time and bandwidth; and avoiding
+such a request would be a gain in efficiency.
+
+To guard against an invalid +id+, a client-side handler could inspect every
+out-going SOAP message to determine if it has an +id+ and, if so, whether the +id+ is a positive 
+integer. If the +id+ is negative, the handler could substitute the absolute value and let the
+request continue on its way to the service; if the +id+ is zero, the handler could throw an exception immediately and
+thereby short-circuit a request that is doomed to fail on the service side. The client-side
++SOAPHandler+ already in place could be amended to do this work, as the SOAP handler has access to the entire SOAP message; but a
++LogicalHandler+ is better suited to the proposed task because the +id+ is part of the payload in
+the SOAP request's body. The existing +SOAPHandler+ can be left as is and a +LogicalHandler+ can 
+be added to the handler chain. Modular design recommends this approach, which is also an opportunity
+to show a two-member handler chain in action.
+
+There are two ways in which the +LogicalHandler+ can access the payload of a SOAP message: as a native
+Java object generated with JAX-B or as an XML document. This example uses a Java object so that
+the +id+ property can be inspected and perhaps changed using the familiar 'get/set' idiom.
+If the +id+ in the client request message is negative, a 'set'-method then can be used to change the
++id+ value. If the +id+ is zero, the handler can disable any further client-side handling and throw a fault
+to signal that the message cannot be fixed. With JAX-B in support, the processing is straightforward.
+
+[[ExLogicalHandler]]
+.The client-side +IdLogicalHandler+.
+====
+----
+class IdHandler implements LogicalHandler<LogicalMessageContext> {                <1>
+    public void close(MessageContext mctx) { }
+    public boolean handleFault(LogicalMessageContext lmctx) {
+	return true;
+    }
+    public boolean handleMessage(LogicalMessageContext lmctx) {
+	Boolean outbound = 
+           (Boolean) lmctx.get(MessageContext.MESSAGE_OUTBOUND_PROPERTY);
+	if (outbound) { // request?
+	    LogicalMessage msg = lmctx.getMessage();
+	    try {
+		JAXBContext jaxbCtx = JAXBContext.newInstance("clientSOAP");      <2>
+		Object payload = msg.getPayload(jaxbCtx);                         <3>
+		// Check payload to be sure it's what we want.
+		if (payload instanceof JAXBElement) {
+		    Object value = ((JAXBElement) payload).getValue();
+		    // Three possibilities of interest: GetOne, Edit, or Delete 
+		    int id = 0;
+		    boolean getOne, edit, delete;
+		    getOne = edit = delete = false;
+		    if (value.toString().contains("GetOne")) {                    <4>
+			id = ((GetOne) value).getArg0();
+			getOne = true;
+		    }
+		    else if (value.toString().contains("Edit")) {
+			id = ((Edit) value).getArg0();
+			edit = true;
+		    }
+		    else if (value.toString().contains("Delete")) {
+			id = ((Delete) value).getArg0();
+			delete = true;
+		    }
+		    else
+		        return true; // GetAll or Create
+		    // If id > 0, there is no problem to fix on the client side.
+		    if (id > 0) return true;                                      <5>    
+		    // If the request is GetOne, Edit, or Delete and the id is zero,
+		    // there is a problem that cannot be fixed.
+		    if (getOne || edit || delete) {
+			if (id == 0) // can't fix
+			    throw new RuntimeException("ID cannot be zero!");     <6>
+			// id < 0 and operation is GetOne, Edit, or Delete
+			int newId = Math.abs(id);
+			// Update argument.
+			if (getOne) ((GetOne) value).setArg0(newId);              <7>
+			else if (edit) ((Edit) value).setArg0(newId);
+			else if (delete) ((Delete) value).setArg0(newId);
+			// Update payload.
+			((JAXBElement) payload).setValue(value);                  <8>
+			// Update message
+			msg.setPayload(payload, jaxbCtx);                         <9>
+		    }
+		}
+	    }
+	    catch(Exception e) { throw new RuntimeException(e); }
+	}
+	return true;
+    }
+}
+----
+====
+The +IdHandler+ class (see <<ExLogicalHandler>>) implements the +LogicalHandler+ rather than the +SOAPHandler+
+interface (line 1). To implement this interface, the +IdHandler+ needs to define the 
++close+, +handleFault+, and +handleMessage+; but a +LogicalHandler+ implementation, unlike a +SOAPHandler+
+implementation, does not define the +getHeaders+ method precisely because a logical handler has no
+access to the SOAP headers. In this example, the +close+ and +handleFault+ methods are minimally
+defined.
+
+The logic in the +handleMessage+ method is a bit tricky. Like the +ClientHashHandler+, the
++IdHandler+ needs to work only on outgoing (that is, request) messages; hence, the +IdHandler+ first
+checks on the direction of the SOAP message. The logical handler then extracts the payload from an
+outgoing message. The payload is available in two formats:
+
+* If the +getPayload+ method were invoked with no arguments (line 3),
+the payload would be returned as an XML document. This document then could be parsed and edited, 
+as required; and the corresponding +setPayload+ method then would be used to update the message
+payload.
+
+* If the +getPayload+ method is invoked with a +JAXBContext+ as the argument, a reference to an +Object+ 
+is returned (line 3). 
+In this example, the +JAXBContext+ is created from the +soapClient+ package (line 2) because three classes in
+this package are of interest: +GetOne+, +Edit+, and +Delete+. These 'wsimport'-generated classes are the Java 
+data types that represent SOAP request messages against the service's 'getOne', 'edit', and 'delete' operations, respectively.
+If only a single SOAP request type were of interest, then the +JAXBContext+ could be created for a single class instead
+of for the entire package of classes.
+
+The extracted payload could be from any request. The next task, therefore, is
+to exclude requests that do not include an +id+. There are two
+such requests, one against the 'getAll' operation and another against the 'create' operation. The requests of 
+interest are against the 'getOne', 'edit', and 'delete' operations; and an +if+ construct, which starts on line 4,
+then determines whether the request is against one of these three operations. In summary, requests against the
+'create' and 'getAll' operations are filtered out; and the remaining requests are inspected to determine if the
+outgoing +id+ is a bad value.
+
+If the outgoing message has an +id+, the handler extracts the +id+ from the payload with a statement such as:
+----
+id = ((GetOne) value).getArg0();
+----
+There is one such statement for each of the three types: +GetOne+, +Edit+, and +Delete+. If the outgoing SOAP
+message is none of these, then +true+ is returned from the +else+ clause to signal that the +IdHandler+ 
+has finished its work and other handlers in the chain, if any, can begin theirs. Here is the code 
+segment for review:
+----
+if (value.toString().contains("GetOne")) {                             
+  id = ((GetOne) value).getArg0();
+  getOne = true;
+}
+else if (value.toString().contains("Edit")) {
+  id = ((Edit) value).getArg0();
+  edit = true;
+}
+...
+else
+  return true; // GetAll or Create: no id
+----
+Once the payload's +id+ value has been extracted, there are three possible outcomes:
+
+* If the extracted +id+ is a positive value, there is nothing more for the +IdHandler+ to do and, therefore, the handler 
+returns +true+ (line 5), thereby indicating that other handlers in the chain, in any, can begin their processing. In 
+fact, there is now another handler in the chain: the +ClientHashHandler+, which executes 'after' the logical
++IdHandler+. By the way, the +id+ still may be out-of-bounds in the sense that no +Prediction+ has such an +id+; but this is
+a problem that must be detected and managed on the service-side, not the client-side.
+
+* If the extracted +id+ is zero, a +RuntimeException+ is thrown (line 6) to terminate the
+entire request process because zero is not a legitimate value for an +id+. It makes no sense to send an +id+ of zero
+to the 'predictionsSOAP' service.
+
+* If the extracted +id+ is negative (for instance, +-31+), then its absolute value (in this case, +31+) is treated
+as the intended value. A 'set'-method is invoked with the new +id+ value (line 7), which updates the payload's value.
+The payload itself is updated (line 8) and, finally, this newly edited payload is inserted as a replacement in the
+outgoing SOAP message (line 9).
+
+This handler logic is clearly lower level than is the application logic of invoking service operations such
+as 'edit' or 'getAll'. JAX-WS is designed under the 'separation of concerns' principle: low-level message
+inspection and tweaking occur at the handler level, whereas high-level operation invocations occur at the
+application level.
+
+The +IdHandler+, like the +ClientHashHandler+, is a non-public class in the same file as the +ClientHandlerResolver+,
+a +public+ class. The reason is convenience: one file holds all of the low-level artifacts.
+The handlers and the resolver all could +public+ classes and, accordingly, in their own files. The +IdHandler+, again like the +ClientHashHandler+, 
+needs to be registered with the run-time. 
+Here is the revised +getHandlerChain+ method in the +ClientHandlerResolver+ class:
+----
+public List<Handler> getHandlerChain(PortInfo portInfo) {
+    List<Handler> handlerChain = new ArrayList<Handler>();
+    handlerChain.add(new IdHandler());                             <1>
+    handlerChain.add(new ClientHashHandler(this.name, this.key));  <2>
+    return handlerChain;
+}
+----
+The logical handler +IdHandler+ is added to the chain (line 1) in front of the
+message handler +ClientHashHandler+ (line 2) because, on an outgoing message,
+logical handlers execute before message handlers. Yet even if the order were
+reversed in this code, the run-time still would ensure that the logical +IdHandler+ executed
+before the message handler +ClientHashHandler+. For handlers in the same group ('e.g.', logical
+handlers), the specified order in the +getHandlerChain+ method matters; for handlers in
+different groups, as in this example, the run-time orders the execution so that
+all logical handlers execute before any message handlers do.
+
+The handler examples illustrate the various ways in which SOAP messages can be inspected and
+manipulated. The client-side +AwsSoapHandler+, a message handler, adds elements to the 'body' of a SOAP request; and
+the client-side +ClientHashHandler+, also a message handler, adds blocks to the 'header' of a SOAP request. The
+logical handler +IdHandler+ inspects the 'payload' of a SOAP request and, under the right circumstances, edits
+this payload so that the request has a chance of succeeding with the service. The code in all three handlers
+is appropriately low-level, as befits code designed to be close to the SOAP metal.
+
+There are three possible parts to a SOAP message: the header blocks, the body, and attachments. The first and
+the last are optional. The examples so far have examined the SOAP header and the SOAP body through code examples. The next section
+does the same for SOAP attachments.
+ 
+=== SOAP-based Web Services and Binary Data
+In the examples so far, the SOAP messages contain 'text' that is converted to service-appropriate
+types such as +List<Prediction>+. The type conversion is typically automatic, occurring in the
+JAX-WS infrastructure without application intervention; but handlers could use JAX-B and related
+technologies for converting text to and from Java types. Even a very simple example illustrates
+the power of this underlying, automatic conversion. Here is a SOAP response from the
++RandService+, in particular a call to the +next1+ operation, which returns a randomly
+generated integer:
+----
+<S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
+   <S:Body>
+      <ns2:next1Response xmlns:ns2="http://rand/">
+         <return>-1691660782</return>                     
+      </ns2:next1Response>
+   </S:Body>
+</S:Envelope>
+----
+The returned value +-1691660782+ occurs as text in the SOAP message but is converted automatically
+to an +int+ for a Java client, which does not need to do any explicit type conversion.
+
+Type conversions come to the forefront in the issue of how binary data such as images, movies, 
+and the like can be arguments passed to or values returned from SOAP-based service operations. SOAP-based
+services can deal with binary payloads but such payloads raise issues of efficiency. There are
+two general approaches to dealing with binary data in SOAP-based services:
+
+* The binary data can be encoded using a scheme such as base64 encoding and the transmitted
+as the 'payload' of the SOAP body--in other words, as 'text'. The downside is that base64
+and similar encoding schemes result in payloads that may be significantly larger in size 
+than the original, unencoded binary data. Encoding binary data as text results in data bloat.
+
+* The binary data be can transmitted as attachments, which minimizes data bloat.
+
+In the course of SOAP development, there have been three options for attachments. 'SwA' (SOAP with
+Attachments) is the original specification but does not work well with +document+-style services, which
+are the default. Moreover, some frameworks such as DotNet do not support 'SwA' out of the box. 
+'DIME' (Direct Internet
+Message Encapsulation) is a lightweight but proprietary encoding scheme, which has received little play
+outside of Windows. MTOM 
+(Message Transmission Optimization Mechanism), which is based on XOP (XML-Binary Optimized Packaging), 
+has the W3C seal of approval and enjoys widespread support. In short, MTOM is a modern, efficient,
+and interoperable way to share binary data through SOAP-based services.
+
+[[ski_image]]
+.The +SkiImageService+, which delivers images encoded as base64 text.
+====
+----
+package images;
+
+import javax.jws.WebService;
+import javax.jws.WebMethod;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.Set;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.awt.Image;
+import java.io.FileInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.ByteArrayInputStream;
+import javax.imageio.ImageIO;
+import javax.imageio.stream.ImageInputStream;
+import javax.imageio.ImageReader;
+
+@WebService
+public class SkiImageService {
+    private Map<String, String> photos;
+
+    @WebMethod
+    public Image getImage(String name) { return createImage(name);  }
+    @WebMethod
+    public List<Image> getImages() { return createImageList(); }
+    public SkiImageService() {
+       photos = new HashMap<String, String>();
+       photos.put("nordic", "nordic.jpg");
+       photos.put("alpine", "alpine.jpg");
+       photos.put("telemk", "telemk.jpg");
+    }
+    private Image createImage(String name) {
+	String fileName = photos.get(name);
+	byte[ ] bytes = getRawBytes(fileName);
+	ByteArrayInputStream in = new ByteArrayInputStream(bytes);
+	Iterator iterators = ImageIO.getImageReadersByFormatName("jpeg");
+	ImageReader iterator = (ImageReader) iterators.next();
+	Image image = null;
+	try {
+	    ImageInputStream iis = ImageIO.createImageInputStream(in);
+	    iterator.setInput(iis, true);
+	    image = iterator.read(0);        
+	}
+	catch(Exception e) { throw new RuntimeException(e); }
+	return image;
+    }
+    private List<Image> createImageList() {
+	List<Image> list = new ArrayList<Image>();
+	for (String key : photos.keySet()) {
+	    Image image = createImage(key);
+	    if (image != null) list.add(image);
+	}
+	return list;
+    }
+    private byte[ ] getRawBytes(String fileName) {
+	if (fileName == null) fileName = "nordic.jpg";
+	ByteArrayOutputStream out = new ByteArrayOutputStream();
+	try {
+	    FileInputStream in = new FileInputStream(fileName);
+	    if (in == null) in = new FileInputStream("nordic.jpg");
+	    byte[ ] buffer = new byte[2048];
+	    int n = 0;
+	    while ((n = in.read(buffer)) != -1) 
+		out.write(buffer, 0, n); // append to array
+	    in.close();
+	}
+	catch(Exception e) { throw new RuntimeException(e); }
+	return out.toByteArray();
+    }
+}
+----
+====
+To underscore the efficiency of MTOM, the first example uses base64 encoding. The
++SkiImageService+ class (see <<ski_image>>) has two +@WebMethod+ operations: +getImage+ returns a specified image about skiing,
+for instance, a picture of a nordic skier; and +getImageList+ returns a list of the available
+skiing images. Most of the code consists of utility methods that read bytes from a file and
+transform these into a Java +Image+. This service can be published straightforwardly with 
++Endpoint+:
+----
+package images;
+import javax.xml.ws.Endpoint;
+public class SkiImagePublisherBase64 {
+    public static void main(String[ ] args) {
+	System.out.println("URL: http://localhost:9876/ski");	
+	Endpoint.publish("http://localhost:9876/ski", new SkiImageService());
+    }
+}
+----
+Here is a Perl client against the service, a client that explicitly consumes the
+service WSDL before making a request:
+----
+#!/usr/bin/perl -w
+use SOAP::Lite +trace => 'debug';
+use strict;
+
+my $url = 'http://localhost:9876/ski?wsdl';   
+my $service = SOAP::Lite->service($url);     
+print $service->getImage("nordic"), "\n"; # base64 string
+----
+There is nothing unusual in either the service or the client: a client request results in
+a SOAP response whose body is 'text' but, in this case, text that is potentially huge in 
+size because of the base64 encoding. The XML Schema in the service WSDL points to the 
+problem. Here is a slice:
+----
+<xs:complexType name="getImageResponse">
+ <xs:sequence>
+  <xs:element name="return" type="xs:base64Binary" minOccurs="0"></xs:element> <1>
+ </xs:sequence>
+</xs:complexType>
+----
+Line 1 shows that the XML Schema type of the response message +getImageResponse+ is, indeed, +xs:base64Binary+.
+For dramatic effect, here is a slice of the more than 30K-byte response to a +getImage+ request:
+----
+<?xml version="1.0" ?>
+<S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
+  <S:Body>
+    <ns2:getImageResponse xmlns:ns2="http://images/">
+      <return>iVBORw0KGgoAAAANSUhEUgAAAHwAAABWCAIAAACCS2W5AABY...</return> <1>
+    </ns2:getImageResponse>
+  </S:Body>
+</S:Envelope>
+----
+The element tagged +return+ (line 1) contains the base64 encoding of the image. The image itself,
+'nordic.jpg', is just under 3K bytes--and the SOAP response is just over 30K bytes. In this
+case, the data bloat is ten-fold.
+
+To avoid the data bloat associated with base64 or equivalent encoding, the service
+can be revised to take advantage of MTOM optimizations. Here are the steps to the revision:
+
+* The +SkiImageService+ class can be annotated to
+signal that MTOM is in play. The revision is line 1:
++
+----
+@WebService(wsdlLocation = "mtom.wsdl")
+@BindingType(value = SOAPBinding.SOAP11HTTP_MTOM_BINDING) // optional <1>
+public class SkiImageService {
+----
++
+There is also a SOAP 1.2 binding for MTOM.
+
+* The XML Schema for the service WSDL needs to be edited in two places, as indicated in lines 1 and 2:
++
+----
+<xsd:complexType name="getImagesResponse">
+  <xsd:sequence>
+    <xsd:element name="return" type="xsd:base64Binary" 
+                 minOccurs="0" maxOccurs="unbounded"
+                 xmime:expectedContentTypes="application/octet-stream"   <1>
+                 xmlns:xmime="http://www.w3.org/2005/05/xmlmime">
+    </xsd:element>
+  </xsd:sequence>
+</xsd:complexType>
+...
+<xsd:complexType name="getImageResponse">
+  <xsd:sequence>
+    <xsd:element name="return" type="xsd:base64Binary" minOccurs="0"
+                 xmime:expectedContentTypes="application/octet-stream"   <2>
+                 xmlns:xmime="http://www.w3.org/2005/05/xmlmime">
+    ...
+----
++
+The MIME type +application/octet-stream+ indicates that the images are to be sent from the
+service to the client as a byte stream. For simplicity and for proof of concept, the revised XML 
+Schema can be inserted into the WSDL directly (line 1):
++
+----
+<definitions xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" 
+             xmlns:tns="http://images/" 
+             xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
+             xmlns="http://schemas.xmlsoap.org/wsdl/" 
+             targetNamespace="http://images/" name="SkiImageServiceService">
+  <types>
+    <xsd:schema xmlns:tns="http://images/"                        <1>
+                xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
+    ...
+----
++
+Assume that the revised WSDL file, with the XML Schema inserted into it, is 'mtom.wsdl'.
+
+* The +@WebService+ annotation for the +SkiImageService+ needs to be parametrized with the
+location of the revised WSDL (line 1):
++
+----
+@WebService(wsdlLocation = "mtom.wsdl")   <1>
+@BindingType(value = SOAPBinding.SOAP11HTTP_MTOM_BINDING) // optional 
+public class SkiImageService {
+----
+
+* If +Endpoint+ is used to publish the revised service, then the publisher can be revised to
+indicate MTOM optimization (line 1), although this step is optional. Here is the 
+revised +SkiImagePublisherMTOM+ in full:
++
+----
+package images;
+import javax.xml.ws.Endpoint;
+import javax.xml.ws.soap.SOAPBinding;
+public class SkiImagePublisherMTOM {
+    private Endpoint endpoint;
+    public static void main(String[ ] args) {
+        SkiImagePublisherMTOM me = new SkiImagePublisherMTOM();
+        me.createEndpoint();
+        me.configureEndpoint();
+        me.publish();
+    }
+    private void createEndpoint() {
+        endpoint = Endpoint.create(new SkiImageService());
+    }
+    private void configureEndpoint() {
+        SOAPBinding binding = (SOAPBinding) endpoint.getBinding();
+        binding.setMTOMEnabled(true);    <1>
+    }
+    private void publish() {
+        int port = 9876;
+        String url = "http://localhost:" + port + "/ski";
+        endpoint.publish(url);
+        System.out.println(url);
+    }
+}
+----
++
+The revised publisher shows that the +Endpoint+ API is rich and flexible.
+
+With these changes in place, an efficient Java client against the revised MTOM-based +SkiImageService+ 
+can be built upon the usual 'wsimport'-artifacts. The by-now familiar command
+----
+% wsimport -p clientMTOM -keep http://localhost:9876/ski?wsdl
+----
+generates the support classes for the revised +SkeImageClient+ (see <<ExRevisedClient>>).
+[[ExRevisedClient]]
+.A Java client against the MTOM-based +SkiImageService+.
+====
+----
+import clientMTOM.SkiImageServiceService;
+import clientMTOM.SkiImageService;
+import java.util.List;
+import javax.activation.DataHandler;
+
+public class SkiImageClient {
+    public static void main(String[ ] args) {
+	SkiImageService port = new SkiImageServiceService().getSkiImageServicePort();
+	DataHandler image = port.getImage("nordic");                 <1>
+	dump(image);
+	List<DataHandler> images = port.getImages();                 <2>
+	for (DataHandler dh : images) dump(dh);
+    }
+    private static void dump(DataHandler dh) {
+	try {
+	    System.out.println("MIME type: " + dh.getContentType()); <3>
+	    System.out.println("Content:   " + dh.getContent());     <4>
+	}
+	catch(Exception e) { throw new RuntimeException(e); }
+    }
+}
+----
+====
+The Java +DataHandler+ type (lines 1 and 2) binds to the type +application/octet-stream+. Each
+image from the service is a +DataHandler+ instance whose properties (for instance, the
++contentType+ and +content+ properties shown in lines 3 and 4) are accessible with the familiar 'get'-methods.
+The output from a sample client run is:
+----
+MIME type: application/octet-stream
+Content:   java.io.ByteArrayInputStream@3f3e10ce
+...
+MIME type: application/octet-stream
+Content:   java.io.ByteArrayInputStream@ca753f7
+----
+The +ByteArrayInputSteam+ instances contain the bytes sent from the MTOM-enabled +SkiImageService+. Although
+the transmission is relatively efficient, the client now must deal with these bytes in some application-appropriate
+way, for instance, by reconstructing the JPG images from the bytes.
+
+In JAX-WS a client, too, can use MTOM to send media attachments to a service. Here is a revision of the
++SkiImageClient+ that shows the set-up (lines 1 through 3):
+----
+SkiImageService port = new SkiImageServiceService().getSkiImageServicePort();
+BindingProvider bp = (BindingProvider) port;          <1>
+SOAPBinding binding = (SOAPBinding) bp.getBinding();  <2>
+binding.setMTOMEnabled(true);                         <3>
+----
+SOAP-based web services are at their best when dealing with 'text' payloads, as the SOAP infrastructure
+then assumes the burden of converting between native language types (for instance, a Java +List<Prediction>+),
+on the one side, and XML Schema types, on the other side. This advantage goes away once the SOAP payloads
+are binary, regardless of whether the payload is, for example, base64 encoded text in the SOAP body or
+SOAP attachments. Can SOAP-based services handle binary payloads? The answer is a firm 'yes' but this
+answer invites the further question of whether SOAP-based services are ideally suited for binary payloads.
+The answer to this second question is 'no'.
+
+=== The Transport Level
+So far this chapter has focused on the distinction, within JAX-WS, between the application and handler levels.
+JAX-WS also provides access, on either the client-side or the service-side, to the 'transport' level, which is
+usually HTTP(S). Such access has been used but not studied in earlier examples. This section focuses on
+the transport level with the deliberately minimalist +Echo+ service and a sample +EchoClient+. 
+Access to the transport level will be
+especially useful in the next chapter, on security.
+
+[[ExEcho]]
+.The +Echo+ service, which accesses the transport level.
+====
+----
+package mctx;
+
+import java.util.Map;
+import java.util.Set;
+import javax.annotation.Resource;
+import javax.jws.WebService;
+import javax.jws.WebMethod;
+import javax.xml.ws.WebServiceContext;
+import javax.xml.ws.handler.MessageContext;
+
+@WebService
+public class Echo {
+    @Resource
+    WebServiceContext wctx;                                                       <1>
+
+    @WebMethod
+    public String echo(String in) {
+	String out = "Echoing: " + in;
+	// Hit the transport level to extract the HTTP headers.
+	MessageContext mctx = wctx.getMessageContext();                           <2>
+	Map requestHeaders = (Map) mctx.get(MessageContext.HTTP_REQUEST_HEADERS); <3>
+	dump(requestHeaders, "");                                                 <4>
+	return out;
+    }
+    private void dump(Map map, String indent) {
+	Set keys = map.keySet();
+	for (Object key : keys) {
+	    System.out.println(indent + key + " : " + map.get(key));
+	    if (map.get(key) instanceof Map)
+		dump((Map) map.get(key), indent += "  ");
+	}
+    }
+}
+----
+====
+The +Echo+ service (see <<ExEcho>>) relies upon 'dependency injection' through the 
++@Resource+ annotation to get a non-+null+ reference to the +WebServiceContext+ (line 1). The
++WebServiceContext+, in turn, can be used to access the +MessageContext+ (line 2), which provides
+information about the transport level. To illustrate such access, the +echo+ method gets the
+HTTP request headers as a +Map+ (line 3) and then prints the map's contents to the
+standard output (line 4). On a sample run of the +EchoClient+, to be studied shortly, the output of
+the +dump+ method was:
+----
+Host : [localhost:7777]
+Content-type : [text/xml; charset=utf-8]
+Accept-encoding : [gzip]                         <1>
+Content-length : [193]
+Connection : [keep-alive]
+Greeting : [Hello, world!]                       <2>
+User-agent : [JAX-WS RI 2.2.4-b01]
+Soapaction : ["http://mctx/Echo/echoRequest"]
+Accept : [text/xml, multipart/related]
+----
+Most of the lines the HTTP header are standard, 'e.g.', the blocks with +Content-type+ and +Accept+ as their
+keys. By contrast, the +EchoClient+ manually inserts lines 1 and 2 into the HTTP headers. HTTP 1.1 allows
+arbitrary header blocks to be added to an HTTP message. In a security context, a username and a supporting
+credential could be inserted into an HTTPS header.
+
+[[ExEchoClient]]
+.The +EchoClient+ against the +EchoService+.
+====
+----
+import java.util.Map;
+import java.util.Set;
+import java.util.List;
+import java.util.Collections;
+import java.util.HashMap;
+import javax.xml.ws.BindingProvider;
+import javax.xml.ws.handler.MessageContext;
+import echoClient.EchoService;
+import echoClient.Echo;
+
+public class EchoClient {
+    private static final String defaultUrl = "http://localhost:7777/echo";
+    public static void main(String[ ] args) {
+	Echo port = new EchoService().getEchoPort();
+	Map<String, Object> requestContext = 
+          ((BindingProvider) port).getRequestContext();                        <1>
+
+	/* Sample invocation: 
+	   java EchoClient http://localhost:7777/ echo	*/
+	String url = (args.length >= 2) ? (args[0] + args[1]) : defaultUrl;
+	requestContext.put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, url);    <2>  
+	// Add application-specific HTTP header blocks.
+	Map<String, Object> myHeaders = new HashMap<String, Object>();
+	myHeaders.put("Accept-Encoding", Collections.singletonList("gzip"));   <3>
+	myHeaders.put("Greeting", Collections.singletonList("Hello, world!")); <4>
+	requestContext.put(MessageContext.HTTP_REQUEST_HEADERS, myHeaders);    <5>
+	String response = port.echo("Have a nice day :)");
+	Map<String, Object> responseContext = 
+           ((BindingProvider) port).getResponseContext();                      <6>
+	dump(responseContext, "");
+    }
+    private static void dump(Map map, String indent) {
+	Set keys = map.keySet();
+	for (Object key : keys) {
+	    System.out.println(indent + key + " : " + map.get(key));
+	    if (map.get(key) instanceof Map)
+		dump((Map) map.get(key), indent += "  ");
+	}
+    }
+}
+----
+====
+The +EchoClient+ class (see <<ExEchoClient>>) is a sample client against the +Echo+ service. 
+The client, too, accesses the transport level 
+by casting the +port+ reference to a +BindingProvider+. As the name suggests, a +BindingProvider+ binds a SOAP message
+to a transport message, in this case an HTTP request message. The +BindingProvider+ reference is used 
+to invoke +getRequestContext+ (line 1), which is a
++Map+ of the key/value pairs in the HTTP request. As proof of concept, the +EchoClient+ shows how the 
+'endpoint address' of the request can be set at the transport level (line 2). In lines 3 and 4, the class +EchoClient+
+adds two key/value pairs to a +Map+ and then, in line 5, appends this +Map+ to the HTTP headers that the underlying
+Java libraries produce. 
+
+The +EchoClient+ prints the +responseContext+ (line 6) to the standard output. On a sample run, the HTTP message from
+the +Echo+ service was:
+----
+javax.xml.ws.wsdl.port : {http://mctx/}EchoPort
+javax.xml.ws.soap.http.soapaction.uri : null
+com.sun.xml.internal.ws.server.OneWayOperation : true
+javax.xml.ws.wsdl.service : {http://mctx/}EchoService
+com.sun.xml.internal.ws.client.handle : JAX-WS RI 2.2.4-b01: 
+                                        Stub for http://localhost:7777/echo
+javax.xml.ws.reference.parameters : []
+com.sun.xml.internal.ws.api.server.WSEndpoint : null
+javax.xml.ws.http.response.code : 200
+javax.xml.ws.wsdl.interface : {http://mctx/}Echo
+javax.xml.ws.wsdl.operation : {http://mctx/}echo
+com.sun.xml.internal.ws.handler.config : 
+                com.sun.xml.internal.ws.client.HandlerConfiguration@6c3a6465
+javax.xml.ws.http.response.headers : {null=[HTTP/1.1 200 OK], 
+                                      Content-type=[text/xml; charset=utf-8], 
+                                      Transfer-encoding=[chunked]}
+  null : [HTTP/1.1 200 OK]                                                  <1>
+  Content-type : [text/xml; charset=utf-8]                                  <2>
+  Transfer-encoding : [chunked]
+  javax.xml.ws.service.endpoint.address : http://localhost:7777/echo        <3>
+  com.sun.xml.internal.ws.api.message.HeaderList : []
+  com.sun.xml.internal.ws.client.ContentNegotiation : none
+----
+The format here is Java's own rather than standard HTTP. Nonetheless, the details are readily recognized. Line 1
+is the 'start line' in the actual HTTP response; line 3 contains the endpoint address of the +Echo+ service; and
+line 2 is the standard key/value pair for the key +Content-type+.
+
+In summary, JAX-WS is more than just an application-level API. There is a powerful handler-level API and even a 
+transport-level API. In the coming chapters, the transport-level API will be put to further use.
+
+=== Axis2
+Axis2 ('axis.apache.org/axis2/java/core'), which implements but also extends JAX-WS, is an alternative to 
+the Metro implementation. The current version is 1.6.x. Axis2 can be downloaded in various formats, 
+including as a self-contained WAR file, 'axis2.war', which can be copied to 'TOMCAT_HOME/webapps'. An Axis2
+service does not require annotations if the proper configuration file is used. This section introduces
+Axis2 using a deliberately simple service so that the focus is on the deployment steps.
+
+[[ExAxis]]
+.The +HiService+ in Axis2.
+====
+----
+package hello;
+
+public class HiService {            // service
+  public String echo(String name) { // service operation
+    String msg = 
+      (name == null || name.length() < 1) ? "Hello, world!" : "Hello, " + name + "!";
+    return msg;
+  }
+}
+----
+====
+The +HiService+ class (see <<ExAxis>>) is a POJO class, free of annotations, that implements the SOAP-based +HiService+ in
+Axis2. Any +public+ instance method in the class is thereby a service operation; so, in this case,
+there is a single operation: +echo+. The configuration file 'services.xml' (see <<ExConfig>>)
+specifies that an instance of the Axis2 class +RPCMessageReceiver+ will act as the
+interceptor for requests against the operation named +echo+. 
+The configuration
+document 'services.xml' must be in deployed JAR file's 'META-INF' directory.
+[[ExConfig]]
+.The 'services.xml' configuration file for the Axis2 +HiService+.
+====
+----
+<service>
+  <parameter name = "ServiceClass" locked = "false">hello.HiService</parameter>
+  <operation name = "echo">
+    <messageReceiver class = "org.apache.axis2.rpc.receivers.RPCMessageReceiver"/>
+  </operation>
+</service>
+----
+====
+Here are the steps for deploying this Axis2 service:
+
+1. The downloaded Axis2 implementation file, 'axis2.war', should be copied to 'webapps' directory
+under 'TOMCAT_HOME'. Tomcat 
+'unwars' this WAR file, creating the directory 'webapps/axis2', which in turn has
+a subdirectory named 'WEB-INF/services'. An Axis2 service is deployed as a JAR file copied to the
+'services' subdirectory.
+
+2. The compiled service class, in this case +hello.HiService+, together with the configuration 
+file 'META-INF/services.xml' should be put in a JAR file with an '.aar' extension, for example,
+'hi.aar'. Here is a snapshot of the contents of 'hi.aar':
++
+----
+hello/HiService.java
+hello/HiService.class
+META-INF/services.xml
+----
++
+The source code, 'HiService.java', is included in the JAR file for convenience. 
+
+3. The deployable JAR file, 'hi.aar', is then copied to 'webapps/axis2/WEB-INF/services'.
+
+Once the Axis2 service is deployed, 'wsimport' can be used to generate client-side artifacts. The command 
+is the usual one:
+----
+% wsimport -p clientAxis2 -keep http://localhost:8080/axis2/services/hi?wsdl
+----
+The 'wsimport' utility outputs a warning that the +portType+ in the WSDL is not standard and that, accordingly,
+there may be problems with the generated JAX-WS artifacts. This issue is addressed next.
+
+[[ExAxisClient]]
+.The +AxisClient+ against the +HiService+.
+====
+----
+import clientAxis2.HiPortType;
+import clientAxis2.Hi;
+import javax.xml.ws.BindingProvider;
+
+public class AxisClient {
+    public static void main(String[ ] args) {
+	final String endpoint = "http://localhost:8080/axis2/services/hi";     <1>
+
+	HiPortType port = new Hi().getHiHttpEndpoint();
+	// Override the endpoint in the wsimport-derived classes.
+	BindingProvider bp = (BindingProvider) port;                           <2>
+	bp.getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY,  <3>
+                                   endpoint);                                 
+	System.out.println(port.echo(null));                                   <4>
+	System.out.println(port.echo("Fred"));                                 <5>
+    }
+}
+----
+====
+The +AxisClient+ class (see <<ExAxisClient>>) is code for a sample client against the Axis2 +HiService+. The client is built on the
+familiar 'wsimport'-generated classes in the package/directory +clientAxis2+.
+These 'wsimport'-generated classes are close to but not identical with the classes that would
+be generated from a Metro service. In any case, the Axis2 versions do not set the
+'service endpoint' according to JAX-WS standards, which explains lines 2 and 3 in the code:
+these two lines change the endpoint address to the correct one, in this
+case to the +endpoint+ given in line 1. Lines 2 and 3 represent 'transport level' code.
+With this small change using the JAX-WS transport-level
+API, the service operation
+can be invoked in the usual way (lines 4 and 5). The output is:
+----
+Hello, world!
+Hello, Fred!
+----
+Axis2 is a popular alternative to the Metro implementation of JAX-WS. Axis2 and Metro are close enough
+that the transition from one to the other should be mostly trouble-free.
+
+=== What's Next?
+
+This chapter rounded out the coverage of SOAP-based services by focusing on the JAX-WS handler APIs, which
+provide fine-grained control, on either the client-side or the service-side, over incoming and outgoing SOAP
+messages. Such control is required in the SOAP message architecture, with its distinctions among sender,
+receiver, and intermediary nodes; and this control allows any SOAP message to be inspected and manipulated
+as needed along the route from the message sender to the ultimate receiver. The chapter also examined SOAP faults 
+at the handler and at the application level. SOAP attachments
+are yet another relatively low-level part of JAX-WS. Although SOAP is not ideally suited for dealing with
+binary payloads, SOAP can do so efficiently with MTOM. The chapter also covered the JAX-WS transport-level
+API, which provides access to the usually HTTP messages that carry SOAP messages. 
+Finally, this chapter introduced Axis2, a JAX-WS
+implementation that is an alternative to Metro.
+
+Web services, whether REST-style or SOAP-based, typically require security. The term 'security' is vague.
+In general, however, there are two broad security challenges. One challenge involves 'wire-level' security; and
+technologies such as HTTPS address this multi-faceted challenge. A second challenge involves 'users/roles' security,
+that is, user authentication and authorization; and Java has various ways to address this challenge.
+The next chapter clarifies various security challenges through a series of examples, thereby
+highlighting the technologies available for securing web services.

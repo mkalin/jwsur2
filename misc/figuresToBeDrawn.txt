@@ -1,0 +1,64 @@
+Chapter 1
+
+page 2, "A web service and one of its clients"
+
+page 6, "A web service as the front-end of a datastore"
+
+page 11, "Downloading a stub in Java RMI"
+
+page 13, "Java/XML conversions"
+
+page 23-24, "The organization of the predictions web service"
+###
+
+Chapter 2
+
+page 89, "A JAX-P transform"
+###
+
+Chapter 3
+
+page 119, "Using the xjc utility to transform an XML Schema into Java classes."
+
+page 137, "The composed cds service."
+###
+
+Chapter 4
+
+page 165, "Encoding and decoding XML."
+
+page 170, "Using the WSDL's XML Schema for message validation"
+###
+
+Chapter 5
+
+page 186-187, "A SOAP fault versus a normal SOAP response."
+
+page 188, "The RandClient with an assumed handler"
+
+page 193-194, "A before/after depiction of how the AwsSoapHandler works."
+
+page 195, "The architecture of the predictionsSOAP service."
+###
+
+Chapter 6
+
+page 244, "A depiction of how a keystore and a truststore function."
+
+page 250, "The routing in the HttpsPublisher."
+
+page 260, "Users/roles security."
+
+page 277, "The client-side architecture in the Echo service."
+
+page 278, "The service-side architecture in the Echo service."
+###
+
+Chapter 7
+
+page 301, "A transformation from a Source to a Result."
+
+page 302, "The interaction between the Dispatch and Provide invoke methods."
+
+page 306, "An architectural sketch of the tcSiteAndService."
+

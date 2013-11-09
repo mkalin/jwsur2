@@ -1,0 +1,18 @@
+p. 70
+
+Bad line:
+msg = "Prediction " + id + " created: (who = " + who + " what = " + what + ").\n";
+
+Fix: 
+msg = "Prediction " + id + 
+      " created: (who = " + who + " what = " + what + ").\n";
+####
+
+p. 71
+
+Bad line:
+BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+
+Fix:
+BufferedReader reader = 
+   new BufferedReader(new InputStreamReader(in));

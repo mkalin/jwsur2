@@ -1,0 +1,1184 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title></title><link rel="stylesheet" href="docbook-xsl.css" type="text/css" /><meta name="generator" content="DocBook XSL Stylesheets V1.75.2" /></head><body><div xml:lang="en" class="article" lang="en"><div class="titlepage"><hr /></div><div class="toc"><p><b>Table of Contents</b></p><dl><dt><span class="section"><a href="#ch07_jax-ws_in_java_application_servers">1. Web Services and Java Application Servers</a></span></dt><dd><dl><dt><span class="section"><a href="#_overview_of_a_java_application_server">1.1. Overview of a Java Application Server</a></span></dt><dt><span class="section"><a href="#_towards_a_lightweight_jas">1.2. Towards a Lightweight JAS</a></span></dt><dt><span class="section"><a href="#_servlet_based_web_services_under_glassfish">1.3. Servlet-Based Web Services under GlassFish</a></span></dt><dt><span class="section"><a href="#_an_interactive_web_site_and_a_soap_based_web_service">1.4. An Interactive Web Site and a SOAP-based Web Service</a></span></dt><dt><span class="section"><a href="#_a_literal_webservice_literal_as_a_literal_stateless_literal_session_ejb">1.5. A <code class="literal">@WebService</code> as a <code class="literal">@Stateless</code> Session EJB</a></span></dt><dt><span class="section"><a href="#_tomee_tomcat_with_java_ee_extensions">1.6. TomEE: Tomcat with Java EE Extensions</a></span></dt><dt><span class="section"><a href="#_where_is_the_best_place_to_be_in_java_web_services">1.7. Where is the Best Place to be in Java Web Services?</a></span></dt></dl></dd></dl></div><div class="section" title="1. Web Services and Java Application Servers"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="ch07_jax-ws_in_java_application_servers"></a>1. Web Services and Java Application Servers</h2></div></div></div><div class="section" title="1.1. Overview of a Java Application Server"><div class="titlepage"><div><div><h3 class="title"><a id="_overview_of_a_java_application_server"></a>1.1. Overview of a Java Application Server</h3></div></div></div><p>This chapter examines how web services can be deployed using a Java Application Server (JAS), the software centerpiece of enterprise Java.
+The current version of enterprise Java is Java EE 6, which includes EJB 3.x. Yet if web services, REST-style and SOAP-based alike, can be
+published straightforwardly using the production-grade web servers such as Tomcat and Jetty, why bother with a JAS at all? The chapter also delves
+into the reasons why a JAS might be preferred over a standalone web server such as Tomcat or Jetty. To begin, however, an
+overview of available JASes might be useful.</p><div class="variablelist"><dl><dt><span class="term">
+Apache Geronimo
+</span></dt><dd>
+This is an open-source project available at <span class="emphasis"><em>geronimo.apache.org</em></span>.
+</dd><dt><span class="term">
+Apache TomEE
+</span></dt><dd>
+This is essentially the Tomcat 7 web server with OpenEJB extensions. It is available at <span class="emphasis"><em>tomee.apache.org</em></span>. This
+chapter includes a code example of a SOAP-based service deployed as a <code class="literal">@Stateless</code> Session EJB and using JPA (Java Persistence API) to
+persist data in an HSQLDB database. The service is deployed under TomEE as a standard WAR file—indeed, as a WAR file that requires no
+<span class="emphasis"><em>web.xml</em></span> document.
+</dd><dt><span class="term">
+IBM WebSphere
+</span></dt><dd>
+This is a JAS with various extensions. There is a free version for developers. More information about
+WebSphere is available at <span class="emphasis"><em>www.ibm.com/websphere-app-server</em></span>.
+</dd><dt><span class="term">
+JBoss
+</span></dt><dd>
+This JAS has been a community-based project and a JAS innovator from the start. It is currently under Red Hat
+and available at <span class="emphasis"><em>www.jboss.org</em></span>.
+</dd><dt><span class="term">
+GlassFish
+</span></dt><dd>
+This JAS is part of the community-based GlassFish Metro project, which includes the Metro implementation of JAX-WS. GlassFish is
+the reference implementation and available at <span class="emphasis"><em>glassfish.java.net</em></span>. This chapter includes a pair of examples that
+involve GlassFish, including a SOAP-based service deployed as a <code class="literal">@Stateless</code> Session EJB and using JPA (Java Persistence API) to
+persist data in a back-end Apache Derby database.
+</dd><dt><span class="term">
+Oracle WebLogic
+</span></dt><dd>
+This JAS originated as BEA Web Logic, another pioneering innovator. There is a free version for
+developers. More information about this JAS, which is also known as Fusion, is available at <span class="emphasis"><em>www.oracle.com/weblogicserver</em></span>.
+</dd></dl></div><p>The complexity of a JAS results from its combining, into a single software application, a variety of APIs and their implementations.
+The following subsections describe the different architectural pieces that together make up a JAS. Even this overview of a JAS may seem overwhelming
+because there are so many details to cover. It is worth keeping in mind that a JAS is a very powerful, but likewise complicated, software system.</p><div class="section" title="1.1.1. The Web Container"><div class="titlepage"><div><div><h4 class="title"><a id="_the_web_container"></a>1.1.1. The Web Container</h4></div></div></div><p>A web container hosts web sites and web services, both of which are deployed as WAR files. Tomcat Catalina is the reference implementation (RI) for
+a web container. A web site in
+Java is a mix of static HTML pages; servlets; higher-level servlet generators and HTML-templating constructs such as JSP (Java Server Pages) and
+JSF (Java Server Faces) scripts; back-end JavaBeans dedicated specifically to servlets and the equivalent; utility classes of all kinds; and, of course,
+JavaScript embedded in the HTML pages.
+There are many JVM-centric frameworks for web development, including
+Netty, Seam, Sitemesh, Tapestry, Wicket, Struts, Spring MVC, VRaptor, Grails, and even Rails on JRuby.</p><p>Tomcat, like other web containers such as Jetty,
+can be embedded in an application server as the JAS web container. JBoss, for example, once bundled Tomcat into one JAR file (with a <span class="emphasis"><em>.sar</em></span>
+extension for <span class="emphasis"><em>service archive</em></span>) and Jetty into another, leaving it up to the JAS administrator about which of these to
+use as the JBoss web container.
+Some JASes
+still use embedded Tomcat for the community edition but roll their own for the production edition. Whatever the implementation choice, a
+JAS has a web container for deploying web sites and, increasingly, web services.
+The deployed WAR files
+typically contain the standard configuration document <span class="emphasis"><em>web.xml</em></span> and may contain vendor-specific configuration
+documents as well.
+To host web services, a web container usually relies upon a servlet interceptor
+that mediates between the client and the web service.</p><p>In contemporary web sites, the model-view-controller (MVC)
+pattern has become popular, even dominant. A <span class="emphasis"><em>model</em></span> maintains state information about the site and is responsible for
+persistence through a data store such as a database system; a <span class="emphasis"><em>view</em></span> provides an appropriate representation of a model; and
+a <span class="emphasis"><em>controller</em></span> is a request endpoint that
+implements the business logic that coordinates interaction between models, on the one side, and views, on the other side.
+Java EE has the <code class="literal">@Entity</code> annotation
+to signal that instances of the annotated class are to be persisted, typically in a relational database system. An <code class="literal">@Entity</code>
+class is thus a natural way to build a model with persistence. (The section below on the EJB container goes into more
+detail on the <code class="literal">@Entity</code> annotation.)
+In interactive web applications, JSP, JSF, or even
+higher-level templating constructs
+can generate an HTML view of a model; and either a servlet or a servlet coordinated with a Session EJB, discussed shortly, is a natural way to
+implement a controller.</p><p>For Java-based web services deployed in an application server such as GlassFish, <code class="literal">@Entity</code> instances are likewise a
+natural way to implement models. The web service itself is the controller that exposes business logic in <code class="literal">@WebMethod</code> or
+RESTful code
+and interacts, as appropriate, with models. Views in web services are basically response documents, with XML and JSON as
+the usual formats.</p></div><div class="section" title="1.1.2. The Message-oriented Middleware"><div class="titlepage"><div><div><h4 class="title"><a id="_the_message_oriented_middleware"></a>1.1.2. The Message-oriented Middleware</h4></div></div></div><p>The message-oriented middleware in a JAS requires a <span class="emphasis"><em>JMS</em></span> (Java Message Service) provider, which furnishes the
+store-and-forward technologies lumped together under the term <span class="emphasis"><em>messaging</em></span>. JMS supports synchronous and asynchronous messaging
+styles and two types of message repository: topics, which are akin to bulletin boards in that a <span class="emphasis"><em>read</em></span> operation does not automatically
+remove a posted message; and queues, which are FIFO (First In, First Out) lists in which a <span class="emphasis"><em>read</em></span> operation, by default, removes the read
+item from a queue. Under JMS, a <span class="emphasis"><em>publisher</em></span> publishes messages to a topic and a <span class="emphasis"><em>sender</em></span> sends messages to a queue. A <span class="emphasis"><em>subscriber</em></span>
+to a topic or a <span class="emphasis"><em>receiver</em></span> on a queue receives such messages either synchronously through a blocking <span class="emphasis"><em>read</em></span> operation or
+asynchronously through either a non-blocking read or the JMS event-driven notification mechanism. JMS topics
+implement the publisher/subscriber model of messaging,
+whereas JMS queues implement the point-to-point model.</p></div><div class="section" title="1.1.3. The Enterprise Java Bean (EJB) Container"><div class="titlepage"><div><div><h4 class="title"><a id="_the_enterprise_java_bean_ejb_container"></a>1.1.3. The Enterprise Java Bean (EJB) Container</h4></div></div></div><p>The EJB container holds EJB instances, which are of three types: Session, Entity, and
+Message-Driven. Session and traditional Entity EJBs are built on a Java RMI (Remote Method Invocation)
+foundation, whereas Message-Driven EJBs are built on a JMS foundation.
+A Message-Driven EJB is a JMS <code class="literal">MessageListener</code> implemented as an EJB. A listener receives an event notification
+whenever a new message arrives at a topic or a queue at which the listener has registered interest.</p><p>A Session EJB typically implements an enterprise application’s business logic and interacts as needed with
+other application components, either local (for instance, other EJBs in the same container) or remote
+(for instance, clients on a different host). As the name suggests, a Session EJB is designed to maintain a client session.
+A Session EJB is either stateless or stateful. A stateless Session EJB is, in effect, a collection of mutually independent
+instance methods that should operate only on data passed in as arguments. The EJB container assumes that a stateless
+Session EJB instance does not maintain state information in instance fields. Suppose, for example, that a Session
+EJB encapsulates two instance methods, <span class="emphasis"><em>m<sub>1</sub></em></span> and <span class="emphasis"><em>m<sub>2</sub></em></span>. If this EJB were deployed as stateless, then the EJB container
+would assume that a particular client, <span class="emphasis"><em>C</em></span>, could invoke <span class="emphasis"><em>m<sub>1</sub></em></span> in one EJB instance and <span class="emphasis"><em>m<sub>2</sub></em></span> in another EJB instance because
+the two methods do not share state. If the same Session EJB were deployed as stateful, then the EJB container would have to
+ensure that the <span class="emphasis"><em>C</em></span> invocation of <span class="emphasis"><em>m<sub>1</sub></em></span> and <span class="emphasis"><em>m<sub>2</sub></em></span> involved the <span class="emphasis"><em>same</em></span> EJB instance because the two methods presumably share state.
+As this summary implies, an EJB container automatically manages a pool of EJB instances for all types of EJB.
+A <code class="literal">@Stateless</code> Session EJB automatically becomes a SOAP-based web service by adding the <code class="literal">@WebService</code> annotation;
+hence, legacy stateless session EJBs become SOAP-based web services through a single additional annotation.</p><p>In J2EE, the precursor to Java EE 5, EJBs in general and Entity EJBs in particular were tricky to code and even trickier to configure,
+as the configuration required a complicated XML document, the notorious <span class="emphasis"><em>ejb-jar.xml</em></span> document—the DD (Deployment Descriptor).
+A case could be made that J2EE is too much work for too little reward. Things are much better with Java EE.
+For example, Java EE 5 and greater allow the programmer to configure an EJB with in-code
+annotations such as <code class="literal">@Stateless</code> instead of with a separate XML document; hence, the DD is now optional.
+Prior to Java EE 5, an Entity EJB instance was the preferred way to provide an enterprise application with an in-memory cache
+of a database object such as a table row. The Entity EJB was the persistence construct that brought ORM (Object Relation Mapping)
+capabilities to the application. A traditional Entity EJB could be deployed with either BMP (Bean Managed Persistence) or
+CMP (Container Managed Persistence). At issue was whether the programmer or the EJB container maintained coherence between the
+data source (for instance, a table row) and the EJB instance. In the early days of EJB containers, the case could be made that
+BMP was more efficient. Yet the EJB containers quickly improved to the point that CMP became the obvious choice. Indeed,
+CMP emerged as a major inducement for and benefit of using traditional Entity EJBs. An EJB deployed with CMP also had
+to deploy with CMT (Container Managed Transactions). All of this changed with Java EE 5, which extended the capabilities of the
+original Entity EJB to POJO classes annotated with <code class="literal">@Entity</code>.
+In effect, the <code class="literal">@Entity</code> annotation let Java programmers enjoy many benefits of the traditional Entity EJB without enduring
+the pain of
+configuring and programming this kind of EJB.
+Although the legacy Entity EJB remains a powerful programming construct,
+it has given way to the <code class="literal">@Entity</code> annotation at the center of the Java Persistence API (JPA). JPA
+integrates features from related technologies such as Hibernate, Oracle’s TopLink, Java Data Objects, and traditional Entity EJBs.
+The <code class="literal">@Entity</code> is now the preferred way to handle persistence. This chapter has two examples that illustrate JPA.</p><p>EJBs, unlike servlets, are thread-safe: the EJB container assumes responsibility for thread synchronization.
+As in the case of requests against servlets, each request against an EJB executes as a separate thread.
+Even in a traditional browser-based web application, EJBs are thus well suited as back-end support for servlets.
+For instance, a servlet might pass a request along to a Session EJB, which in turn might use instances of various
+classes, annotated with <code class="literal">@Entity</code>, as persisted data sources (see <a class="xref" href="#fig_ch06_mvc" title="Figure 1. Architecture of an enterprise application">Figure 1, “Architecture of an enterprise application”</a>).</p><div class="figure"><a id="fig_ch06_mvc"></a><p class="title"><b>Figure 1. Architecture of an enterprise application</b></p><div class="figure-contents"><div class="mediaobject"><img src="images/jwsu_0601.png" alt="images/jwsu_0601.png" /></div></div></div><br class="figure-break" /></div><div class="section" title="1.1.4. The Naming and Lookup Service"><div class="titlepage"><div><div><h4 class="title"><a id="_the_naming_and_lookup_service"></a>1.1.4. The Naming and Lookup Service</h4></div></div></div><p>The web container, message-oriented-middleware provider, and the EJB container expose
+different APIs; and components in each container may require security and persistence services (<span class="emphasis"><em>e.g.</em></span>, with a relational
+database management system handling the persistence). A challenge is for components in one container or service to find
+those in another. The JNDI (Java Naming and Directory Interface) provider in a JAS handles the registering-by-name and finding-by-name
+of components across containers and services. In a JAS, the JNDI provider maintains, at the least, a <span class="emphasis"><em>naming service</em></span> in which names
+(for instance, the deployed name of an EJB or a message queue) are bound to entities (in this case, the deployed EJB or the queue).
+If the JNDI provider supports <span class="emphasis"><em>directory services</em></span> as well, then the
+name of an entity binds to the entity and its attributes. In the simple case, a JNDI provider maintains a hierarchical database of
+name/entity pairs. Any component dropped into a JAS container is automatically registered with the naming service and thereafter
+available for lookup. In Java EE 5 and later, the JNDI provider is largely unseen infrastructure; and the naming conventions are
+simpler than they once were.</p></div><div class="section" title="1.1.5. The Security Provider"><div class="titlepage"><div><div><h4 class="title"><a id="_the_security_provider"></a>1.1.5. The Security Provider</h4></div></div></div><p>The security provider brings to the JAS high-level security services for components deployed in
+any of the containers. Among these services are,
+of course, authentication and authorization. The security provider has to be JAAS (Java Authentication and Authorization Service)
+compliant. Nowadays a security provider typically has plugins for providers such as an LDAP (Lightweight Directory Access Protocol) provider.
+The security in an application server is usually integrated. For instance, the container-managed security that the web container provides is
+integrated into the default JAAS-based security that the EJB container provides. It is common, moreover, for a JAS such as GlassFish to
+deploy, by default, a web service with both an HTTP and an HTTPS endpoint.</p></div><div class="section" title="1.1.6. The Client Container"><div class="titlepage"><div><div><h4 class="title"><a id="_the_client_container"></a>1.1.6. The Client Container</h4></div></div></div><p>The client container consists of the software libraries that a client requires to interact with
+deployed components such as message topics or EJBs and to use services such as JNDI and security. In the case of web-service
+clients, however, there is essentially no change if the service is deployed under the lightweight <code class="literal">Endpoint</code> publisher,
+a web server such as Tomcat or Jetty, or a JAS. Even in the JAS environment, web services represent a simplified approach
+to distributed systems.</p></div><div class="section" title="1.1.7. The Database System"><div class="titlepage"><div><div><h4 class="title"><a id="_the_database_system"></a>1.1.7. The Database System</h4></div></div></div><p>A JAS typically comes with a RDBMS (Relational Database Management System), which serves as the persistence store. In a modern JAS, the
+JPA provider manages connections between in-memory objects such as <code class="literal">@Entity</code> instances and database entities such as
+table rows or join views. A
+modern JAS also allows an RDBMS to be plugged in so that the administrator has a range of choices. GlassFish, for example, comes with
+Apache Derby but it is uncomplicated to use a different system such as MySQL or PostgreSQL. This chapter has examples that involve
+Derby  (<span class="emphasis"><em>db.apache.org/derby</em></span>) and HSQLDB (<span class="emphasis"><em>hsqldb.org</em></span>), both of which are implemented in Java. HSQLDB supports in-memory as well as disk-based tables; and both
+database systems support transactions.</p></div></div><div class="section" title="1.2. Towards a Lightweight JAS"><div class="titlepage"><div><div><h3 class="title"><a id="_towards_a_lightweight_jas"></a>1.2. Towards a Lightweight JAS</h3></div></div></div><p>As a bundle of so many components, features, containers, and services, a JAS is unavoidably complicated software.
+At issue among Java programmers is whether the benefits that come with a JAS offset the complexity of
+using a JAS. This complexity stems, in large part, from the fact that so many APIs come into play. For example,
+a deployed application that incorporates servlets, JSP scripts, JSF scripts, messaging, and EJBs must deal with at least five distinct APIs.
+This state of affairs accounts for recent efforts
+among vendors to provide seamless integration of Java EE components, which presumably would result in a lighter-weight,
+more programmer-friendly framework for doing enterprise Java. JBoss Seam and TomEE
+OpenEJB are examples. It should be emphasized, however,
+that Java EE 5 is significantly easier to use than its predecessor, J2EE 1.4. Java EE is definitely moving down the road that
+lighter frameworks such as Spring cut out for enterprise Java. As a result, the JASes that deliver Java EE applications are more nimble
+and manageable.</p><p>The GlassFish application server is open source and the reference implementation of a JAS. (To be legalistic, a particular <span class="emphasis"><em>snapshot</em></span> of
+GlassFish is the RI.) The current production release can be downloaded from
+<span class="emphasis"><em>glassfish.java.net</em></span>.  GlassFish is available either separately or integrated with the NetBeans IDE. TomEE likewise
+represents a deliberately lightweight approach to Java EE. This chapter has examples deployed under both
+GlassFish and TomEE.</p><div class="sidebar" title="GlassFish Basics"><a id="glassfish"></a><p class="title"><b>GlassFish Basics</b></p><p>GlassFish can be installed in various ways, including via installers for the standard operating systems. The entire download also
+is available as a ZIP file. However GlassFish is installed, the installation process includes prompts for an administrator username (the default is <code class="literal">admin</code>)
+and a password. GlassFish has a web console (<span class="emphasis"><em>localhost:4848</em></span> by default) and a command-line utility named <span class="emphasis"><em>asadmin</em></span> (in Windows,
+<span class="emphasis"><em>asadmin.bat</em></span>) that can be used to administer the JAS. The web console (see <a class="xref" href="#web_console" title="Figure 2. The GlassFish web console home page.">Figure 2, “The GlassFish web console home page.”</a>) can be used only if GlassFish
+is already running.</p><div class="figure"><a id="web_console"></a><p class="title"><b>Figure 2. The GlassFish web console home page.</b></p><div class="figure-contents"><div class="mediaobject"><img src="images/GlassFishAdminConsole.png" alt="images/GlassFishAdminConsole.png" /></div></div></div><br class="figure-break" /><p>During installation, it is possible to have GlassFish made into a system service so that GlassFish starts automatically whenever the
+system reboots. At start-up, GlassFish checks for available ports on which to listen for connections. For example, if Tomcat or some other
+application is running and listening already on port 8080 for client connections, GlassFish notes the fact and asks for an
+alternative port to receive HTTP connections. (On my system, Tomcat listens on port 8080 for HTTP connections and GlassFish listens on
+port 8081.) By default, GlassFish listens for HTTPS connections on port 8181. GlassFish allows
+administrative overrides of all defaults.</p><p>The GlassFish web console is well organized and informative. GlassFish groups together, under the tab <span class="emphasis"><em>Applications</em></span>,
+web sites, web services, EJBs, and other deployed artifacts. This tab
+gives pertinent information about each deployed item and supports
+operations such as <span class="emphasis"><em>undeploy</em></span>. The web console is particularly helpful because it lists, in the case of SOAP-based web services, the
+URLs for the WSDL; in the case of EJB-based services, GlassFish also provides a web-based test client. The use of plural <span class="emphasis"><em>URLs</em></span> also
+deserves clarification: by default, GlassFish publishes a site or a service under HTTP and
+HTTPS. GlassFish comes with a keystore, although the self-signed certificates therein would need to be upgraded for
+production-level use.</p><p>The GlassFish <span class="emphasis"><em>Applications</em></span> tab makes it easy to check whether a service has deployed. This tab also can be
+used to upload WAR files and deploy them. For that reason, my sample deployments under GlassFish use the web console rather than
+the Ant script familiar from earlier examples of Tomcat deployment.</p><p>In the web console, there is also a <span class="emphasis"><em>Resources</em></span> tab in the same left panel as the <span class="emphasis"><em>Applications</em></span> tab. The <span class="emphasis"><em>Resources</em></span> tab
+lists database connections, JMS message topics
+and queues, email sessions, and other resources that GlassFish applications are likely to use. In this chapter, the section
+on EJB-based services illustrates a database connection with two <code class="literal">@Entity</code> examples, one involving GlassFish and the other
+involving TomEE.</p><p>If <span class="emphasis"><em>AS_HOME</em></span> points to the GlassFish install directory, the <span class="emphasis"><em>AS_HOME/bin</em></span> subdirectory has the <span class="emphasis"><em>asadmin</em></span> utility that
+runs as a command-line application. This utility can be used, as can the web console, to administer GlassFish.
+At the <span class="emphasis"><em>asadmin</em></span> prompt, the command</p><pre class="screen">asadmin&gt;list-commands</pre><p>gives a sorted list of the local and remote commands available. Some of these commands require administrator privilege.
+For example, the <span class="emphasis"><em>stop-instance</em></span> command, which stops an executing instance of the GlassFish JAS, requires
+administrator status; hence,
+the <span class="emphasis"><em>asadmin</em></span> utility would prompt for the administrator name and password given during the GlassFish installation.</p><p>GlassFish lets the administrator organize deployed applications into <span class="emphasis"><em>domains</em></span>. At start-up, for example, it is common to
+have GlassFish create a domain named <span class="emphasis"><em>domain1</em></span>; the domain names are arbitrary but, of course, each must be unique. A
+domain can be stopped</p><pre class="screen">% asadmin stop-domain domain1</pre><p>and started again</p><pre class="screen">% asadmin start-domain domain1</pre><p>A domain also can be restarted with the <span class="emphasis"><em>restart-domain</em></span> command.</p><p>GlassFish domains are implemented as subdirectories of the <span class="emphasis"><em>domains</em></span> directory; and each domain, in turn, has an
+<span class="emphasis"><em>autodeploy</em></span> subdirectory. Deploying an application is straightforward. Consider the <span class="emphasis"><em>predictions.war</em></span> file RESTful service
+from Chapter 1, which is created using
+the Ant script. This file, with no changes, can be deployed to the GlassFish <span class="emphasis"><em>domain1</em></span> by copying the WAR file to:</p><pre class="screen">AS_HOME/glassfish/domains/domain1/autodeploy</pre><p>The copying can be done at the command line or through the GlassFish web console.
+To confirm a successful deployment, GlassFish creates an empty marker file</p><pre class="screen">AS_HOME/glassfish/domains/domain1/autodeploy/predictions.war_deployed</pre><p>If the deployment fails, GlassFish indicates so with a marker file:</p><pre class="screen">AS_HOME/glassfish/domains/domain1/autodeploy/predictions.war_deployedFailed</pre><p>If the <span class="emphasis"><em>predictions</em></span> service is undeployed by removing the file <span class="emphasis"><em>predictions.war</em></span> from the <span class="emphasis"><em>autodeploy</em></span> subdirectory,
+GlassFish likewise confirms with another marker file:</p><pre class="screen">AS_HOME/glassfish/domains/domain1/autodeploy/predictions.war_undeployed</pre><p>As noted earlier, the GlassFish web console is an easy way to deploy applications, including web services, to a
+specified domain. The deployed file (for instance, a WAR file a web service) can be uploaded from a remote machine
+to the GlassFish server.</p><p>The Derby database system, which ships with GlassFish3, is not started automatically when a domain is activated. The
+database system can be started with the command:</p><pre class="screen">% asadmin start-database</pre><p>An EJB example in this chapter accesses Derby with JPA (Java Persistence API).</p></div></div><div class="section" title="1.3. Servlet-Based Web Services under GlassFish"><div class="titlepage"><div><div><h3 class="title"><a id="_servlet_based_web_services_under_glassfish"></a>1.3. Servlet-Based Web Services under GlassFish</h3></div></div></div><p>GlassFish distinguishes between <span class="emphasis"><em>servlet-based</em></span> and <span class="emphasis"><em>EJB-based</em></span> web services. Servlet-based services include
+REST-style and SOAP-based services of the sort published earlier with Tomcat, Jetty, or a command-line publisher.
+EJB-based services also may be REST-style or SOAP-based services implemented as
+Session EJBs. For
+example, a JAX-RS service might be implemented as a Session EJB. Yet GlassFish and other JASes make it especially attractive to
+implement legacy <code class="literal">@Stateless</code> EJBs as SOAP-based web services because this requires only an additional annotation,
+<code class="literal">@WebService</code>.
+For
+servlet-based services under the JAX-WS umbrella, <code class="literal">@WebService</code> and <code class="literal">@WebServiceProvider</code> instances, the deployment under
+GlassFish is simpler than the deployment under Tomcat because GlassFish includes, among its libraries, the full Metro
+implementation of JAX-WS; hence, the Metro JAR files need not be (indeed, should not be) packaged in the deployed WAR file.
+GlassFish can handle JAX-WS out of the box.</p><p>Among the services in the previous chapters deployed with Tomcat or Jetty, all would count as servlet-based in GlassFish terms.
+They can be deployed, as is, to GlassFish as servlet-based services. Here is a sample selection of services from Chapters 2 and
+5. This review focuses on what needs to be included in a WAR file for GlassFish deployment of servlet-based services.</p><div class="variablelist"><dl><dt><span class="term">
+predictions2
+</span></dt><dd><p class="simpara">
+This the <span class="emphasis"><em>predictions</em></span> RESTful service implemented as an <code class="literal">HttpServlet</code>. Here, for review, are the contents of the deployed WAR file
+under GlassFish:
+</p><pre class="screen">WEB-INF/web.xml
+WEB-INF/classes/predictions2/Prediction.class
+WEB-INF/classes/predictions2/Predictions.class
+WEB-INF/classes/predictions2/PredictionsServlet.class
+WEB-INF/data/predictions.db
+WEB-INF/lib/json.jar</pre><p class="simpara">None of the source code needs to change; indeed, this WAR file can be deployed, as is, under Tomcat, Jetty, or GlassFish.
+For review, the service supports all of the CRUD operations and responds with either XML (the default)
+or JSON (if the HTTP header includes the key/value pair <code class="literal">Accept: application/json</code>). The <span class="emphasis"><em>json.jar</em></span> file in the deployed WAR generates the
+JSON.</p><p class="simpara">There is a subtle difference between the URLs used
+in calls against the Tomcat or Jetty deployment, on the one side, and the GlassFish deployment, on the other side. For example, for
+Tomcat/Jetty, the <span class="emphasis"><em>curl</em></span> call</p><pre class="screen">% curl localhost:8080/predictions2?id=31</pre><p class="simpara">returns in XML format the <code class="literal">Prediction</code> with an <code class="literal">id</code> value of <code class="literal">31</code>. Against the GlassFish deployment, the URL becomes</p><pre class="screen">% curl localhost:8081/predictions2/?id=31  ;; /?id=31 instead of ?id=31</pre><p class="simpara">Under GlassFish deployment, a slash <code class="literal">/</code> occurs after the WAR file name. In this example,
+the port number for Tomcat is 8080 as usual. For the sample runs in this section, the assumption is that
+GlassFish is started after Tomcat is already running; hence, GlassFish awaits HTTP connections on port 8081.</p><p class="simpara">The <span class="emphasis"><em>predictions2</em></span> service does not require an <span class="emphasis"><em>interceptor</em></span> servlet that acts as the intermediary between client requests and
+the web service. In the case of the <span class="emphasis"><em>predictions2</em></span> service, the implementation class is <code class="literal">PredictionsServlet</code>, a subclass of
+<code class="literal">HttpServlet</code>. In short, the service instance is itself a servlet. In this sense, the <span class="emphasis"><em>predictions2</em></span> service is the least
+complicated implementation among the REST-style and SOAP-based implementations of the <span class="emphasis"><em>predictions</em></span> and <span class="emphasis"><em>adages</em></span> services in Chapter 2.
+The SOAP-based <span class="emphasis"><em>predictionsSOAP</em></span>
+implementation uses the Metro <code class="literal">WSServlet</code> as the interceptor. The JAX-RS implementation, <span class="emphasis"><em>predictions3</em></span>,
+uses the Jersey <code class="literal">ServletContainer</code> as the interceptor; and the Restlet implementation of the <span class="emphasis"><em>adages</em></span>
+RESTful service relies upon the <code class="literal">ServerServlet</code> as the interceptor.</p></dd><dt><span class="term">
+predictions3
+</span></dt><dd><p class="simpara">
+This a RESTful version of the service using JAX-RS. The WAR file can be deployed, as is,
+under Tomcat, Jetty, or GlassFish.
+Here, for review, are the contents of the
+deployed WAR file:
+</p><pre class="screen">WEB-INF/web.xml
+WEB-INF/classes/predictions3/Prediction.class
+WEB-INF/classes/predictions3/PredictionsList.class
+WEB-INF/classes/predictions3/PredictionsRS.class
+WEB-INF/classes/predictions3/RestfulPrediction.class
+WEB-INF/data/predictions.db
+WEB-INF/lib/asm.jar
+WEB-INF/lib/jackson-annotations.jar
+WEB-INF/lib/jackson-core.jar
+WEB-INF/lib/jackson-databind.jar
+WEB-INF/lib/jersey-core.jar
+WEB-INF/lib/jersey-server.jar
+WEB-INF/lib/jersey-servlet.jar</pre><p class="simpara">The various <span class="emphasis"><em>jackson</em></span> JAR files provide the JSON support and the <span class="emphasis"><em>jersey</em></span> JARs are the RI implementation of JAX-RS.
+The <span class="emphasis"><em>predictions3</em></span> service also supports all of the CRUD operations. The syntax of the CRUD calls changes deliberately
+in order to highlight the JAX-WS <code class="literal">@Path</code> annotation. For example, the <span class="emphasis"><em>curl</em></span> call</p><pre class="screen">% curl http://localhost:8081/predictions3/resourcesP/json/31</pre><p class="simpara">would return, in JSON format, the <code class="literal">Prediction</code> with the <code class="literal">id</code> value <code class="literal">31</code>.</p></dd><dt><span class="term">
+adages2
+</span></dt><dd><p class="simpara">
+This is a Restlet implementation of the RESTful <span class="emphasis"><em>adages</em></span> service. Nothing in the WAR file
+changes from the Tomcat or Jetty deployments. The service supports all of the
+CRUD operations with intuitive URIs such as <code class="literal">/create</code> to create a new <code class="literal">Adage</code> or
+<code class="literal">/delete/9</code> to delete the <code class="literal">Adage</code> with the <code class="literal">id</code> value of <code class="literal">9</code>. For review,
+here are the contents of the deployed WAR file:
+</p><pre class="screen">WEB-INF/web.xml
+WEB-INF/classes/aphorism2/Adage.class
+WEB-INF/classes/aphorism2/Adages.class
+WEB-INF/classes/aphorism2/AdagesApplication$1.class
+WEB-INF/classes/aphorism2/AdagesApplication.class
+WEB-INF/classes/aphorism2/CreateResource.class
+WEB-INF/classes/aphorism2/JsonAllResource.class
+WEB-INF/classes/aphorism2/PlainResource.class
+WEB-INF/classes/aphorism2/UpdateResource.class
+WEB-INF/classes/aphorism2/XmlAllResource.class
+WEB-INF/classes/aphorism2/XmlOneResource.class
+WEB-INF/lib/org.json.jar
+WEB-INF/lib/org.restlet.ext.json.jar
+WEB-INF/lib/org.restlet.ext.servlet.jar
+WEB-INF/lib/org.restlet.ext.xml.jar
+WEB-INF/lib/org.restlet.jar</pre><p class="simpara">This service, like the others, deploys straightforwardly to GlassFish.</p></dd><dt><span class="term">
+predictionsSOAP
+</span></dt><dd><p class="simpara">
+This the SOAP-based implementation of the <span class="emphasis"><em>predictions</em></span> service, which also supports all of the
+CRUD operations but in this case with four methods annotated with <code class="literal">@WebMethod</code>. The implementation includes a
+service-side handler that verifies a security credential sent with a request. For the GlassFish deployment,
+the interceptor servlet is the Metro <code class="literal">WSServlet</code>; but the Metro JAR files are not in the deployed WAR file
+because GlassFish comes with the Metro libraries. Here, for review, are the contents of the deployed WAR file:
+</p><pre class="screen">WEB-INF/web.xml
+WEB-INF/classes/predictions/DataStore.class
+WEB-INF/classes/predictions/Prediction.class
+WEB-INF/classes/predictions/Predictions.class
+WEB-INF/classes/predictions/PredictionsSOAP.class
+WEB-INF/classes/predictions/ServiceHashHandler.class
+WEB-INF/classes/predictions/VerbosityException.class
+WEB-INF/data/predictions.db
+WEB-INF/lib/commons-codec.jar
+WEB-INF/serviceHandler.xml
+WEB-INF/sun-jaxws.xml</pre></dd></dl></div><p>The upshot of this review is that services deployed under <code class="literal">Endpoint</code>, Tomcat, or Jetty should deploy either as is or with very
+small change (for instance, removing Metro JARs from the WAR file) to GlassFish.</p><p>The next section picks up a theme from Chapter3, which focused on clients against REST-style services. The idea is to
+illustrate how a service-side API (in this case, Restlet) can be combined with a different client-side API (in this case,
+the JAX-WS <code class="literal">Dispatch</code> interface). In the world of JASes, mixed APIs are more the rule than the exception.
+The Restlet/JAX-WS combination is not without complication, however; the section is thus an opportunity to
+review, in the context of GlassFish deployment, the challenges of RESTful services before moving on to SOAP-based services
+under GlassFish.</p><div class="section" title="1.3.1. An Example with Mixed APIs"><div class="titlepage"><div><div><h4 class="title"><a id="_an_example_with_mixed_apis"></a>1.3.1. An Example with Mixed APIs</h4></div></div></div><p>JAX-RS, Restlet, and JAX-WS with <code class="literal">@WebServiceProvider</code> have service-side and client-side APIs. Chapter 3 includes
+an example of the JAX-RS client-side API. This section introduces a client-side API designed specifically for <code class="literal">@WebServiceProvider</code>
+services; but this API will be used, as an illustration, against the Restlet <span class="emphasis"><em>adages2</em></span> service deployed with GlassFish.
+In summary, the service-side API is Restlet and the
+client-side API is JAX-WS, in particular the <code class="literal">Dispatch</code> client-side API targeted at <code class="literal">@WebServiceProvider</code> services.</p><p>Section 3.5 of Chapter 3 covers the REST-style <span class="emphasis"><em>adages3</em></span> service, which is implemented as a <code class="literal">@WebServiceProvider</code>.
+The implementation class begins as follows:</p><pre class="screen">public class AdagesProvider implements Provider&lt;Source&gt; {</pre><p>The <code class="literal">Provider&lt;Source&gt;</code> provides XML documents: a <code class="literal">Source</code> is a
+source of XML specifically. To implement the <code class="literal">Provider</code> interface, the <code class="literal">AdagesProvider</code> class defines the method</p><pre class="screen">public Source invoke(Source request); // declaration</pre><p>The <code class="literal">invoke</code> method on the service-side expects an XML <code class="literal">Source</code>, perhaps <code class="literal">null</code>, and returns an XML <code class="literal">Source</code>,
+which also could be <code class="literal">null</code>. In the usual case, the response <code class="literal">Source</code> is not <code class="literal">null</code>; the
+request <code class="literal">Source</code> would be <code class="literal">null</code> on HTTP body-less requests such as GETs and DELETEs. A <code class="literal">Source</code> can serve as the
+source of a transformation, which yields a <code class="literal">Result</code>. For example, a <code class="literal">Source</code> of XML might be transformed into
+an HTML, plaintext, or some other MIME type of document. The standard JAX-P (Java API for XML-Processing) <code class="literal">Transformer</code> class
+encapsulates a <code class="literal">transform</code> method that
+takes two arguments: the first is a <code class="literal">Source</code> of XML and the second is a <code class="literal">Result</code> (see <a class="xref" href="#transform" title="Example 1. A transformation from a Source to a Result.">Example 1, “A transformation from a <code class="literal">Source</code> to a <code class="literal">Result</code>.”</a>).</p><div class="example"><a id="transform"></a><p class="title"><b>Example 1. A transformation from a <code class="literal">Source</code> to a <code class="literal">Result</code>.</b></p><div class="example-contents"><pre class="screen">configurable
+transform properties---+
+                       |
+                      \|/
+                 +-----------+
+       XML -----&gt;| transform |------&gt;Result
+       Source    +-----------+</pre></div></div><br class="example-break" /><p>The <code class="literal">Provider</code> interface used on the service-side has, as a client-side counterpart, the <code class="literal">Dispatch</code> interface. A
+<code class="literal">Dispatch</code> object, which serves as <span class="emphasis"><em>dynamic service-proxy</em></span>, likewise encapsulates an <code class="literal">invoke</code> method that
+expects a <code class="literal">Source</code> (perhaps <code class="literal">null</code>) and returns a <code class="literal">Source</code> (perhaps <code class="literal">null</code> but typically not). The details of
+a <code class="literal">Dispatch</code> and <code class="literal">Provider</code> interaction can be summed up as follows (see <a class="xref" href="#dispatch_pic" title="Example 2. The interaction between the Dispatch and Provider invoke methods.">Example 2, “The interaction between the <code class="literal">Dispatch</code> and <code class="literal">Provider</code> <code class="literal">invoke</code> methods.”</a>):</p><div class="itemizedlist"><ul class="itemizedlist" type="disc"><li class="listitem">
+A client calls the <code class="literal">Dispatch</code> method <code class="literal">invoke</code> with an XML document as the <code class="literal">Source</code>. If the request does not
+require such a document as an argument, the <code class="literal">Source</code> can be <code class="literal">null</code>.
+</li><li class="listitem">
+The client request is dispatched, on the service-side, to the <code class="literal">invoke</code> method in a <code class="literal">Provider</code>. The <code class="literal">Source</code> argument
+passed to the service-side <code class="literal">invoke</code> corresponds to the <code class="literal">Source</code> argument passed to the client-side <code class="literal">invoke</code>.
+</li><li class="listitem">
+The service transforms the <code class="literal">Source</code> into an appropriate <code class="literal">Result</code>, for instance, a DOM tree that can be searched for
+content of interest or an HTML document suitable for display in a browser.
+</li><li class="listitem">
+The service returns an XML <code class="literal">Source</code> as a response; and the response is typically not <code class="literal">null</code>.
+</li><li class="listitem">
+The client receives the <code class="literal">Source</code> from the service as the return value of the <code class="literal">Dispatch</code> method <code class="literal">invoke</code>. The client then transforms
+this <code class="literal">Source</code>, as needed, into an appropriate <code class="literal">Result</code> for client-side processing.
+</li></ul></div><div class="example"><a id="dispatch_pic"></a><p class="title"><b>Example 2. The interaction between the <code class="literal">Dispatch</code> and <code class="literal">Provider</code> <code class="literal">invoke</code> methods.</b></p><div class="example-contents"><pre class="screen">Request: Dispatch to Provider
+
+       Client side                             Service side
++---------------------------+   Source    +-------------------------+
+| dispatcher.invoke(Source) |------------&gt;| provider.invoke(Source) |
++---------------------------+             +-------------------------+
+                             Source of XML
+
+
+Response: Provider to Dispatch
+
+    Client side                    Service side
++------------------+   Source    +-------------+
+|   dispatcher     |&lt;------------|   provider  |
++------------------+             +-------------+
+                    Source of XML</pre></div></div><br class="example-break" /><p>The <code class="literal">DispatchClient</code> (see <a class="xref" href="#dispatch" title="Example 3. The DispatchClient against the Restlet adages2 service.">Example 3, “The <code class="literal">DispatchClient</code> against the Restlet <span class="emphasis"><em>adages2</em></span> service.”</a>) uses the <code class="literal">invoke</code> method in a <code class="literal">Dispatch</code> service-proxy to
+make CRUD calls against the Restlet <span class="emphasis"><em>adages2</em></span> service. This client creates a <code class="literal">Service</code> instance
+(line 1), whose identity is a <code class="literal">QName</code>, in this case <code class="literal">uri:restlet</code>. The name is arbitrary but
+should be unique. The Restlet service, written with an altogether different API, has no <code class="literal">invoke</code>
+method to pair up with the <code class="literal">Dispatch</code> method named <code class="literal">invoke</code>. Nonetheless, the communication
+between the two is mostly trouble-free. The trouble spot is clarified next.</p><div class="example"><a id="dispatch"></a><p class="title"><b>Example 3. The <code class="literal">DispatchClient</code> against the Restlet <span class="emphasis"><em>adages2</em></span> service.</b></p><div class="example-contents"><pre class="screen">import javax.xml.ws.Service;
+import javax.xml.namespace.QName;
+import javax.xml.ws.http.HTTPBinding;
+import javax.xml.ws.ServiceMode;
+import javax.xml.ws.Dispatch;
+import javax.xml.transform.Source;
+import javax.xml.transform.stream.StreamSource;
+import javax.xml.transform.stream.StreamResult;
+import javax.xml.ws.handler.MessageContext;
+import java.util.Map;
+import java.io.StringReader;
+
+public class DispatchClient {
+    private static final String baseUrl = "http://localhost:8081/aphorisms2/";
+
+    public static void main(String[ ] args) {
+        new DispatchClient().callRestlet();
+    }
+    private void callRestlet() {
+        QName qname = getQName("uri", "restlet"); // service's name
+        Service service = Service.create(qname);                                     <a id="CO1-1"></a><img src="/etc/asciidoc/images/icons//callouts/1.png" alt="1" border="0" />
+        runTests(service);
+    }
+    private void runTests(Service service) {
+        // get all -- plain text
+        Dispatch&lt;Source&gt; dispatch = getDispatch(service, getQName("get", "All"),     <a id="CO1-2"></a><img src="/etc/asciidoc/images/icons//callouts/2.png" alt="2" border="0" />
+                                                baseUrl);
+        setRequestMethod(dispatch, "GET");                                           <a id="CO1-3"></a><img src="/etc/asciidoc/images/icons//callouts/3.png" alt="3" border="0" />
+        Source result = dispatch.invoke(null);                                       <a id="CO1-4"></a><img src="/etc/asciidoc/images/icons//callouts/4.png" alt="4" border="0" />
+        stringifyAndPrintResponse("Result (plaintext):", result);
+        // get all -- xml
+        dispatch = getDispatch(service, getQName("get", "AllXml"), baseUrl + "xml");
+        setRequestMethod(dispatch, "GET");
+        result = dispatch.invoke(null);
+        stringifyAndPrintResponse("Result (xml):", result);
+        // get all -- json
+        dispatch = getDispatch(service, getQName("get", "AllJson"), baseUrl + "json");
+        setRequestMethod(dispatch, "GET");
+        result = dispatch.invoke(null);
+        stringifyAndPrintResponse("Result (json):", result);
+        // get one -- xml
+        dispatch = getDispatch(service, getQName("get", "OneXml"), baseUrl + "xml/2");
+        setRequestMethod(dispatch, "GET");
+        result = dispatch.invoke(null);
+        stringifyAndPrintResponse("Result (one--xml):", result);
+        // delete
+        dispatch = getDispatch(service, getQName("delete", "One"), baseUrl + "delete/3");
+        setRequestMethod(dispatch, "DELETE");
+        result = dispatch.invoke(null);
+        stringifyAndPrintResponse("Result (delete):", result);
+        // post -- failure
+        dispatch = getDispatch(service, getQName("post", "Create"), baseUrl + "create");
+        setRequestMethod(dispatch, "POST");
+        String cargo = "&lt;a&gt;words=This test will not work!&lt;/a&gt;"; // minimal XML       <a id="CO1-5"></a><img src="/etc/asciidoc/images/icons//callouts/5.png" alt="5" border="0" />
+        StringReader reader = new StringReader(cargo);
+        result = dispatch.invoke(new StreamSource(reader));
+        stringifyAndPrintResponse("Result (post):", result);
+    }
+    private Dispatch&lt;Source&gt; getDispatch(Service service, QName portName, String url) {
+        service.addPort(portName, HTTPBinding.HTTP_BINDING, url);
+        return service.createDispatch(portName,
+                                      Source.class,
+                                      javax.xml.ws.Service.Mode.MESSAGE);
+    }
+    private void setRequestMethod(Dispatch&lt;Source&gt; dispatcher, String method) {
+        Map&lt;String, Object&gt; rc = dispatcher.getRequestContext();
+        rc.put(MessageContext.HTTP_REQUEST_METHOD, method);
+    }
+    private QName getQName(String ns, String ln) {
+        return new QName(ns, ln);
+    }
+    private void stringifyAndPrintResponse(String msg, Source result) {
+        String str = null;
+        if (result instanceof StreamSource) {
+            try {
+                StreamSource source = (StreamSource) result;
+                byte[ ] buff = new byte[1024]; // adages are short
+                source.getInputStream().read(buff);
+                str = new String(buff);
+            }
+            catch(Exception e) { throw new RuntimeException(e); }
+        }
+        System.out.println("\n" + msg + "\n" + str);
+    }
+}</pre></div></div><br class="example-break" /><p>After the set-up, the <code class="literal">DispatchClient</code> then makes six calls against the Restlet service (lines 2 through
+4 illustrate), which
+can be summarized as follows:</p><div class="variablelist"><dl><dt><span class="term">
+<code class="literal">getAllPT</code>
+</span></dt><dd><p class="simpara">
+The first call gets all of the <code class="literal">Adages</code> in plaintext. The response, extracted from the
+<code class="literal">Source</code>, is:
+</p><pre class="screen"> 1: What can be shown cannot be said. -- 7 words
+ 2: If a lion could talk, we could not understand him. -- 10 words
+ ...</pre><p class="simpara">This call uses a GET request with the default URI <code class="literal">/</code>, the slash.</p><p class="simpara">For all of the calls against the
+Restlet service, the <code class="literal">Source</code> of XML returned as a response is sent to the
+<code class="literal">stringifyAndPrintResponse</code> method. This method first checks whether the <code class="literal">Source</code> is, in fact,
+a <code class="literal">StreamSource</code> and, if so, extracts the bytes from the <code class="literal">InputStream</code> encapsulated in the
+<code class="literal">StreamSource</code>. These bytes then are fed to a <code class="literal">String</code> constructor, which produces a string. The
+resulting string may be plaintext, as in this first sample call, or XML and JSON, as in later
+sample calls.</p></dd><dt><span class="term">
+<code class="literal">getAllXml</code>
+</span></dt><dd>
+This call becomes another GET request but the URI is now <code class="literal">/xml</code>. The response has the
+same informational content as <code class="literal">getAllPT</code> but the format is XML.
+</dd><dt><span class="term">
+<code class="literal">getAllJson</code>
+</span></dt><dd>
+This call also results in a GET request but with a URI of <code class="literal">/json</code>. The response
+is in JSON format.
+</dd><dt><span class="term">
+<code class="literal">getOne</code>
+</span></dt><dd>
+This call results in yet another GET request with the URI <code class="literal">/xml/2</code>, which specifies
+the <code class="literal">Adage</code> with an <code class="literal">id</code> of 2. The response is an XML document.
+</dd><dt><span class="term">
+<code class="literal">deleteOne</code>
+</span></dt><dd>
+This call becomes a DELETE request with the URI <code class="literal">/delete/3</code>, which specifies
+the <code class="literal">Adage</code> with an <code class="literal">id</code> of 3 as the one to remove from the list of <code class="literal">Adages</code>. The
+response is a plaintext confirmation of the deletion.
+</dd><dt><span class="term">
+<code class="literal">create</code>
+</span></dt><dd><p class="simpara">
+This call fails. The response is an error message:
+</p><pre class="screen">No words were given for the adage.</pre><p class="simpara">The problem arises because, with a POST request against the URI <code class="literal">/create</code>, the <code class="literal">Source</code> argument
+to the <code class="literal">invoke</code> method cannot be <code class="literal">null</code> but, rather, must contain the <code class="literal">words</code> in the <code class="literal">Adage</code> to
+be created. The Restlet service expects a simple HTML-like form in the body of the POST request;
+and this form has key/value pairs such as:</p><pre class="screen">words=This is the way the world ends</pre><p class="simpara">The Restlet service searches on the key <code class="literal">words</code> to get the value, in this case the line from the T. S. Eliot
+poem <span class="emphasis"><em>The Hollow Men</em></span>. On the client-side, however, the call to the <code class="literal">create</code> operation uses a POST request
+against the URI <code class="literal">/create</code>; and the contents of the POST body are given as a <code class="literal">Source</code> instance—of XML. When the
+underlying XML libraries parse the non-XML string above, the parser throws an exception. The fix is to
+turn the string into XML, for example, the minimalist XML document (line 5):</p><pre class="screen">&lt;a&gt;words=This is the way the world end&lt;/a&gt;</pre><p class="simpara">When this document is turned into a <code class="literal">StreamSource</code> argument to the <code class="literal">Dispatch</code> method <code class="literal">invoke</code>, the
+XML parser is satisfied. The problem now shifts to the service-side because the Restlet service expects
+a simple key/value pair, not key/value pair embedded as text in an XML element. As a result, the Restlet service complains that it cannot
+find the look-up key <code class="literal">words</code> in the body of the POST request.</p></dd></dl></div><p>The example reinforces a hard lesson in programming and many other activities: the devil is in the details. The fix to the problem would be
+relatively straightforward; and perhaps the easiest fix would be to make the Restlet service flexible enough to handle POST requests whose cargo is either
+plaintext or XML. The example also
+underscores that the JAX-WS <code class="literal">@WebServiceProvider</code> API is XML-centric. In this API, a <code class="literal">Dispatch</code> client against a <code class="literal">Provider</code> service such as
+the <span class="emphasis"><em>adages3</em></span> service (see Section 2.5 in Chapter 2) would be natural because each side would be dealing with XML <code class="literal">Source</code>
+arguments and return values.</p></div></div><div class="section" title="1.4. An Interactive Web Site and a SOAP-based Web Service"><div class="titlepage"><div><div><h3 class="title"><a id="_an_interactive_web_site_and_a_soap_based_web_service"></a>1.4. An Interactive Web Site and a SOAP-based Web Service</h3></div></div></div><p>This section has an example that uses GlassFish to host a web site and Tomcat to host a SOAP-based web service that the
+web site accesses. Chapter 3, on RESTful clients, has examples in which jQuery clients make calls against REST-style
+services that respond with JSON payloads; and the JavaScript embedded in the web page puts the JSON to good use.
+The web site in the current example is old-school in that the
+HTML page contains no JavaScript. Instead, the page has a familiar <span class="emphasis"><em>submit</em></span> button that, when pressed, causes an HTML
+form to be POSTed to a JSP script, which then calls upon a SOAP-based service to perform simple computations. The results of these computations
+are displayed on the web page. The interaction is among an HTML page, a JSP script with access to <span class="emphasis"><em>wsimport</em></span>-generated artifacts, and
+a SOAP-based service (see <a class="xref" href="#site_service" title="Example 4. An architectural sketch of the tcSiteAndService.">Example 4, “An architectural sketch of the <span class="emphasis"><em>tcSiteAndService</em></span>.”</a>). This distributed application performs temperature conversions.
+To make the example realistic and to set up a comparison between deployment details, the web service is
+published with standalone Tomcat and the web site is published with GlassFish.</p><div class="example"><a id="site_service"></a><p class="title"><b>Example 4. An architectural sketch of the <span class="emphasis"><em>tcSiteAndService</em></span>.</b></p><div class="example-contents"><pre class="screen">               GET
++---------+  index.html    +-----------+ call c2f or f2c  +-------------+
+| Browser |---------------&gt;| GlassFish |-----------------&gt;| Tomcat      |
+| client  |---------------&gt;| JAS       |&lt;-----------------| web server  |
++---------+   POST         +-----------+  response data   +-------------+
+         tempConvert.jsp    HTML + JSP                      @WebService
+                            wsimport artifacts</pre></div></div><br class="example-break" /><p>The HTML page <span class="emphasis"><em>index.html</em></span> (see <a class="xref" href="#html" title="Example 5. The HTML document index.html.">Example 5, “The HTML document <span class="emphasis"><em>index.html</em></span>.”</a>) contains a simple form with a text box into which
+a user enters temperatures to converted into fahrenheit and centigrade. To keep matters
+simple, the CSS styling is embedded in the HTML. When the HTML form is submitted with
+a button push, a POST request is sent to the JSP script named <span class="emphasis"><em>tempConvert.jsp</em></span>. There is also
+an error script, <span class="emphasis"><em>error.jsp</em></span>, to handle errors that result from trying to convert
+non-numeric input (<span class="emphasis"><em>e.g.</em></span>, the string <span class="emphasis"><em>foo</em></span>) into a decimal number. The two JSP scripts and the
+HTML page, together with some other artifacts discussed shortly,
+are deployed in the WAR file <span class="emphasis"><em>tcWeb.war</em></span>. GlassFish hosts the web site.</p><div class="example"><a id="html"></a><p class="title"><b>Example 5. The HTML document <span class="emphasis"><em>index.html</em></span>.</b></p><div class="example-contents"><pre class="screen">&lt;!DOCTTYPE html&gt;
+&lt;html&gt;
+  &lt;head&gt;
+    &lt;style type = "text/css"&gt;
+      input {background-color: white; font-weight: bold; font-size: medium}
+      legend {color:#990000; font-size: large;}
+      fieldset {width: 600px; background-color: rgb(225, 225, 225);}
+    &lt;/style&gt;
+  &lt;/head&gt;
+  &lt;body&gt;
+    &lt;form method = 'post' action = 'tempConvert.jsp'&gt;             <a id="CO1-6"></a><img src="/etc/asciidoc/images/icons//callouts/1.png" alt="1" border="0" />
+      &lt;fieldset&gt;
+        &lt;legend&gt;Temperature conversion&lt;/legend&gt;
+        &lt;table&gt;
+          &lt;tr&gt;
+            &lt;td&gt;Temperature:&lt;/td&gt;
+            &lt;td&gt;&lt;input type = 'text' name = 'temperature'/&gt;&lt;/td&gt;  <a id="CO1-7"></a><img src="/etc/asciidoc/images/icons//callouts/2.png" alt="2" border="0" />
+          &lt;/tr&gt;
+        &lt;/table&gt;
+        &lt;input type = 'submit' value = ' Convert '/&gt;              <a id="CO1-8"></a><img src="/etc/asciidoc/images/icons//callouts/3.png" alt="3" border="0" />
+      &lt;/fieldset&gt;
+    &lt;/form&gt;
+  &lt;/body&gt;
+&lt;/html&gt;</pre></div></div><br class="example-break" /><p>For context, the main contents of the web site WAR file are:</p><pre class="screen">WEB-INF/web.xml
+WEB-INF/classes/tempConvertClient/C2F.class
+WEB-INF/classes/tempConvertClient/C2FResponse.class
+WEB-INF/classes/tempConvertClient/F2C.class
+WEB-INF/classes/tempConvertClient/F2CResponse.class
+WEB-INF/classes/tempConvertClient/ObjectFactory.class
+WEB-INF/classes/tempConvertClient/TempConvert.class
+WEB-INF/classes/tempConvertClient/TempConvertService.class
+error.jsp
+index.html
+tempConvert.jsp</pre><p>The HTML page <span class="emphasis"><em>index.html</em></span> provides a text field (line 2) into which a user can enter input.
+When the form (line 1) is submitted by clicking the <span class="emphasis"><em>submit</em></span> button (line 3),
+the targeted action is the JSP script
+<span class="emphasis"><em>tempConvert.jsp</em></span>, which receives the contents of the text field as request data.</p><p>The code of JSP script <span class="emphasis"><em>tempConvert.jsp</em></span> (see <a class="xref" href="#JSP_script" title="Example 6. The JSP script tempConvert.jsp, deployed in the tcWeb.war file.">Example 6, “The JSP script <span class="emphasis"><em>tempConvert.jsp</em></span>, deployed in the <span class="emphasis"><em>tcWeb.war</em></span> file.”</a>) has two <code class="literal">page</code>
+directives (lines 1 and 2), which import <span class="emphasis"><em>wsimport</em></span>-generated classes for the
+web service. These classes reside in the package/directory <span class="emphasis"><em>tempConvertClient</em></span>, which
+is included in the deployed WAR file <span class="emphasis"><em>tcWeb.war</em></span>. The JSP script extracts the
+user input from the HTTP POST request (line 3) and then tries to convert the input
+to a floating-point number. If there are any errors, control immediately goes via an
+automatic redirect, which GlassFish manages, to the
+error page <span class="emphasis"><em>error.jsp</em></span> (see <a class="xref" href="#error_jsp" title="Example 7. The error page error.jsp.">Example 7, “The error page <span class="emphasis"><em>error.jsp</em></span>.”</a>); the HTTP status code is 400 for <span class="emphasis"><em>bad request</em></span>
+(see line 1 in the displayed error page).
+The error page announces an input error and,
+through a hyperlink back to <span class="emphasis"><em>index.html</em></span>, gives the user the option of trying again.</p><div class="example"><a id="JSP_script"></a><p class="title"><b>Example 6. The JSP script <span class="emphasis"><em>tempConvert.jsp</em></span>, deployed in the <span class="emphasis"><em>tcWeb.war</em></span> file.</b></p><div class="example-contents"><pre class="screen">&lt;!DOCTYPE html&gt;
+&lt;%@ page errorPage = "error.jsp" %&gt;
+&lt;!-- wsimport-generated artifacts --&gt;
+&lt;%@ page import = "tempConvertClient.TempConvertService" %&gt;              <a id="CO1-9"></a><img src="/etc/asciidoc/images/icons//callouts/1.png" alt="1" border="0" />
+&lt;%@ page import = "tempConvertClient.TempConvert" %&gt;                     <a id="CO1-10"></a><img src="/etc/asciidoc/images/icons//callouts/2.png" alt="2" border="0" />
+&lt;html&gt;
+  &lt;head&gt;
+  &lt;style type = 'text/css'&gt;
+    a {color: #151b8d; text-decoration:none;}
+    a:visited {color: #151b8d;}
+    a:hover {color: #fff; background-color: #666;}
+    .p {color: blue; font-size: large;}
+    legend {color:#990000; font-size: large;}
+    fieldset {width: 600px; background-color: rgb(225, 225, 225);}
+  &lt;/style&gt;
+  &lt;%! private float f2c, c2f, temp; %&gt;
+  &lt;%
+     String tempStr = request.getParameter("temperature"); // text field <a id="CO1-11"></a><img src="/etc/asciidoc/images/icons//callouts/3.png" alt="3" border="0" />
+     if (tempStr != null) this.temp = Float.parseFloat(tempStr.trim());  <a id="CO1-12"></a><img src="/etc/asciidoc/images/icons//callouts/4.png" alt="4" border="0" />
+     this.f2c = this.c2f = this.temp;
+     TempConvert port = new TempConvertService().getTempConvertPort();   <a id="CO1-13"></a><img src="/etc/asciidoc/images/icons//callouts/5.png" alt="5" border="0" />
+     c2f = port.c2F(temp);                                               <a id="CO1-14"></a><img src="/etc/asciidoc/images/icons//callouts/6.png" alt="6" border="0" />
+     f2c = port.f2C(temp);                                               <a id="CO1-15"></a><img src="/etc/asciidoc/images/icons//callouts/7.png" alt="7" border="0" />
+  %&gt;
+  &lt;body&gt;
+    &lt;fieldset&gt;
+      &lt;legend&gt;Temperature conversions&lt;/legend&gt;
+      &lt;p&gt;&lt;%= this.temp %&gt;F = &lt;%= this.c2f %&gt;C&lt;/p&gt;                        <a id="CO1-16"></a><img src="/etc/asciidoc/images/icons//callouts/8.png" alt="8" border="0" />
+      &lt;p&gt;&lt;%= this.temp %&gt;C = &lt;%= this.f2c %&gt;F&lt;/p&gt;                        <a id="CO1-17"></a><img src="/etc/asciidoc/images/icons//callouts/9.png" alt="9" border="0" />
+    &lt;/fieldset&gt;
+    &lt;hr/&gt;
+    &lt;a href = 'index.html'&gt;Try another&lt;/a&gt;                               <a id="CO1-18"></a><img src="/etc/asciidoc/images/icons//callouts/10.png" alt="10" border="0" />
+  &lt;/body&gt;
+&lt;/html&gt;</pre></div></div><br class="example-break" /><p>If the conversion of the input data to a floating-point number succeeds, the
+JSP script calls the SOAP-based <span class="emphasis"><em>tcService</em></span>, running on Tomcat, to convert the
+number into centigrade (line 6) and fahrenheit (line 7). The values returned from
+the <span class="emphasis"><em>tcService</em></span> then are displayed (lines 8 and 9). A hyperlink at the bottom of
+the page (line 10) gives the user the option of trying again.</p><div class="example"><a id="error_jsp"></a><p class="title"><b>Example 7. The error page <span class="emphasis"><em>error.jsp</em></span>.</b></p><div class="example-contents"><pre class="screen">&lt;%@ page isErrorPage = "true" %&gt;
+&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+  &lt;head&gt;
+    &lt;style type = 'text/css'&gt;
+      a {color: #151b8d; text-decoration:none;}
+      a:visited {color: #151b8d;}
+      a:hover {color: #fff; background-color: #666;}
+      .p {color: red; font-size: large;}
+    &lt;/style&gt;
+  &lt;/head&gt;
+  &lt;body&gt;
+    &lt;% response.setStatus(400); %&gt; &lt;!-- bad request --&gt;   <a id="CO1-19"></a><img src="/etc/asciidoc/images/icons//callouts/1.png" alt="1" border="0" />
+    &lt;p class = 'p'&gt;Numbers only, please.&lt;/p&gt;
+    &lt;hr/&gt;
+    &lt;a href = 'index.html'&gt;Try again.&lt;/a&gt;
+  &lt;/body&gt;
+&lt;/html&gt;</pre></div></div><br class="example-break" /><p>The <span class="emphasis"><em>tcService.war</em></span> file, which contains the SOAP-based web service, has these contents:</p><pre class="screen">WEB-INF/web.xml                                <a id="CO1-20"></a><img src="/etc/asciidoc/images/icons//callouts/1.png" alt="1" border="0" />
+WEB-INF/classes/tempConvert/TempConvert.class
+WEB-INF/lib/webservices-api.jar                <a id="CO1-21"></a><img src="/etc/asciidoc/images/icons//callouts/2.png" alt="2" border="0" />
+WEB-INF/lib/webservices-rt.jar                 <a id="CO1-22"></a><img src="/etc/asciidoc/images/icons//callouts/3.png" alt="3" border="0" />
+WEB-INF/sun-jaxws.xml                          <a id="CO1-23"></a><img src="/etc/asciidoc/images/icons//callouts/4.png" alt="4" border="0" /></pre><p>Two deployment files are needed (lines 1 and 4) because the Metro <code class="literal">JWSServlet</code> acts the intermediary
+between the client request and the <code class="literal">TempConvert</code> service. The <span class="emphasis"><em>web.xml</em></span> (see <a class="xref" href="#web_xml" title="Example 8. The web.xml for the TempConvert service deployed under Tomcat.">Example 8, “The <span class="emphasis"><em>web.xml</em></span> for the <code class="literal">TempConvert</code> service deployed under Tomcat.”</a>) specifies the Metro servlet (line 1)
+as the request handler and the <span class="emphasis"><em>sun-jaxws.xml</em></span> then routes the request from the Metro servlet to a
+<code class="literal">TempConvert</code> instance (see <a class="xref" href="#web_xml" title="Example 8. The web.xml for the TempConvert service deployed under Tomcat.">Example 8, “The <span class="emphasis"><em>web.xml</em></span> for the <code class="literal">TempConvert</code> service deployed under Tomcat.”</a>). Further, the two Metro JAR files (lines 2 and 3) are needed because Tomcat
+does not come with the Metro implementation of JAX-WS.</p><div class="example"><a id="web_xml"></a><p class="title"><b>Example 8. The <span class="emphasis"><em>web.xml</em></span> for the <code class="literal">TempConvert</code> service deployed under Tomcat.</b></p><div class="example-contents"><pre class="screen">&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;web-app&gt;
+  &lt;listener&gt;
+    &lt;listener-class&gt;
+      com.sun.xml.ws.transport.http.servlet.WSServletContextListener
+    &lt;/listener-class&gt;
+  &lt;/listener&gt;
+  &lt;servlet&gt;
+    &lt;servlet-name&gt;jaxws&lt;/servlet-name&gt;
+    &lt;servlet-class&gt;
+       com.sun.xml.ws.transport.http.servlet.WSServlet   <a id="CO1-24"></a><img src="/etc/asciidoc/images/icons//callouts/1.png" alt="1" border="0" />
+    &lt;/servlet-class&gt;
+    &lt;load-on-startup&gt;1&lt;/load-on-startup&gt;
+  &lt;/servlet&gt;
+  &lt;servlet-mapping&gt;
+    &lt;servlet-name&gt;jaxws&lt;/servlet-name&gt;
+    &lt;url-pattern&gt;/*&lt;/url-pattern&gt;
+  &lt;/servlet-mapping&gt;
+&lt;/web-app&gt;</pre></div></div><br class="example-break" /><p>The JSP script <span class="emphasis"><em>tempConvert.jsp</em></span> makes calls against the <span class="emphasis"><em>tcService</em></span> by using the <span class="emphasis"><em>wsimport</em></span>-generated
+classes in the package/directory <span class="emphasis"><em>tempConvertClient</em></span>. This JSP script together with HTML page, the
+error page, and the contents of the <span class="emphasis"><em>tempConvertClient</em></span> directory are encapsulated in the
+WAR file <span class="emphasis"><em>tcWeb.war</em></span>, which is deployed with GlassFish instead of Tomcat. The point of interest is
+that the Metro JAR files are <span class="emphasis"><em>not</em></span> included in the deployed <span class="emphasis"><em>tcWeb.war</em></span> precisely because GlassFish
+itself comes with the full Metro implementation. Accordingly, if the <span class="emphasis"><em>tcService</em></span> were deployed under
+GlassFish instead of standalone Tomcat, the two JAR files in <span class="emphasis"><em>tcService.war</em></span> could be removed—indeed, these
+JAR files would have to be removed in order to avoid a conflict with the Metro library that comes installed
+with GlassFish. The <span class="emphasis"><em>tcService</em></span> still would use the <code class="literal">JWSServlet</code> as the intermediary, which in turn means that the
+<span class="emphasis"><em>web.xml</em></span> and the <span class="emphasis"><em>sun-jaxws.xml</em></span> configuration files would be needed as well.</p><p>It is hardly surprising that GlassFish includes the Metro libraries. Metro is the
+reference implementation of JAX-WS; and the GlassFish JAS includes this
+implementation as one of the JAS components. The GlassFish JAS officially comes under the <span class="emphasis"><em>GlassFish Metro Project</em></span>, which in turn
+includes the full web-service stack that implements JAX-WS.
+As earlier examples with Tomcat and Jetty illustrate, the web-service stack can be used independently of the GlassFish JAS.
+Among JASes, Oracle WebLogic also
+includes the Metro web-service stack.</p></div><div class="section" title="1.5. A @WebService as a @Stateless Session EJB"><div class="titlepage"><div><div><h3 class="title"><a id="_a_literal_webservice_literal_as_a_literal_stateless_literal_session_ejb"></a>1.5. A <code class="literal">@WebService</code> as a <code class="literal">@Stateless</code> Session EJB</h3></div></div></div><p>Why should SOAP-based web services be deployed as EJBs instead of as POJOs? One answer is quite practical. If
+an organization already has stateless Session EJBs in place, these can become SOAP-based services as well by adding the
+<code class="literal">@WebService</code> annotation to the EJB code; no other change to the EJB code is needed.
+At a more technical but still practical level, the EJB container is programmer-friendly in handling
+issues such as thread safety. A web container such as Tomcat’s Catalina or Jetty do not provide thread-safety for web
+sites and services; but an EJB container does provide such safety. Concurrency issues are formidable challenges in
+Java and it is appealing to off-load such challenges from the programmer to the container. GlassFish and other JASes
+also offer first-rate development support for web services deployed as <code class="literal">@Stateless</code> Session EJBs. Upon successful
+deployment of the service, for example, GlassFish generates a web page that can be used to test all of the
+service operations; another page to inspect the WSDL; another page to inspect performance; and so on.
+In any event, the good news is that
+Java programmers have a options about how to implement SOAP-based as well as REST-style web
+services. This section explores one such option for SOAP-based services: the <code class="literal">@Stateless</code> Session EJB. The EJB example
+also uses a database for persistence, which is an opportunity to illustrate how the <code class="literal">@Entity</code> annotation works.
+For reference, this version of the service is <span class="emphasis"><em>predictionsEJB</em></span>.</p><p>In the <span class="emphasis"><em>predictionsEJB</em></span> service, instances of the <code class="literal">Prediction</code> class, which is annotated as an <code class="literal">@Entity</code> (line 1),
+are persisted in the database, in this case the Derby database
+that comes with GlassFish. A configuration document, clarified shortly, instructs the GlassFish JPA (Java Persistence API)
+provider to generate a table that stores <code class="literal">Prediction</code> instances. Because a <code class="literal">Prediction</code> has three
+properties (<code class="literal">who</code>, <code class="literal">what</code>, and <code class="literal">id</code>), the table will have three fields. By default, the field names are the
+property names and the table name is the class name.</p><div class="example"><a id="pred_model"></a><p class="title"><b>Example 9. The <code class="literal">Prediction</code> class, annotated as an <code class="literal">@Entity</code>.</b></p><div class="example-contents"><pre class="screen">package predEJB;
+
+import javax.persistence.Entity;
+import javax.persistence.NamedQuery;
+import javax.persistence.NamedQueries;
+import javax.persistence.Id;
+import javax.persistence.GeneratedValue;
+import java.io.Serializable;
+
+@Entity                                                                  <a id="CO1-25"></a><img src="/etc/asciidoc/images/icons//callouts/1.png" alt="1" border="0" />
+@NamedQueries({                                                          <a id="CO1-26"></a><img src="/etc/asciidoc/images/icons//callouts/2.png" alt="2" border="0" />
+  @NamedQuery(name = "pred.list", query = "select p from Prediction p")
+})
+public class Prediction implements Serializable {
+    private String who;   // person
+    private String what;  // his/her prediction
+    private int    id;    // identifier used as lookup-key
+
+    public Prediction() { }
+    public String getWho() { return this.who; }
+    public void setWho(String who) { this.who = who; }
+    public String getWhat() { return this.what; }
+    public void setWhat(String what) { this.what = what; }
+    @Id                                                                  <a id="CO1-27"></a><img src="/etc/asciidoc/images/icons//callouts/3.png" alt="3" border="0" />
+    @GeneratedValue                                                      <a id="CO1-28"></a><img src="/etc/asciidoc/images/icons//callouts/4.png" alt="4" border="0" />
+    public int getId() { return this.id; }
+    public void setId(int id) { this.id = id; }
+}</pre></div></div><br class="example-break" /><p>The <code class="literal">Prediction</code> class uses four annotations but JPA has others that might be of
+interest. Immediately after the <code class="literal">@Entity</code> annotation (line 1) come two additional annotations: <code class="literal">@NamedQueries</code> and
+<code class="literal">@NamedQuery</code>. For convenience, the <code class="literal">Prediction</code> class includes a named query in the JPA QL (Query Language),
+which is close to but not identical with SQL. QL acts as uniformly structured alternative to the various SQL dialects; hence,
+QL promotes portability across database systems.
+In the <code class="literal">select</code> query the letter <code class="literal">p</code>, short for <span class="emphasis"><em>prediction</em></span>,
+is arbitrary but serves as a placeholder for each <code class="literal">Prediction</code> row to be selected. The query is
+used in the <code class="literal">PredictionEJB</code> class, which is clarified shortly.</p><p>In the <code class="literal">Prediction</code> class, the <code class="literal">id</code> property is annotated as an <code class="literal">@Id</code> (line 3), which means that the
+<code class="literal">id</code> of a <code class="literal">Prediction</code> becomes the primary key for a record in the database table. The <code class="literal">id</code> also is annotated
+as a <code class="literal">@GeneratedValue</code> (line 4),
+which means that the database system will generate unique primary keys for each <code class="literal">Prediction</code>; the keys are
+ascending integers, starting with 1. Other
+annotations are available. For example, the <code class="literal">who</code> property might be annotated with:</p><pre class="screen">@Column(name = "predictor", nullable = false, length = 64)</pre><p>In this case, the database field would be named <span class="emphasis"><em>predictor</em></span>; the database would ensure that the
+content of the field could not be NULL; and the database would enforce a maximum length of 64
+characters on the <code class="literal">who</code> value.</p><p>The JPA details for the <span class="emphasis"><em>predictionsEJB</em></span> service could be provided programmatically but the
+best practice is to isolate such details in a configuration document named <span class="emphasis"><em>persistence.xml</em></span>
+(see <a class="xref" href="#jpa_config" title="Example 10. The persistence.xml JPA configuration document.">Example 10, “The <span class="emphasis"><em>persistence.xml</em></span> JPA configuration document.”</a>). Under this approach, the database configuration could be changed without
+changing any code. The <span class="emphasis"><em>persistence.xml</em></span> file in this example is deliberately minimalist to
+show that database configuration need not be complicated. The <code class="literal">persistence-unit</code> (line 1) has
+a <code class="literal">name</code> that is referenced in the EJB, which is examined shortly; and the persistence unit
+also has a <code class="literal">transaction-type</code>, in this case JTA (Java Transaction API, the default). Three
+properties are set in the document (lines 2, 3, and 4). The first property (line 1) automates
+the creation of the database table and also causes the table to be dropped whenever the
+application is redeployed; in production, <code class="literal">create-tables</code> might be used instead.
+The second property (line 2) ensures that the table
+generation impacts the database resource associated with the <span class="emphasis"><em>predictionsEJB</em></span> service; in
+this example, the database is the default, Apache Derby.
+The third and last property (line 3) specifies the JDBC
+driver that connects the service to the database system; and this driver, as its name
+indicates, targets the Derby database system.</p><div class="example"><a id="jpa_config"></a><p class="title"><b>Example 10. The <span class="emphasis"><em>persistence.xml</em></span> JPA configuration document.</b></p><div class="example-contents"><pre class="screen">&lt;?xml version = "1.0" encoding = "UTF-8"?&gt;
+&lt;persistence&gt;
+  &lt;persistence-unit name = "predictionsDB" transaction-type = "JTA"&gt;   <a id="CO1-29"></a><img src="/etc/asciidoc/images/icons//callouts/1.png" alt="1" border="0" />
+    &lt;properties&gt;
+      &lt;property name  = "eclipselink.ddl-generation"                   <a id="CO1-30"></a><img src="/etc/asciidoc/images/icons//callouts/2.png" alt="2" border="0" />
+                value = "drop-and-create-tables"/&gt;
+      &lt;property name  = "eclipselink.ddl-generation.output-mode"       <a id="CO1-31"></a><img src="/etc/asciidoc/images/icons//callouts/3.png" alt="3" border="0" />
+                value = "database"/&gt;
+      &lt;property name  = "javax.persistence.jdbc.driver"                <a id="CO1-32"></a><img src="/etc/asciidoc/images/icons//callouts/4.png" alt="4" border="0" />
+                value = "org.apache.derby.jdbc.ClientDriver"/&gt;
+    &lt;/properties&gt;
+  &lt;/persistence-unit&gt;
+&lt;/persistence&gt;</pre></div></div><br class="example-break" /><p>The <span class="emphasis"><em>persistence.xml</em></span> document does not specify what, in GlassFish terminology, is the JDBC <code class="literal">Resource</code>. Each
+<code class="literal">Resource</code> has a JNDI name for identification in look-up operations.
+Neither does the <span class="emphasis"><em>persistence.xml</em></span> document specify a table name in the database. As a result, the defaults
+kick in. The default JDBC <code class="literal">Resource</code>, which is a <code class="literal">DataSource</code>, is named:</p><pre class="screen">jdbc/__default</pre><p>The default table
+name derives from the name of class annotated as an <code class="literal">@Entity</code>, in this case <code class="literal">Prediction</code>. Accordingly,
+the <span class="emphasis"><em>Prediction</em></span> table is accessible through a data source named <span class="emphasis"><em>jdbc/__default</em></span>. Of course, GlassFish
+allows an administrator to create and name other data sources.</p><div class="example"><a id="pred_ejb"></a><p class="title"><b>Example 11. The <code class="literal">PredictionEJB</code> class, annotated as a <code class="literal">@Stateless @WebService</code>.</b></p><div class="example-contents"><pre class="screen">package predEJB;
+
+import javax.ejb.Stateless;
+import javax.jws.WebService;
+import javax.jws.WebMethod;
+import java.util.List;
+import java.util.Arrays;
+import javax.persistence.PersistenceContext;
+import javax.persistence.EntityManager;
+
+@Stateless                                                           <a id="CO1-33"></a><img src="/etc/asciidoc/images/icons//callouts/1.png" alt="1" border="0" />
+@WebService                                                          <a id="CO1-34"></a><img src="/etc/asciidoc/images/icons//callouts/2.png" alt="2" border="0" />
+public class PredictionEJB {
+    @PersistenceContext(name = "predictionsDB")                      <a id="CO1-35"></a><img src="/etc/asciidoc/images/icons//callouts/3.png" alt="3" border="0" />
+    private EntityManager em;
+
+    @WebMethod
+    public Prediction create(String who, String what) {
+        if (who == null || what == null) return null;
+        if (who.length() &lt; 1 || what.length() &lt; 1) return null;
+        Prediction prediction = new Prediction();
+        prediction.setWho(who);
+        prediction.setWhat(what);
+        try {
+            em.persist(prediction);                                  <a id="CO1-36"></a><img src="/etc/asciidoc/images/icons//callouts/4.png" alt="4" border="0" />
+        }
+        catch(Exception e) {
+            throw new RuntimeException("create:persist -- " + e);
+        }
+        return prediction;
+    }
+    @WebMethod
+    public Prediction edit(int id, String who, String what) {
+        if (id &lt; 1 || who == null || what == null) return null;
+        if (who.length() &lt; 1 || what.length() &lt; 1) return null;
+        Prediction prediction = em.find(Prediction.class, id);
+        if (prediction == null) return null;
+
+        prediction.setWho(who);
+        prediction.setWhat(what);
+        return prediction;
+    }
+    @WebMethod
+    public String delete(int id) {
+        String msg = "Could not remove prediction with ID " + id;
+        if (id &lt; 1) return msg;
+        Prediction prediction = em.find(Prediction.class, id);       <a id="CO1-37"></a><img src="/etc/asciidoc/images/icons//callouts/5.png" alt="5" border="0" />
+        if (prediction == null) return msg;
+        em.remove(prediction); // delete from database               <a id="CO1-38"></a><img src="/etc/asciidoc/images/icons//callouts/6.png" alt="6" border="0" />
+
+        return prediction.toString() + " -- deleted";
+    }
+    @WebMethod
+    public Prediction getOne(int id) {
+        if (id &lt; 1) return null;
+        Prediction prediction = em.find(Prediction.class, id);       <a id="CO1-39"></a><img src="/etc/asciidoc/images/icons//callouts/7.png" alt="7" border="0" />
+        if (prediction == null) return null;
+        return prediction;
+    }
+    @WebMethod
+    public List&lt;Prediction&gt; getAll() {
+        List&lt;Prediction&gt; predList =                                  <a id="CO1-40"></a><img src="/etc/asciidoc/images/icons//callouts/8.png" alt="8" border="0" />
+           em.createNamedQuery("pred.list", Prediction.class).getResultList();
+        return predList;
+    }
+}</pre></div></div><br class="example-break" /><p>The <code class="literal">PredictionEJB</code> class (see <a class="xref" href="#pred_ejb" title="Example 11. The PredictionEJB class, annotated as a @Stateless @WebService.">Example 11, “The <code class="literal">PredictionEJB</code> class, annotated as a <code class="literal">@Stateless @WebService</code>.”</a>) is the service implementation. The class is annotated
+with both <code class="literal">@Stateless</code> (line 1) and <code class="literal">@WebService</code> (line 2), although this order is arbitrary.
+Line 3 is the all-important <code class="literal">@PersistenceContext</code> annotation on the <code class="literal">EntityManager</code> reference
+<code class="literal">em</code>. In the <code class="literal">@PersistenceContext</code> annotation, the <code class="literal">name</code> attribute has <code class="literal">predictionsDB</code> as
+its value, which
+is likewise the value of the <code class="literal">name</code> attribute in the <code class="literal">persistence-unit</code> element of the <span class="emphasis"><em>persistence.xml</em></span>
+document. Accordingly, the <code class="literal">@PersistenceContext</code> annotation links the <code class="literal">PredictionEJB</code> service to the
+configuration file <span class="emphasis"><em>persistence.xml</em></span>. The <code class="literal">@PersistenceContext</code> annotation also causes dependency injection
+on the <code class="literal">em</code> reference: the run-time ensures that <code class="literal">em</code> refers to a suitable <code class="literal">EntityManager</code> instance, which
+manages the connection between the <code class="literal">PredictionEJB</code> and the back-end database.</p><p>The <span class="emphasis"><em>predictionsEJB</em></span> service implements the CRUD operations, all of which now reference the database using
+the <code class="literal">EntityManager</code> methods, which can include JPA QL constructs. The <code class="literal">EntityManager</code> operations
+against the database, which are implemented under the hood as transactions, are the four CRUD operations
+with intuitive method names:
+the <span class="emphasis"><em>create</em></span> operation in the <span class="emphasis"><em>predictionsEJB</em></span> service occurs in the <code class="literal">create</code>
+method (line 4). After a new <code class="literal">Prediction</code> is constructed and its <code class="literal">who</code> and <code class="literal">what</code> properties are set,
+the <code class="literal">EntityManager</code> method <code class="literal">persist</code> is invoked with the new <code class="literal">Prediction</code> as its argument:</p><pre class="screen">em.persist(prediction);</pre><p>This statement saves the <code class="literal">Prediction</code> to the database.</p><p>The <span class="emphasis"><em>delete</em></span> operation (line 6) first requires a <span class="emphasis"><em>read</em></span> operation (line 5). The <code class="literal">Prediction</code>
+has to be found before it can be removed:</p><pre class="screen">Prediction prediction = em.find(Prediction.class, id);</pre><p>If the <code class="literal">find</code> succeeds, the <code class="literal">Prediction</code> then can be removed from the database:</p><pre class="screen">em.remove(prediction);</pre><p>The same call to <code class="literal">find</code> also is used in the <code class="literal">getOne</code> operation (line 7).</p><p>Updating a <code class="literal">Prediction</code> in the <code class="literal">edit</code> operation requires no explicit JPA call. Instead,
+the <code class="literal">who</code> and <code class="literal">what</code> properties are <span class="emphasis"><em>set</em></span> in the usual way. The JPA infrastructure manages the coherence
+between an in-memory <code class="literal">Prediction</code> instance and the corresponding database record. After the <code class="literal">find</code> call
+fetches the <code class="literal">Prediction</code> to be updated, its properties are <span class="emphasis"><em>set</em></span> in the usual way—and that is the end
+of the <span class="emphasis"><em>update</em></span> operation.</p><p>The <code class="literal">getAll</code> operation in the <span class="emphasis"><em>predictionsEJB</em></span> service uses the <code class="literal">@NamedQuery</code> from the <code class="literal">Prediction</code>
+class to select all of the <code class="literal">Prediction</code> rows from the table (line 8). For review, the statement is:</p><pre class="screen">List&lt;Prediction&gt; predList =
+   em.createNamedQuery("pred.list", Prediction.class).getResultList();</pre><p>The string <code class="literal">pred.list</code> is the <code class="literal">@Query</code> name and the result list includes all of the rows selected.
+The <code class="literal">getAll</code> method returns the <code class="literal">predList</code> reference. The <code class="literal">EntityManager</code> encapsulates several methods
+besides <code class="literal">createNamedQuery</code> for creating queries against a database.</p><p>All of the methods in the <code class="literal">PredictionEJB</code> class are annotated with <code class="literal">@WebMethod</code>. In the <span class="emphasis"><em>predictionsEJB</em></span>
+service, these annotations are mandatory in order for a <code class="literal">public</code> method to count as a <code class="literal">@WebService</code> operation.
+The EJB container takes seriously the distinction between
+the SEI (Service Endpoint Interface) and the SIB (Service Implementation Bean), the latter of which is
+now the <code class="literal">@Stateless</code> Session EJB. In a standalone SEI, the <code class="literal">@WebService</code> annotation is required; hence,
+the EJB container insists that this annotation be present in a case such as the <code class="literal">PredictionEJB</code>, the
+single class that serves as both the SEI and the SIB.
+In the servlet-based implementations seen so
+far, the annotation <code class="literal">@WebService</code> is recommended but technically optional. The <span class="emphasis"><em>predictionsEJB</em></span> service
+could have a separate SEI and SIB but, for convenience, these have been combined into one class,
+<code class="literal">PredictionEJB</code>.</p><div class="section" title="1.5.1. Packaging and Deploying the predictionsEJB Service"><div class="titlepage"><div><div><h4 class="title"><a id="_packaging_and_deploying_the_emphasis_predictionsejb_emphasis_service"></a>1.5.1. Packaging and Deploying the <span class="emphasis"><em>predictionsEJB</em></span> Service</h4></div></div></div><p>Packaging and deploying a <code class="literal">@WebService</code> as a <code class="literal">@Stateless</code> Session EJB is simpler overall than deploying
+its servlet-based counterpart; and, the point bears repeating, the EJB-based deployment enjoys complete
+thread safety. Here is a summary of the steps:</p><div class="itemizedlist"><ul class="itemizedlist" type="disc"><li class="listitem">
+The <span class="emphasis"><em>.java</em></span> classes obviously need to be compiled but packages such as <code class="literal">javax.ejb</code> and
+<code class="literal">javax.persistence</code> are not included among the core Java libraries. GlassFish provides these
+packages in the JAR file <span class="emphasis"><em>AS_HOME/glassfish/lib/javaee.jar</em></span>. This JAR file thus needs to be on the
+classpath for compilation.
+</li><li class="listitem"><p class="simpara">
+The compiled <span class="emphasis"><em>.class</em></span> files can be placed, as is, in a JAR file with any name. In this example,
+the JAR file is <span class="emphasis"><em>ejbWS.jar</em></span> and its main contents are:
+</p><pre class="screen">META-INF/persistence.xml     <a id="CO1-41"></a><img src="/etc/asciidoc/images/icons//callouts/1.png" alt="1" border="0" />
+predEJB/PredictionEJB.class
+predEJB/Prediction.class</pre><p class="simpara">The critical requirement is that the <span class="emphasis"><em>persistence.xml</em></span> document (line 1) be in the
+<span class="emphasis"><em>META-INF</em></span> subdirectory.</p></li><li class="listitem"><p class="simpara">
+The JAR file with the EJB (in this case, <code class="literal">PredictionEJB</code>) and any supporting classes
+(in this case, <code class="literal">Prediction</code>) is then placed inside another JAR file, preferably with an
+<span class="emphasis"><em>ear</em></span> (Enterprise ARchive) extension. The name is arbitrary. In this example, the
+EAR file is <span class="emphasis"><em>predService.ear</em></span> and its contents are:
+</p><pre class="screen">ejbWS.jar</pre></li><li class="listitem">
+The EAR file is copied to <span class="emphasis"><em>AS_HOME/glassfish/domains/domain1/autodeploy</em></span>. The GlassFish
+web console is an easy way, under the <span class="emphasis"><em>Applications</em></span> tab, to confirm that the
+deployment succeeded.
+</li><li class="listitem"><p class="simpara">
+The GlassFish domain <span class="emphasis"><em>domain1</em></span> must be up and running. To ensure that the domain is
+active, the command is:
+</p><pre class="screen">% asadmin start-domain domain1</pre><p class="simpara">Also, the database must be started. The command is:</p><pre class="screen">% asadmin start-database</pre></li></ul></div><p>Neither the JAR file <span class="emphasis"><em>ejbWS.jar</em></span> nor the EAR file <span class="emphasis"><em>predService.ear</em></span> requires any
+configuration document other than the <span class="emphasis"><em>persistence.xml</em></span> file in <span class="emphasis"><em>ejbWS.jar</em></span>. GlassFish
+generates the traditional <span class="emphasis"><em>ejb-jar.xml</em></span> document for the JAR file and the
+traditional <span class="emphasis"><em>application.xml</em></span> document for the EAR file if these are not provided.</p><p>Once the <span class="emphasis"><em>predictionsEJB</em></span> service is deployed, there is no need to write a test client because
+GlassFish generates such a client automatically. In the GlassFish web console, under the
+<span class="emphasis"><em>Applications</em></span> tab, is a list of all deployed applications; for web services, the list
+includes servlet-based and EJB-based instances. In the <span class="emphasis"><em>Applications</em></span> tab, the name
+given for the <span class="emphasis"><em>predictionsEJB</em></span> service is the name of the EAR file: <code class="literal">predService</code> without
+the <span class="emphasis"><em>.ear</em></span> extension. Clicking on this name makes the service endpoints available. There
+are two:</p><div class="itemizedlist"><ul class="itemizedlist" type="disc"><li class="listitem"><p class="simpara">
+Endpoints for the WSDL, one for HTTP and another for HTTPS. The URI for each is:
+</p><pre class="screen">/PredictionEJBService/PredictionEJB?wsdl</pre><p class="simpara">The naming convention used in this URI is:</p><div class="itemizedlist"><ul class="itemizedlist" type="circle"><li class="listitem">
+the name of the <code class="literal">@WebService</code> class, in this case <code class="literal">PredictionEJB</code>, with <code class="literal">Service</code> appended
+</li><li class="listitem">
+a slash <code class="literal">/</code>
+</li><li class="listitem">
+the name of the <code class="literal">@WebService</code> class again
+</li><li class="listitem"><p class="simpara">
+the query string <code class="literal">?wsdl</code>
+</p><p class="simpara">The WSDL can be used with the <span class="emphasis"><em>wsimport</em></span> utility to generate the by-now familiar client-support
+classes.</p></li></ul></div></li><li class="listitem">
+The endpoint <span class="emphasis"><em>/PredictionEJBService/PredictionEJB?Tester</em></span>, which is the GlassFish-generated
+test client as a web page (see <a class="xref" href="#test_page" title="Figure 3. The GlassFish-generated test client against the predictionsEJB service.">Figure 3, “The GlassFish-generated test client against the <span class="emphasis"><em>predictionsEJB</em></span> service.”</a>). The test page covers all of the operations
+and displays, for each, the request and the response SOAP message. Operations carried out on
+the test page impact the database. This test page obviates the need to write the kind
+of test client familiar in the servlet-based examples.
+</li></ul></div><div class="figure"><a id="test_page"></a><p class="title"><b>Figure 3. The GlassFish-generated test client against the <span class="emphasis"><em>predictionsEJB</em></span> service.</b></p><div class="figure-contents"><div class="mediaobject"><img src="images/WebServiceTester.png" alt="images/WebServiceTester.png" /></div></div></div><br class="figure-break" /></div><div class="section" title="1.5.2. A Client against the predictionsEJB Service"><div class="titlepage"><div><div><h4 class="title"><a id="_a_client_against_the_emphasis_predictionsejb_emphasis_service"></a>1.5.2. A Client against the <span class="emphasis"><em>predictionsEJB</em></span> Service</h4></div></div></div><p>Although the test page in the GlassFish web console is excellent for round-one of testing, a
+Java client can be built in the usual way with <span class="emphasis"><em>wsimport</em></span>:</p><pre class="screen">% wsimport -p clientEJB -keep \
+  http://localhost:8081/PredictionEJBService/PredictionEJB?wsdl</pre><p>The <code class="literal">ClientEJB</code> (see <a class="xref" href="#client_ejb" title="Example 12. The sample ClientEJB built with wsimport-generated classes.">Example 12, “The sample <code class="literal">ClientEJB</code> built with <span class="emphasis"><em>wsimport</em></span>-generated classes.”</a>) uses the <span class="emphasis"><em>wsimport</em></span>-generated artifacts.</p><div class="example"><a id="client_ejb"></a><p class="title"><b>Example 12. The sample <code class="literal">ClientEJB</code> built with <span class="emphasis"><em>wsimport</em></span>-generated classes.</b></p><div class="example-contents"><pre class="screen">import clientEJB.PredictionEJBService;
+import clientEJB.PredictionEJB;
+import clientEJB.Prediction;
+import java.util.List;
+
+public class ClientEJB {
+    public static void main(String[ ] args) {
+        new ClientEJB().runTests();
+    }
+    private void runTests() {
+        PredictionEJB port =
+            new PredictionEJBService().getPredictionEJBPort();
+        create(port);                       <a id="CO1-42"></a><img src="/etc/asciidoc/images/icons//callouts/1.png" alt="1" border="0" />
+        getAll(port);                       <a id="CO1-43"></a><img src="/etc/asciidoc/images/icons//callouts/2.png" alt="2" border="0" />
+        edit(port);    // id == 2           <a id="CO1-44"></a><img src="/etc/asciidoc/images/icons//callouts/3.png" alt="3" border="0" />
+        getOne(port);  // id == 2           <a id="CO1-45"></a><img src="/etc/asciidoc/images/icons//callouts/4.png" alt="4" border="0" />
+        delete(port);  // id == 2           <a id="CO1-46"></a><img src="/etc/asciidoc/images/icons//callouts/5.png" alt="5" border="0" />
+        getAll(port);                       <a id="CO1-47"></a><img src="/etc/asciidoc/images/icons//callouts/6.png" alt="6" border="0" />
+    }
+    private void getAll(PredictionEJB port) {
+        System.out.println("\n### getAll:");
+        List&lt;Prediction&gt; predictions = port.getAll();
+        for (Prediction pred : predictions) stringify(pred);
+    }
+    private void getOne(PredictionEJB port) {
+        System.out.println("\n### getOne:");
+        Prediction pred = port.getOne(2);
+        stringify(pred);
+    }
+    private void create(PredictionEJB port) {
+        System.out.println("\n### create:");
+        String who = "River Friesen";
+        String what = "Decentralized 24/7 hub will target robust web-readiness.";
+        Prediction pred = port.create(who, what);
+        stringify(pred);
+
+        who = "Kaden Crona";
+        what = "Optional static definition will unleash dynamic e-tailers.";
+        pred = port.create(who, what);
+        stringify(pred);
+    }
+    private void edit(PredictionEJB port) {
+        System.out.println("\n### edit:");
+        Prediction pred = port.edit(2, "Testing! New who", "Testing! New what");
+        stringify(pred);
+    }
+    private void delete(PredictionEJB port) {
+        System.out.println("\n### delete:");
+        String msg = port.delete(2);
+        System.out.println(msg);
+    }
+    private void stringify(Prediction pred) {
+        if (pred == null) return;
+        String s = String.format("%2d ", pred.getId()) +
+            pred.getWho() + ": " + pred.getWhat();
+        System.out.println(s);
+    }
+}</pre></div></div><br class="example-break" /><p>The <code class="literal">ClientEJB</code> runs preliminary tests against the service’s CRUD operations (lines 1 through
+6): predictions are created, fetched all at once and one at a time, edited, and deleted.
+Here is the output from a sample run right after the <span class="emphasis"><em>predictionsEJB</em></span>
+had been deployed:</p><pre class="screen">### create:
+ 1 River Friesen: Decentralized 24/7 hub will target robust web-readiness.
+ 2 Kaden Crona: Optional static definition will unleash dynamic e-tailers.
+### getAll:
+ 1 River Friesen: Decentralized 24/7 hub will target robust web-readiness.
+ 2 Kaden Crona: Optional static definition will unleash dynamic e-tailers.
+### edit:
+ 2 Testing! New who: Testing! New what
+### getOne:
+ 2 Testing! New who: Testing! New what
+### delete:
+predEJB.Prediction@dbb5965 -- deleted
+### getAll:
+ 1 River Friesen: Decentralized 24/7 hub will target robust web-readiness.</pre><p>It should noted that this sample run occurred immediately after deploying the service for the first
+time. The Derby database system maintains the primary keys, the integers that identify the
+<code class="literal">Prediction</code> records in the database table. Subsequent test runs of the <code class="literal">ClientEJB</code> will result
+in different primary keys, which means that the tests for editing and deleting need to be
+modified. At present, each of these tests uses 2 as the key.</p></div></div><div class="section" title="1.6. TomEE: Tomcat with Java EE Extensions"><div class="titlepage"><div><div><h3 class="title"><a id="_tomee_tomcat_with_java_ee_extensions"></a>1.6. TomEE: Tomcat with Java EE Extensions</h3></div></div></div><p>Apache TomEE (<span class="emphasis"><em>tomee.apache.org</em></span>) can be downloaded in various ways, including as a standalone
+Java EE application server or as a bundled WAR file that can be published with Tomcat7.
+TomEE adds the OpenEJB container to Tomcat 7 but also includes, for example, the Apache CXF implementation
+of the JAX-RS API and a JMS (Java Message Service) provider. TomEE, like Tomcat, can be installed anywhere on the
+file system; and the TomEE directory structure is almost identical to that of Tomcat 7. TomEE is designed with
+simplicity in mind. The Java world is awash with options and, with respect to JASes, TomEE is one worth considering.</p><div class="sidebar" title="Managing the TomEE web server and EJB container"><p class="title"><b>Managing the TomEE web server and EJB container</b></p><p>In a TomEE installation, the
+web server can be started and stopped independently of the EJB components, which includes the EJB container. A
+typical start-up scenario would be:</p><div class="itemizedlist"><ul class="itemizedlist" type="disc"><li class="listitem"><p class="simpara">
+In <span class="emphasis"><em>TomEE_HOME/bin</em></span>, run the start-up script:
+</p><pre class="screen">% shartup.sh  ;; startup.bat under windows</pre></li><li class="listitem"><p class="simpara">
+In the same directory, run the start-up script for the EE components:
+</p><pre class="screen">% tomee.sh start</pre></li></ul></div><p>The TomEE web server would be stopped in the usual way:</p><pre class="screen">% shutdown.sh ;; shutdown.bat under Windows</pre><p>The TomEE EE components are stopped with the command:</p><pre class="screen">% tomee.sh stop</pre><p>The TomEE web server furnishes the usual Tomcat 7 web console (<span class="emphasis"><em>localhost:8080</em></span>), which also includes
+a TomEE web console (<span class="emphasis"><em>localhost:8080/tomee</em></span>) for the distinctly EE components.</p></div><div class="section" title="1.6.1. Porting the predictionsEJB Web Service to TomEE"><div class="titlepage"><div><div><h4 class="title"><a id="_porting_the_emphasis_predictionsejb_emphasis_web_service_to_tomee"></a>1.6.1. Porting the <span class="emphasis"><em>predictionsEJB</em></span> Web Service to TomEE</h4></div></div></div><p>The two <span class="emphasis"><em>.java</em></span> files in the <span class="emphasis"><em>predictionsEJB</em></span> service, <span class="emphasis"><em>Prediction.java</em></span> (see <a class="xref" href="#pred_model" title="Example 9. The Prediction class, annotated as an @Entity.">Example 9, “The <code class="literal">Prediction</code> class, annotated as an <code class="literal">@Entity</code>.”</a>) and
+<span class="emphasis"><em>PredictionEJB.java</em></span> (see <a class="xref" href="#pred_ejb" title="Example 11. The PredictionEJB class, annotated as a @Stateless @WebService.">Example 11, “The <code class="literal">PredictionEJB</code> class, annotated as a <code class="literal">@Stateless @WebService</code>.”</a>), are completely unchanged in the port from
+GlassFish to TomEE. The configuration files, however, are different.
+The TomEE configuration files are the <span class="emphasis"><em>persistence.xml</em></span> file (see <a class="xref" href="#per_config" title="Example 13. The persistence.xml document for the TomEE port of the predictionsEJB service.">Example 13, “The <span class="emphasis"><em>persistence.xml</em></span> document for the TomEE port of the <span class="emphasis"><em>predictionsEJB</em></span> service.”</a>), the same name as in GlassFish, and the
+<span class="emphasis"><em>openejb.xml</em></span> file (see <a class="xref" href="#open_config" title="Example 14. The openejb.xml for the TomEE port of the predictionsEJB service.">Example 14, “The <span class="emphasis"><em>openejb.xml</em></span> for the TomEE port of the <span class="emphasis"><em>predictionsEJB</em></span> service.”</a>).</p><div class="example"><a id="per_config"></a><p class="title"><b>Example 13. The <span class="emphasis"><em>persistence.xml</em></span> document for the TomEE port of the <span class="emphasis"><em>predictionsEJB</em></span> service.</b></p><div class="example-contents"><pre class="screen">&lt;persistence&gt;
+  &lt;persistence-unit name = "predictionsDB"&gt;
+    &lt;jta-data-source&gt;predictionsDB&lt;/jta-data-source&gt;
+    &lt;class&gt;predEJB.Prediction&lt;/class&gt;                       <a id="CO1-48"></a><img src="/etc/asciidoc/images/icons//callouts/1.png" alt="1" border="0" />
+    &lt;properties&gt;
+      &lt;property name  = "openjpa.jdbc.SynchronizeMappings"  <a id="CO1-49"></a><img src="/etc/asciidoc/images/icons//callouts/2.png" alt="2" border="0" />
+                value = "buildSchema(ForeignKeys=true)"/&gt;   <a id="CO1-50"></a><img src="/etc/asciidoc/images/icons//callouts/3.png" alt="3" border="0" />
+    &lt;/properties&gt;
+  &lt;/persistence-unit&gt;
+&lt;/persistence&gt;</pre></div></div><br class="example-break" /><p>In the <span class="emphasis"><em>persistence.xml</em></span> document, lines 2 and 3 ensure that the OpenJPA provider automatically generates whatever
+database tables are required to persist <code class="literal">Prediction</code> instances. The configuration document also names the
+<code class="literal">@Entity</code> class <code class="literal">Prediction</code> (line 1) whose instances are mapped to table rows.</p><div class="example"><a id="open_config"></a><p class="title"><b>Example 14. The <span class="emphasis"><em>openejb.xml</em></span> for the TomEE port of the <span class="emphasis"><em>predictionsEJB</em></span> service.</b></p><div class="example-contents"><pre class="screen">&lt;Resource id = "predictionsDB" type = "DataSource"&gt;  <a id="CO1-51"></a><img src="/etc/asciidoc/images/icons//callouts/1.png" alt="1" border="0" />
+  JdbcDriver = org.hsqldb.jdbcDriver                 <a id="CO1-52"></a><img src="/etc/asciidoc/images/icons//callouts/2.png" alt="2" border="0" />
+  JdbcUrl = jdbc:hsqldb:mem:predictionsDB            <a id="CO1-53"></a><img src="/etc/asciidoc/images/icons//callouts/3.png" alt="3" border="0" />
+&lt;/Resource&gt;</pre></div></div><br class="example-break" /><p>The second configuration document, <span class="emphasis"><em>openejb.xml</em></span>, names the <code class="literal">DataSource</code> (line 1); specifies the JDBC driver (line 2),
+in this case the driver for the HSQLDB database, a convenient RDBMS with, by default, in-memory tables; and
+ends with the JNDI name (line 3) of the database system. The HSQLDB system comes with TomEE.
+TomEE documentation covers sample <code class="literal">Resource</code> configuration for various other
+popular database systems such as Derby, MySQL, and PostgreSQL.
+The two configuration files shown here must occur in the <span class="emphasis"><em>META-INF</em></span> subdirectory of the deployed JAR file. The deployment
+options and details are laid out in the next section.</p><p>TomEE, like GlassFish, provides a JAR file with the required Java EE packages such as <code class="literal">javax.persistence</code>.
+All of the TomEE libraries come as JAR files and most of these are in the <span class="emphasis"><em>TomEE_HOME/lib</em></span> directory, which contains more than 100
+JAR files, including the files for the Apache CXF implementation of JAX-RS. There is also the directory <span class="emphasis"><em>TomEE_HOME/endorsed</em></span>, which holds
+a few additional JAR files.
+The TomEE JAR for the core Java EE packages
+is named <span class="emphasis"><em>javaee-api-N-tomcat.jar</em></span>, with a version number where the <span class="emphasis"><em>N</em></span> occurs. This JAR, roughly the TomEE counterpart of
+the GlassFish file <span class="emphasis"><em>javaee.jar</em></span>, can be used for compilation.</p></div><div class="section" title="1.6.2. Deploying an EJB in a WAR File"><div class="titlepage"><div><div><h4 class="title"><a id="_deploying_an_ejb_in_a_war_file"></a>1.6.2. Deploying an EJB in a WAR File</h4></div></div></div><p>TomEE comes with the familiar <span class="emphasis"><em>TomEE_HOME/webapps</em></span> subdirectory already in place. The subdirectory
+<span class="emphasis"><em>TomEE_HOME/apps</em></span> is not present but can be created manually; and the <span class="emphasis"><em>TomEE_HOME/bin/tomee.sh</em></span> command has
+<span class="emphasis"><em>deploy</em></span> and <span class="emphasis"><em>undeploy</em></span> options that can be used to deploy EAR files, whose contents are one or more
+JAR files, each with its own EJB. The <span class="emphasis"><em>deploy</em></span> and <span class="emphasis"><em>undeploy</em></span> options target the <span class="emphasis"><em>apps</em></span> subdirectory, which
+TomEE supports for backwards compatibility with versions of Java EE earlier than 6. Under Java EE 6, the same
+Java class loader can load the contents of servlets and EJBs; hence, the Java EE 6 specification enables
+EJB deployment in a WAR file.
+This style of deployment is preferred practice in TomEE. The deployment details for the <span class="emphasis"><em>predictionsEJB</em></span> service
+under TomEE can be summarized as follows:</p><div class="itemizedlist"><ul class="itemizedlist" type="disc"><li class="listitem"><p class="simpara">
+A standard WAR can be built using the (perhaps slightly modified) Ant script from earlier chapters. A
+<span class="emphasis"><em>web.xml</em></span> document is not required. Suppose that the name of this file is <span class="emphasis"><em>pred.war</em></span>. The two configuration
+files then can be inserted into the WAR file subdirectory <span class="emphasis"><em>META-INF</em></span>:
+</p><pre class="screen">% jar uf pred.war META-INF/*.xml  ;; persistence.xml and openejb.xml</pre><p class="simpara">The resulting WAR structure is:</p><pre class="screen">META-INF/MANIFEST.MF
+META-INF/openejb.xml
+META-INF/persistence.xml
+WEB-INF/classes/predEJB/PredictionEJB.class
+WEB-INF/classes/predEJB/Prediction.class</pre></li><li class="listitem">
+The WAR file then is copied to <span class="emphasis"><em>TomEE_HOME/webapps</em></span> for deployment. A web site or a servlet-based
+service would be deployed in exactly the same way.
+</li><li class="listitem"><p class="simpara">
+The usual client-side artifacts can be constructed with the <span class="emphasis"><em>wsimport</em></span> utility:
+</p><pre class="screen">% wsimport -p clientEJB -keep \
+  http://localhost:8080/pred/webservices/PredictionEJB?wsdl</pre></li></ul></div><p>The TomEE endpoint URL for an EJB-service differs slightly from GlassFish endpoint. In particular, the
+TomEE URI in this example is <span class="emphasis"><em>/pred/webservices/PredictionEJB</em></span>: the URI begins with the slash and the
+name of the WAR file (<span class="emphasis"><em>/pred</em></span>); the term <span class="emphasis"><em>webservices</em></span> is appended (<span class="emphasis"><em>/pred/webservices</em></span>); and then
+the name of the <code class="literal">@WebService</code> class is appended to yield <span class="emphasis"><em>/pred/webservices/PredictionEJB</em></span>. The very same
+<code class="literal">ClientEJB</code> used for the GlassFish deployment of <span class="emphasis"><em>predictionsEJB</em></span> (see <a class="xref" href="#client_ejb" title="Example 12. The sample ClientEJB built with wsimport-generated classes.">Example 12, “The sample <code class="literal">ClientEJB</code> built with <span class="emphasis"><em>wsimport</em></span>-generated classes.”</a>) can be used, once
+recompiled against the <span class="emphasis"><em>wsimport</em></span>-generated artifacts to get the correct endpoint URL, against the
+TomEE deployment. It is a nice TomEE touch to support conventional WAR deployment of even EJBs,
+including EJB-based web services.</p></div></div><div class="section" title="1.7. Where is the Best Place to be in Java Web Services?"><div class="titlepage"><div><div><h3 class="title"><a id="_where_is_the_best_place_to_be_in_java_web_services"></a>1.7. Where is the Best Place to be in Java Web Services?</h3></div></div></div><p>This book is a code-centric tour through the APIs and implementation technologies that support web services
+under Java. The tour has taken seven chapters. To set up an answer to the question posed in this section’s
+title, it may be useful to review the stops along the way.</p><div class="section" title="1.7.1. Chapter 1"><div class="titlepage"><div><div><h4 class="title"><a id="_chapter_1"></a>1.7.1. Chapter 1</h4></div></div></div><p>This chapter opens the tour with a broad look at REST-style and SOAP-based services. This overview includes a
+short history of alternatives to distributed software systems, such as systems based on the <span class="emphasis"><em>distributed object architecture</em></span> (DOA)
+that pre-date and still compete with deliberately lightweight web services. The chapter sketches the relationship between web services and
+<span class="emphasis"><em>service oriented architecture</em></span> (SOA), which can be viewed as a reaction against DOA. Chapter 1 likewise clarifies the core meaning and
+especially the spirit of REST as
+an approach to the design of distributed software systems, especially systems built on in-place, widely available, and free protocols
+and technologies such as HTTP and XML/JSON. A dominant theme in this overview of web services is <span class="emphasis"><em>interoperability</em></span>, which in turn requires
+language and platform neutrality.
+Chapter 1 ends with
+the implementation of a small RESTful service that consists of a JSP script and two back-end POJO classes. The <span class="emphasis"><em>predictions</em></span>
+RESTful service is published with the Tomcat web server; and the sample
+client calls are done with the <span class="emphasis"><em>curl</em></span> utility.</p></div><div class="section" title="1.7.2. Chapter 2"><div class="titlepage"><div><div><h4 class="title"><a id="_chapter_2"></a>1.7.2. Chapter 2</h4></div></div></div><p>This chapter narrows the focus to the various APIs and API implementations available for programming and delivering REST-style
+services in Java. The main APIs are:</p><div class="itemizedlist"><ul class="itemizedlist" type="disc"><li class="listitem">
+<code class="literal">HttpServlet</code> classes along with JSP and other scripts that become, at run-time, instances of <code class="literal">HttpServlet</code>.
+</li><li class="listitem">
+JAX-RS and Restlet classes with high-level annotations for HTTP verbs, URIs (<span class="emphasis"><em>paths</em></span>), MIME types, and
+status codes together with support for generating automatically XML and JSON payloads.
+</li><li class="listitem">
+JAX-WS with its relatively low-level <code class="literal">@WebServiceProvider</code> and XML-centric API that gets the programmer close to the
+metal.
+</li></ul></div><p>This chapter looks at various ways of generating both XML and JSON payloads, particularly given the rising
+popularity of JSON as a data-interchange format. Java offers a range of options for XML generation, from the
+<code class="literal">XMLEncoder</code> class to the rich assortment of classes in the JAX-B packages. The code samples adhere to RESTful
+principles such as honoring the intended meaning of each CRUD verb, using intuitive URIs to name resources, and
+taking full advantage of HTTP status codes to signal the fate of a request against a REST-style service.
+Chapter 2 and later chapters also explore, for publishing these RESTful services, production-grade web servers such as Tomcat
+and Jetty together with
+development-level publishers such as <code class="literal">Endpoint</code>, <code class="literal">HttpsServer</code>, and the Restlet <code class="literal">Component</code>. All of the APIs are quite good, on
+the service-side and on the client-side, at
+adhering to the separation-of-concerns principle: the programming of a web service is one thing and its publication is another—and
+independent—thing.</p></div><div class="section" title="1.7.3. Chapter 3"><div class="titlepage"><div><div><h4 class="title"><a id="_chapter_3"></a>1.7.3. Chapter 3</h4></div></div></div><p>This chapter turns from the service-side to the client-side. There are clients based upon the
+grizzled but trusty <code class="literal">URLConnection</code> class and upon REST-specific client-side APIs such as JAX-RS.
+As proof of concept for interoperability, clients are written in different languages. For instance, there are Perl and jQuery clients
+against Java services and Java clients against services whose implementation language is unknown.
+The code samples explore
+the various possibilities for dealing with XML and JSON payloads, in particular with the standard JAX-B and the third party
+utilities such as <code class="literal">XStream</code> for automating the transformation of XML documents in particular into native Java objects.
+Most modern RESTful services furnish at least an XML Schema for the service; and Java has utilities such as <span class="emphasis"><em>xjc</em></span> that covert
+an XML Schema or comparable XML-based grammar into Java types. The chapter has clients against real-world services. For
+instance, there are two sample clients against Amazon’s E-Commerce service as well as clients against the Twitter and Chicago Transit Authority
+RESTful services. The chapter pays special attention to the growing importance of JavaScript clients against RESTful
+services, in particular JavaScript clients embedded in HTML documents. The JavaScript clients are written in the
+widely used jQuery dialect; and these clients highlight ways in which JSON payloads can be treated as native JavaScript objects. This
+chapter also illustrates how web services can be composed or orchestrated, that is, built out of other web services.</p></div><div class="section" title="1.7.4. Chapters 4 and 5"><div class="titlepage"><div><div><h4 class="title"><a id="_chapters_4_and_5"></a>1.7.4. Chapters 4 and 5</h4></div></div></div><p>These chapters turn from turn from REST-style to SOAP-based web services, in particular to the JAX-WS API and its <code class="literal">@WebService</code> annotation.
+Chapter 4 focuses on the <span class="emphasis"><em>application level</em></span> in SOAP-based services,
+a level at which SOAP, an XML dialect, remains transparent. Chapter 5 studies the <span class="emphasis"><em>handler level</em></span> at which the entire SOAP message or
+the payload in the SOAP body are exposed for inspection and manipulation. This chapter also looks at the <span class="emphasis"><em>transport level</em></span>, which provides
+access to HTTP(S) transport in particular. The <span class="emphasis"><em>handler level</em></span> and the <span class="emphasis"><em>transport level</em></span> are especially important for security, the
+topic of Chapter 6. In terms of popularity, SOAP-based services have lost ground in recent years to REST-style ones; indeed, REST-style
+services can be seen as a reaction against the creeping complexity of SOAP-based frameworks and services. Yet if SOAP-based services are
+delivered over HTTP(S), then such services can be seen as a programmer-friendly variant of REST-style services. The programmer-friendliness
+comes from the fact that SOAP hides the XML payloads, allowing programmers on either the service-side or the client-side to deal with familiar native
+data types.
+SOAP effectively and fully automates the transformation between native language types and XML types: there is
+no reason, at the <span class="emphasis"><em>application level</em></span>, ever to create manually or to parse an XML document. The <span class="emphasis"><em>basic profile</em></span> of SOAP remains
+uncomplicated; and this profile promotes interoperability through its powerful, high-level API.
+Furthermore, dynamically generated service contracts—the WSDL documents—are ubiquitous in the SOAP world. Major SOAP frameworks such as
+Java and DotNet furnish utilities (in Java, <span class="emphasis"><em>wsimport</em></span>) that can generate client-support code from the document. Although WSDLs could be used
+in the RESTful world, they typically are not; and nothing in the RESTful world quite matches the ease of writing a client against a SOAP-based
+service. In short, SOAP-based services still deserve serious consideration.
+Chapters 4 and 5 also include clients against
+real-world services such as the Amazon’s E-Commerce service; and the chapters explore both synchronous and asynchronous clients. SOAP-based
+web services, like their REST-style cousins, usually work with <span class="emphasis"><em>text</em></span> payloads—XML or JSON documents. Yet SOAP messages can include arbitrarily many binary
+<span class="emphasis"><em>attachments</em></span>, which Chapter 6 shows with code examples.
+For the most part, the examples in Chapters 4 and 5 use the Metro implementation of JAX-WS. However,
+there is also an example of an Axis2 service and
+an Axis2 client. Axis2 remains a popular, alternative implementation of JAX-WS.</p></div><div class="section" title="1.7.5. Chapter 6"><div class="titlepage"><div><div><h4 class="title"><a id="_chapter_6"></a>1.7.5. Chapter 6</h4></div></div></div><p>This chapter covers security, a core issue that cuts across SOAP and REST. The chapter opens with a study of
+wire-level security and services that a transport protocol such as HTTPS offers: peer authentication, message confidentiality, and
+message integrity. Underlying technologies such as <span class="emphasis"><em>message digest</em></span>, <span class="emphasis"><em>message encryption and decryption</em></span>, <span class="emphasis"><em>digital certificate</em></span>,
+<span class="emphasis"><em>certificate authority</em></span>, and <span class="emphasis"><em>cipher suite</em></span> are clarified in due course. The concepts are fleshed out in a series of examples,
+starting with a simple Java HTTPS client against the Google home site. Another example builds a very lightweight HTTPS server and
+an HTTPS client against a RESTful service published with this server. Wire-level security is, for services delivered over HTTP,
+required infrastructure for the next security level, commonly known as <span class="emphasis"><em>users/roles security</em></span>. The relevant concepts are <span class="emphasis"><em>user authentication</em></span>
+(that is, establishing a user’s true identity) and <span class="emphasis"><em>role authorization</em></span> (that is, fine-tuning the access permissions for an
+authenticated user). Managing users/roles security at the service level is tricky; for one thing, this approach does not scale well. The
+recommended approach is <span class="emphasis"><em>container-managed</em></span> security: the user authentication and role authorization are handed off from the web service
+to the (servlet) container. The configuration is
+relatively easy and the responsibility then shifts from the web service to the publisher such as Tomcat or Jetty. Indeed, a chief benefit
+of using a production-grade web server is that it can handle both wire-level security (typically in the form of HTTPS) and users/roles
+security. For users/roles security, client access to the transport level is critical because an identity such as username and a
+credential such as a password typically are expected, on the service side, to be inside the HTTP request header. Various ways of
+injecting header blocks in an HTTP request are thus covered with examples. Wire-level and users/roles security are equally pertinent in
+REST-style and SOAP-based services. By contrast, WS-Security is a relevant only in SOAP-based services and represents an effort to
+provide <span class="emphasis"><em>end-to-end</em></span> security at the SOAP level rather than at the transport (that is, HTTPS) or container (that is, Tomcat or Jetty)
+level. The WS-* initiatives, which promote the goals of transport-neutral and container-neutral messaging, are what make SOAP complicated.
+The chapter ends with a WS-Security example, which provides a first look at SOAP beyond the <span class="emphasis"><em>basic profile</em></span>.</p></div><div class="section" title="1.7.6. Chapter 7"><div class="titlepage"><div><div><h4 class="title"><a id="_chapter_7"></a>1.7.6. Chapter 7</h4></div></div></div><p>The current chapter considers the trade-offs in deploying web services with a Java Application Server (JAS) rather than
+with a standalone web server such
+as Tomcat or Jetty. Various JASes are available: IBM WebSphere, Oracle WebLogic, RedHat JBoss, Apache Geronimo, GlassFish, and
+Apache TomEE. This chapter begins
+with an overview of the components and resources that are bundled into a JAS. Among these are a web container, an EJB container, a
+message-oriented middleware provider, a naming service, a security service, and usually a database management system. A web service, REST-style
+or SOAP-based, that can be published with a standalone web server such as Tomcat can be published, essentially as is, with a JAS. Such services
+are described as <span class="emphasis"><em>servlet-based</em></span> because the service itself either executes as an <code class="literal">HttpServlet</code> instance or relies upon such an
+instance (<span class="emphasis"><em>e.g.</em></span>, the <code class="literal">WSServlet</code> that comes with Metro) as an intermediary between the client and web service. A JAS offers, as an alternative,
+an <span class="emphasis"><em>EJB-based</em></span> service, which could be REST-style or SOAP-based. Of particular interest
+is that a <code class="literal">@Stateless</code> Session EJB becomes a SOAP-based web service if annotated as a <code class="literal">@WebService</code>. The
+EJB’s <code class="literal">public</code> methods become service operations if annotated with <code class="literal">@WebMethod</code>. An EJB-based service, unlike a servlet-based one, is
+thread-safe because the EJB container bestows thread safety on the components therein. This chapter also
+covers some miscellaneous topics
+such as the interaction of a GlassFish-hosted web site and a Tomcat-hosted web service; and the chapter revisits the JAX-WS client-side
+API with a sample client against a Restlet service. The main example is a SOAP-based service that uses JPA (Java Persistence API) to
+persist data in a back-end database. GlassFish and TomEE are contrasted as two modern JASes.</p></div><div class="section" title="1.7.7. Back to the Question at Hand"><div class="titlepage"><div><div><h4 class="title"><a id="_back_to_the_question_at_hand"></a>1.7.7. Back to the Question at Hand</h4></div></div></div><p>In summary, the book explores Java-based web services with code examples that cover a range of APIs and implementations. The code
+examples themselves are meant to highlight the pluses and minuses. Nonetheless,
+this code-driven exploration invites an obvious question:
+Where is the best place to be with respect to Java web services? Which API is superior to the rest? Which implementation should be
+preferred over the others?
+These questions, natural as they are, overlook a
+principal reason for using Java in the first place. To be sure, the Java language and the JVM run-time are major players in the world
+of software development and deployment; and the run-time is best-in-breed among production-grade virtual machines.
+From the start, however, Java has been renowned for its options. There is no single IDE for Java or even a single library for, say,
+parsing XML, making network connections, or implementing users/roles security. There is now growing variety among the
+languages that compile to JVM byte-codes and are able to reference the huge number of run-time
+libraries, standard and third
+party, available in the JVM. There is even choice about which Java run-time to use.</p><p>A sensible principle in software development is to pick least complicated tool-set that is up to the task at hand.
+The toolkit for Java web services is rich in tools. It makes no sense to declare a winner among, for example, the
+<code class="literal">HttpServlet</code>, JAX-RS/Restlet, and <code class="literal">@WebServiceProvider</code> APIs for REST-style services. These APIs differ and in this
+difference are to be found choices for addressing specific programming and deployment challenges. For SOAP-based services,
+even the JAX-WS API has
+at least two excellent implementations, Metro and Axis2; and Axis2 adds features to JAX-WS for those who require such
+extensions. For publishing web services, the choices are likewise varied, from development and testing environments through staging and up to
+production-level publishing. Tomcat and Jetty are excellent standalone
+web servers that include first-rate servlet containers. It is hard to make a bad choice here. The next step up, in complexity
+but also in features, is where the Java Application Servers are. Even here there are choices. WebSphere and Oracle WebLogic have been in
+the game for a long time; and their for-free counterparts such as Geronimo, GlassFish, JBoss, and TomEE are likewise fine pieces
+of software. Over the past decade, the Java EE API has become simpler and, therefore, more attractive. JPA is an API that deserves a
+special pat on the back. At the implementation level, the thread-safety that comes with an EJB container is enticing.</p><p>Where is the best place to be in Java web services? The answer depends on the challenges in place and resources at hand. Java comes with
+first-rate options for programming and publishing web services, REST-style and SOAP-based. This means that the question has more
+than one good answer. Let the task at hand and the resources in place decide the matter.</p></div></div></div></div></body></html>
