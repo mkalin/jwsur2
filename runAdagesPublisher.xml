@@ -1,0 +1,37 @@
+<!--
+    Place this Ant script in the ../ch2/jaxrs1/src directory and
+    then execute it:
+
+      ant -f runAdagesPublisher.xml
+
+    This directory contains all of the required JARs for JAX-RS and
+    Jackson.
+
+    You can also execute in the usual way from the same directory once
+    the compilation is complete:
+
+     java -cp "*:." adages.AdagesPublisher
+
+   For Windows, change the colon in "*:." to a semi-colon.
+
+   If you run this script, control-C to terminate; if you run directly,
+   hit any key.
+-->
+<project name="AdagesPublisher" basedir="." default="run">
+  <property name="lib.dir" value="${basedir}"/>
+  <path id="classpath">
+    <fileset dir="${lib.dir}" includes="**/*.jar"/>
+  </path>
+
+  <target name="compile">
+    <javac srcdir="${basedir}/adages" classpathref="classpath"/>
+  </target>
+
+  <target name="run" depends="compile">
+    <java fork="true" classname="adages.AdagesPublisher" classpath=".">
+       <classpath>
+         <fileset dir="${lib.dir}" includes="**/*.jar"/>
+       </classpath>
+    </java>	
+  </target>
+</project>
