@@ -15,7 +15,7 @@ documentation about what needs to be changed.
 
 Best of luck with the code. Make it better.
 
-If you're interested in a modern introduction to C, with examples ranging from the basics through networking, securing,
+If you're interested in a modern introduction to C, with examples ranging from the basics through networking, security,
 and concurrency/parallelism, please take a look at:
 [C Programming: Introducing Portable Assembler](https://www.amazon.com/dp/1977056954?ref_=pe_870760_150889320)
 
