@@ -1,0 +1,30 @@
+Susan,
+
+You and Brian both had asked about a 3rd edition of Java Web Services: Up and Running. I don't
+see any huge changes, as the web services landscape has not changed drastically since the 2nd edition.
+The changes from the 1st to the 2nd editions were more dramatic.
+
+Here's my short list. Feedback from elsewhere would be very useful, of course. 
+
+# Incorporate the functional programming and stream innovations of Java 8 into the examples, perhaps
+  with new examples that better illustrate these new APIs.
+
+# More emphasis on RESTful services and social media sites:
+
+  -- Full example involving a RESTful client against Twitter, Facebook, or LinkedIn.
+     Probably Facebook, as there are some good 3rd-party libraries out there.
+
+# Drop the coverage of Restlet in favor of Spring MVC.
+
+# Expand the coverage of JAX-RS with an additional example or two.
+
+# Drop most of the Java EE material, but maintain the TomEE for coverage of how
+  a @Stateless Session EJB is thereby a SOAP-based service.
+
+# Change the .Net/Java interoperability example, on the .Net side, to the WebAPI.
+
+Marty
+
+
+
+

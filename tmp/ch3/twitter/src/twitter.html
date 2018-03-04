@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Twittering</title>
+    <script type = "text/javascript"
+            src = "http://code.jquery.com/jquery-latest.min.js">
+    </script>
+    <script type = 'text/javascript'>
+       function cBack(data) { alert(JSON.stringify(data)); } 
+
+       (function($) {
+          var url = "http://search.twitter.com/search.json?q=skiing&rpp=4";
+
+          $.ajax({
+             type: 'GET',
+             url: url,
+             async: false,
+             jsonpCallback: 'cBack',                         
+             contentType: "application/json",
+             dataType: 'jsonp',                              
+             success: function(json) { console.dir(json.sites); },
+             error: function(e) { console.log(e.message); }
+          });
+       })(jQuery);
+    </script>
+</head>
+<body></body>
+</html>
+

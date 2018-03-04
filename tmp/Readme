@@ -1,0 +1,12 @@
+The sample services are partitioned by chapter. The source code together with an Ant script, where applicable,
+is included. Each sample includes a Readme, which provides a quick overview. The book itself has more details
+about each service.
+
+For each application, a deployable WAR or EAR file is provided where appropriate. These files either include
+the source files or the source files are included in the directory. Except in JAR files, the compiled .class
+files are not included. To avoid any versioning issues and to get a better feel for deployement, it's not
+a bad idea to recompile and rebuild. Except for the EJB cases in Chapter 7, this can be done with the
+provided Ant script, build.xml.
+
+
+

@@ -1,0 +1,18 @@
+<project name="Basic" basedir="." default="run">
+  <property name="lib.dir" value="${basedir}"/>
+  <path id="classpath">
+    <fileset dir="${lib.dir}" includes="**/*.jar"/>
+  </path>
+  <target name="compile">
+    <javac srcdir="${basedir}/basic" 
+           classpathref="classpath"/>
+  </target>
+  <target name="run" depends="compile">
+    <java fork="true" classname="JsonTest">
+      <classpath>
+        <path refid="classpath"/>
+	<pathelement location="${basedir}/basic"/>
+      </classpath>
+    </java>
+  </target>
+</project>

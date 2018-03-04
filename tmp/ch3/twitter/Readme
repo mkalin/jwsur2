@@ -1,0 +1,6 @@
+ant -Dwar.name=twitter deploy
+
+Open a browser to: http://localhost:8080/twitter/
+
+The returned JSON is displayed in an alert window.
+

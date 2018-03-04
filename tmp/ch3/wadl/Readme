@@ -1,0 +1,5 @@
+There are two Ant scripts:
+
+ant -f wadl.xml:    generates the WADL artifacts in the predictions3 package/subdirectory
+ant -f runWADL.xml: compiles and executes the sample client against the predictions3 service
+

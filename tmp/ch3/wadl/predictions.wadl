@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<application xmlns="http://wadl.dev.java.net/2009/02">
+    <doc xmlns:jersey="http://jersey.java.net/" 
+         jersey:generatedBy="Jersey: 1.10 11/02/2011 03:53 PM"/>
+    <grammars/>
+    <resources base="http://localhost:8080/predictions3/resourcesP/">
+      <resource path="/">
+        <resource path="/delete/{id: \d+}">
+          <param xmlns:xs="http://www.w3.org/2001/XMLSchema" 
+                 type="xs:int" style="template" name="id"/>
+          <method name="DELETE" id="delete">
+            <response>
+              <representation mediaType="application/json"/>
+            </response>
+          </method>
+        </resource>
+        <resource path="/create">
+          <method name="POST" id="create">
+            <request>
+              <representation mediaType="application/x-www-form-urlencoded">
+                <param xmlns:xs="http://www.w3.org/2001/XMLSchema" 
+                       type="xs:string" style="query" name="who"/>
+                <param xmlns:xs="http://www.w3.org/2001/XMLSchema" 
+                       type="xs:string" style="query" name="what"/>
+              </representation>
+            </request>
+            <response>
+                        <representation mediaType="text/plain"/>
+            </response>
+          </method>
+        </resource>
+        <resource path="/update">
+          <method name="PUT" id="update">
+            <request>
+              <representation mediaType="application/x-www-form-urlencoded">
+                <param xmlns:xs="http://www.w3.org/2001/XMLSchema" 
+		       type="xs:int" style="query" name="id"/>
+                <param xmlns:xs="http://www.w3.org/2001/XMLSchema" 
+		       type="xs:string" style="query" name="who"/>
+                <param xmlns:xs="http://www.w3.org/2001/XMLSchema" 
+		       type="xs:string" style="query" name="what"/>
+              </representation>
+            </request>
+            <response>
+              <representation mediaType="text/plain"/>
+            </response>
+          </method>
+        </resource>
+        <resource path="/xml">
+          <method name="GET" id="getXml">
+            <response>
+              <representation mediaType="application/xml"/>
+            </response>
+          </method>
+        </resource>
+        <resource path="/xml/{id: \d+}">
+          <param xmlns:xs="http://www.w3.org/2001/XMLSchema" 
+		 type="xs:int" style="template" name="id"/>
+                <method name="GET" id="getXml">
+                  <response>
+                    <representation mediaType="application/xml"/>
+                  </response>
+                </method>
+        </resource>
+        <resource path="/json">
+          <method name="GET" id="getJson">
+            <response>
+              <representation mediaType="application/json"/>
+            </response>
+          </method>
+        </resource>
+        <resource path="/json/{id: \d+}">
+          <param xmlns:xs="http://www.w3.org/2001/XMLSchema" 
+		 type="xs:int" style="template" name="id"/>
+          <method name="GET" id="getJson">
+            <response>
+              <representation mediaType="application/json"/>
+            </response>
+          </method>
+        </resource>
+        <resource path="/plain">
+          <method name="GET" id="getPlain">
+            <response>
+              <representation mediaType="text/plain"/>
+            </response>
+          </method>
+        </resource>
+      </resource>
+    </resources>
+</application>

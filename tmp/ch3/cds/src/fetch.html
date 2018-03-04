@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>JSON</title>
+    <script type = "text/javascript" 
+	    src = "http://code.jquery.com/jquery-latest.min.js">
+    </script>
+    <script type = "text/javascript">
+      $.getJSON('http://localhost:8080/cds/getCDs.jsp', function(cds) {
+         $.each(cds, function(ind, val) { 
+             $('#container').append('<li>' + cds[ind].title + ': ' + 
+	                                     cds[ind].artist + '</li>'); });
+      });
+    </script>  
+</head>
+  <body>
+    <ul id = 'container'></ul>
+  </body>
+</html>

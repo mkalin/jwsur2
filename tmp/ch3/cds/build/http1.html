@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+  <script 
+    src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.min.js">
+  </script>
+  <body>
+    <div ng-app="myApp" ng-controller="myCtrl"> 
+
+      <p>The goodies are:</p>
+      <h4>{{records}}</h4>
+    </div>
+
+    <script>
+      var app = angular.module('myApp', []);
+      app.controller('myCtrl', function($scope, $http) {
+      $http.get("getCDs.jsp")
+      .then(function(response) {
+      $scope.records = response.data;
+      });
+      });
+    </script>
+  </body>
+</html>

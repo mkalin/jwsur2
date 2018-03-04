@@ -1,0 +1,1303 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
+	   xmlns:tns="http://webservices.amazon.com/AWSECommerceService/2011-08-01" 
+	   targetNamespace="http://webservices.amazon.com/AWSECommerceService/2011-08-01" elementFormDefault="qualified">
+  <xsd:element name="Bin">
+    <xsd:complexType>
+      <xsd:sequence>
+	<xsd:element name="BinName" type="xsd:string"/>
+	<xsd:element name="BinItemCount" type="xsd:positiveInteger"/>
+	<xsd:element name="BinParameter" minOccurs="0" maxOccurs="unbounded">
+	  <xsd:complexType>
+	    <xsd:sequence>
+	      <xsd:element name="Name" type="xsd:string"/>
+	      <xsd:element name="Value" type="xsd:string"/>
+	    </xsd:sequence>
+	  </xsd:complexType>
+	</xsd:element>
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="SearchBinSet">
+    <xsd:complexType>
+      <xsd:sequence>
+	<xsd:element ref="tns:Bin" minOccurs="0" maxOccurs="unbounded"/>
+      </xsd:sequence>
+      <xsd:attribute name="NarrowBy" type="xsd:string" use="required"/>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="SearchBinSets">
+    <xsd:complexType>
+      <xsd:sequence>
+	<xsd:element ref="tns:SearchBinSet" minOccurs="0" maxOccurs="unbounded"/>
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="ItemSearch">
+    <xsd:complexType>
+      <xsd:sequence>
+	<xsd:element name="MarketplaceDomain" type="xsd:string" minOccurs="0"/>
+	<xsd:element name="AWSAccessKeyId" type="xsd:string" minOccurs="0"/>
+	<xsd:element name="AssociateTag" type="xsd:string" minOccurs="0"/>
+	<xsd:element name="XMLEscaping" type="xsd:string" minOccurs="0"/>
+	<xsd:element name="Validate" type="xsd:string" minOccurs="0"/>
+	<xsd:element name="Shared" type="tns:ItemSearchRequest" minOccurs="0"/>
+	<xsd:element name="Request" type="tns:ItemSearchRequest" minOccurs="0" maxOccurs="unbounded"/>
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:complexType name="ItemSearchRequest">
+    <xsd:sequence>
+      <xsd:element name="Actor" type="xsd:string" minOccurs="0"/>
+      <xsd:element name="Artist" type="xsd:string" minOccurs="0"/>
+      <xsd:element name="Availability" minOccurs="0">
+	<xsd:simpleType>
+	  <xsd:restriction base="xsd:string">
+	    <xsd:enumeration value="Available"/>
+	  </xsd:restriction>
+	</xsd:simpleType>
+      </xsd:element>
+      <xsd:element ref="tns:AudienceRating" minOccurs="0" maxOccurs="unbounded"/>
+      <xsd:element name="Author" type="xsd:string" minOccurs="0"/>
+      <xsd:element name="Brand" type="xsd:string" minOccurs="0"/>
+      <xsd:element name="BrowseNode" type="xsd:string" minOccurs="0"/>
+      <xsd:element name="Composer" type="xsd:string" minOccurs="0"/>
+      <xsd:element ref="tns:Condition" minOccurs="0"/>
+      <xsd:element name="Conductor" type="xsd:string" minOccurs="0"/>
+      <xsd:element name="Director" type="xsd:string" minOccurs="0"/>
+      <xsd:element name="ItemPage" type="xsd:positiveInteger" minOccurs="0"/>
+      <xsd:element name="Keywords" type="xsd:string" minOccurs="0"/>
+      <xsd:element name="Manufacturer" type="xsd:string" minOccurs="0"/>
+      <xsd:element name="MaximumPrice" type="xsd:nonNegativeInteger" minOccurs="0"/>
+      <xsd:element name="MerchantId" type="xsd:string" minOccurs="0"/>
+      <xsd:element name="MinimumPrice" type="xsd:nonNegativeInteger" minOccurs="0"/>
+      <xsd:element name="MinPercentageOff" type="xsd:nonNegativeInteger" minOccurs="0"/>
+      <xsd:element name="MusicLabel" type="xsd:string" minOccurs="0"/>
+      <xsd:element name="Orchestra" type="xsd:string" minOccurs="0"/>
+      <xsd:element name="Power" type="xsd:string" minOccurs="0"/>
+      <xsd:element name="Publisher" type="xsd:string" minOccurs="0"/>
+      <xsd:element name="RelatedItemPage" type="tns:positiveIntegerOrAll" minOccurs="0"/>
+      <xsd:element name="RelationshipType" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+      <xsd:element name="ResponseGroup" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+      <xsd:element name="SearchIndex" type="xsd:string" minOccurs="0"/>
+      <xsd:element name="Sort" type="xsd:string" minOccurs="0"/>
+      <xsd:element name="Title" type="xsd:string" minOccurs="0"/>
+      <xsd:element name="ReleaseDate" type="xsd:string" minOccurs="0"/>
+      <xsd:element name="IncludeReviewsSummary" type="xsd:string" minOccurs="0"/>
+      <xsd:element name="TruncateReviewsAt" type="xsd:nonNegativeInteger" minOccurs="0"/>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:element name="ItemLookup">
+    <xsd:complexType>
+      <xsd:sequence>
+	<xsd:element name="MarketplaceDomain" type="xsd:string" minOccurs="0"/>
+	<xsd:element name="AWSAccessKeyId" type="xsd:string" minOccurs="0"/>
+	<xsd:element name="AssociateTag" type="xsd:string" minOccurs="0"/>
+	<xsd:element name="Validate" type="xsd:string" minOccurs="0"/>
+	<xsd:element name="XMLEscaping" type="xsd:string" minOccurs="0"/>
+	<xsd:element name="Shared" type="tns:ItemLookupRequest" minOccurs="0"/>
+	<xsd:element name="Request" type="tns:ItemLookupRequest" minOccurs="0" maxOccurs="unbounded"/>
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:complexType name="ItemLookupRequest">
+    <xsd:sequence>
+      <xsd:element ref="tns:Condition" minOccurs="0"/>
+      <xsd:element name="IdType" minOccurs="0">
+	<xsd:simpleType>
+	  <xsd:restriction base="xsd:string">
+	    <xsd:enumeration value="ASIN"/>
+	    <xsd:enumeration value="UPC"/>
+	    <xsd:enumeration value="SKU"/>
+	    <xsd:enumeration value="EAN"/>
+	    <xsd:enumeration value="ISBN"/>
+	  </xsd:restriction>
+	</xsd:simpleType>
+      </xsd:element>
+      <xsd:element name="MerchantId" type="xsd:string" minOccurs="0"/>
+      <xsd:element name="ItemId" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+      <xsd:element name="ResponseGroup" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+      <xsd:element name="SearchIndex" type="xsd:string" minOccurs="0"/>
+      <xsd:element name="VariationPage" type="tns:positiveIntegerOrAll" minOccurs="0"/>
+      <xsd:element name="RelatedItemPage" type="tns:positiveIntegerOrAll" minOccurs="0"/>
+      <xsd:element name="RelationshipType" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+      <xsd:element name="IncludeReviewsSummary" type="xsd:string" minOccurs="0"/>
+      <xsd:element name="TruncateReviewsAt" type="xsd:nonNegativeInteger" minOccurs="0"/>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:element name="SimilarityLookup">
+    <xsd:complexType>
+      <xsd:sequence>
+	<xsd:element name="MarketplaceDomain" type="xsd:string" minOccurs="0"/>
+	<xsd:element name="AWSAccessKeyId" type="xsd:string" minOccurs="0"/>
+	<xsd:element name="AssociateTag" type="xsd:string" minOccurs="0"/>
+	<xsd:element name="Validate" type="xsd:string" minOccurs="0"/>
+	<xsd:element name="XMLEscaping" type="xsd:string" minOccurs="0"/>
+	<xsd:element name="Shared" type="tns:SimilarityLookupRequest" minOccurs="0"/>
+	<xsd:element name="Request" type="tns:SimilarityLookupRequest" minOccurs="0" maxOccurs="unbounded"/>
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:complexType name="SimilarityLookupRequest">
+    <xsd:sequence>
+      <xsd:element ref="tns:Condition" minOccurs="0"/>
+      <xsd:element name="ItemId" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+      <xsd:element name="MerchantId" type="xsd:string" minOccurs="0"/>
+      <xsd:element name="ResponseGroup" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+      <xsd:element name="SimilarityType" minOccurs="0">
+	<xsd:simpleType>
+	  <xsd:restriction base="xsd:string">
+	    <xsd:enumeration value="Intersection"/>
+	    <xsd:enumeration value="Random"/>
+	  </xsd:restriction>
+	</xsd:simpleType>
+      </xsd:element>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:element name="CartGet">
+    <xsd:complexType>
+      <xsd:sequence>
+	<xsd:element name="MarketplaceDomain" type="xsd:string" minOccurs="0"/>
+	<xsd:element name="AWSAccessKeyId" type="xsd:string" minOccurs="0"/>
+	<xsd:element name="AssociateTag" type="xsd:string" minOccurs="0"/>
+	<xsd:element name="Validate" type="xsd:string" minOccurs="0"/>
+	<xsd:element name="XMLEscaping" type="xsd:string" minOccurs="0"/>
+	<xsd:element name="Shared" type="tns:CartGetRequest" minOccurs="0"/>
+	<xsd:element name="Request" type="tns:CartGetRequest" minOccurs="0" maxOccurs="unbounded"/>
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:complexType name="CartGetRequest">
+    <xsd:sequence>
+      <xsd:element name="CartId" type="xsd:string" minOccurs="0"/>
+      <xsd:element name="HMAC" type="xsd:string" minOccurs="0"/>
+      <xsd:element name="MergeCart" type="xsd:string" minOccurs="0"/>
+      <xsd:element name="ResponseGroup" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:element name="CartAdd">
+    <xsd:complexType>
+      <xsd:sequence>
+	<xsd:element name="MarketplaceDomain" type="xsd:string" minOccurs="0"/>
+	<xsd:element name="AWSAccessKeyId" type="xsd:string" minOccurs="0"/>
+	<xsd:element name="AssociateTag" type="xsd:string" minOccurs="0"/>
+	<xsd:element name="Validate" type="xsd:string" minOccurs="0"/>
+	<xsd:element name="XMLEscaping" type="xsd:string" minOccurs="0"/>
+	<xsd:element name="Shared" type="tns:CartAddRequest" minOccurs="0"/>
+	<xsd:element name="Request" type="tns:CartAddRequest" minOccurs="0" maxOccurs="unbounded"/>
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:complexType name="CartAddRequest">
+    <xsd:sequence>
+      <xsd:element name="CartId" type="xsd:string" minOccurs="0"/>
+      <xsd:element name="HMAC" type="xsd:string" minOccurs="0"/>
+      <xsd:element name="MergeCart" type="xsd:string" minOccurs="0"/>
+      <xsd:element name="Items" minOccurs="0">
+	<xsd:complexType>
+	  <xsd:sequence>
+	    <xsd:element name="Item" minOccurs="0" maxOccurs="unbounded">
+	      <xsd:complexType>
+		<xsd:sequence>
+		  <xsd:element name="ASIN" type="xsd:string" minOccurs="0"/>
+		  <xsd:element name="OfferListingId" type="xsd:string" minOccurs="0"/>
+		  <xsd:element name="Quantity" type="xsd:positiveInteger" minOccurs="0"/>
+		  <xsd:element name="AssociateTag" type="xsd:string" minOccurs="0"/>
+		  <xsd:element name="ListItemId" type="xsd:string" minOccurs="0"/>
+		</xsd:sequence>
+	      </xsd:complexType>
+	    </xsd:element>
+	  </xsd:sequence>
+	</xsd:complexType>
+      </xsd:element>
+      <xsd:element name="ResponseGroup" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:element name="CartCreate">
+    <xsd:complexType>
+      <xsd:sequence>
+	<xsd:element name="MarketplaceDomain" type="xsd:string" minOccurs="0"/>
+	<xsd:element name="AWSAccessKeyId" type="xsd:string" minOccurs="0"/>
+	<xsd:element name="AssociateTag" type="xsd:string" minOccurs="0"/>
+	<xsd:element name="Validate" type="xsd:string" minOccurs="0"/>
+	<xsd:element name="XMLEscaping" type="xsd:string" minOccurs="0"/>
+	<xsd:element name="Shared" type="tns:CartCreateRequest" minOccurs="0"/>
+	<xsd:element name="Request" type="tns:CartCreateRequest" minOccurs="0" maxOccurs="unbounded"/>
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:complexType name="CartCreateRequest">
+    <xsd:sequence>
+      <xsd:element name="MergeCart" type="xsd:string" minOccurs="0"/>
+      <xsd:element name="Items" minOccurs="0">
+	<xsd:complexType>
+	  <xsd:sequence>
+	    <xsd:element name="Item" minOccurs="0" maxOccurs="unbounded">
+	      <xsd:complexType>
+		<xsd:sequence>
+		  <xsd:element name="ASIN" type="xsd:string" minOccurs="0"/>
+		  <xsd:element name="OfferListingId" type="xsd:string" minOccurs="0"/>
+		  <xsd:element name="Quantity" type="xsd:positiveInteger" minOccurs="0"/>
+		  <xsd:element name="AssociateTag" type="xsd:string" minOccurs="0"/>
+		  <xsd:element name="ListItemId" type="xsd:string" minOccurs="0"/>
+		  <xsd:element name="MetaData" minOccurs="0" maxOccurs="unbounded">
+		    <xsd:complexType>
+		      <xsd:sequence>
+			<xsd:element name="Key" type="xsd:string" minOccurs="0"/>
+			<xsd:element name="Value" type="xsd:string" minOccurs="0"/>
+		      </xsd:sequence>
+		    </xsd:complexType>
+		  </xsd:element>
+		</xsd:sequence>
+	      </xsd:complexType>
+	    </xsd:element>
+	  </xsd:sequence>
+	</xsd:complexType>
+      </xsd:element>
+      <xsd:element name="ResponseGroup" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:element name="CartModify">
+    <xsd:complexType>
+      <xsd:sequence>
+	<xsd:element name="MarketplaceDomain" type="xsd:string" minOccurs="0"/>
+	<xsd:element name="AWSAccessKeyId" type="xsd:string" minOccurs="0"/>
+	<xsd:element name="AssociateTag" type="xsd:string" minOccurs="0"/>
+	<xsd:element name="Validate" type="xsd:string" minOccurs="0"/>
+	<xsd:element name="XMLEscaping" type="xsd:string" minOccurs="0"/>
+	<xsd:element name="Shared" type="tns:CartModifyRequest" minOccurs="0"/>
+	<xsd:element name="Request" type="tns:CartModifyRequest" minOccurs="0" maxOccurs="unbounded"/>
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:complexType name="CartModifyRequest">
+    <xsd:sequence>
+      <xsd:element name="CartId" type="xsd:string" minOccurs="0"/>
+      <xsd:element name="HMAC" type="xsd:string" minOccurs="0"/>
+      <xsd:element name="MergeCart" type="xsd:string" minOccurs="0"/>
+      <xsd:element name="Items" minOccurs="0">
+	<xsd:complexType>
+	  <xsd:sequence>
+	    <xsd:element name="Item" minOccurs="0" maxOccurs="unbounded">
+	      <xsd:complexType>
+		<xsd:sequence>
+		  <xsd:element name="Action" minOccurs="0">
+		    <xsd:simpleType>
+		      <xsd:restriction base="xsd:string">
+			<xsd:enumeration value="MoveToCart"/>
+			<xsd:enumeration value="SaveForLater"/>
+		      </xsd:restriction>
+		    </xsd:simpleType>
+		  </xsd:element>
+		  <xsd:element name="CartItemId" type="xsd:string" minOccurs="0"/>
+		  <xsd:element name="Quantity" type="xsd:nonNegativeInteger" minOccurs="0"/>
+		</xsd:sequence>
+	      </xsd:complexType>
+	    </xsd:element>
+	  </xsd:sequence>
+	</xsd:complexType>
+      </xsd:element>
+      <xsd:element name="ResponseGroup" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:element name="CartClear">
+    <xsd:complexType>
+      <xsd:sequence>
+	<xsd:element name="MarketplaceDomain" type="xsd:string" minOccurs="0"/>
+	<xsd:element name="AWSAccessKeyId" type="xsd:string" minOccurs="0"/>
+	<xsd:element name="AssociateTag" type="xsd:string" minOccurs="0"/>
+	<xsd:element name="Validate" type="xsd:string" minOccurs="0"/>
+	<xsd:element name="XMLEscaping" type="xsd:string" minOccurs="0"/>
+	<xsd:element name="Shared" type="tns:CartClearRequest" minOccurs="0"/>
+	<xsd:element name="Request" type="tns:CartClearRequest" minOccurs="0" maxOccurs="unbounded"/>
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:complexType name="CartClearRequest">
+    <xsd:sequence>
+      <xsd:element name="CartId" type="xsd:string" minOccurs="0"/>
+      <xsd:element name="HMAC" type="xsd:string" minOccurs="0"/>
+      <xsd:element name="MergeCart" type="xsd:string" minOccurs="0"/>
+      <xsd:element name="ResponseGroup" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:element name="BrowseNodeLookup">
+    <xsd:complexType>
+      <xsd:sequence>
+	<xsd:element name="MarketplaceDomain" type="xsd:string" minOccurs="0"/>
+	<xsd:element name="AWSAccessKeyId" type="xsd:string" minOccurs="0"/>
+	<xsd:element name="AssociateTag" type="xsd:string" minOccurs="0"/>
+	<xsd:element name="Validate" type="xsd:string" minOccurs="0"/>
+	<xsd:element name="XMLEscaping" type="xsd:string" minOccurs="0"/>
+	<xsd:element name="Shared" type="tns:BrowseNodeLookupRequest" minOccurs="0"/>
+	<xsd:element name="Request" type="tns:BrowseNodeLookupRequest" minOccurs="0" maxOccurs="unbounded"/>
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:complexType name="BrowseNodeLookupRequest">
+    <xsd:sequence>
+      <xsd:element name="BrowseNodeId" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+      <xsd:element name="ResponseGroup" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:element name="Condition">
+    <xsd:simpleType>
+      <xsd:restriction base="xsd:string">
+	<xsd:enumeration value="All"/>
+	<xsd:enumeration value="New"/>
+	<xsd:enumeration value="Used"/>
+	<xsd:enumeration value="Collectible"/>
+	<xsd:enumeration value="Refurbished"/>
+      </xsd:restriction>
+    </xsd:simpleType>
+  </xsd:element>
+  <xsd:element name="AudienceRating">
+    <xsd:simpleType>
+      <xsd:restriction base="xsd:string">
+	<xsd:enumeration value="G"/>
+	<xsd:enumeration value="PG"/>
+	<xsd:enumeration value="PG-13"/>
+	<xsd:enumeration value="R"/>
+	<xsd:enumeration value="NC-17"/>
+	<xsd:enumeration value="NR"/>
+	<xsd:enumeration value="Unrated"/>
+	<xsd:enumeration value="6"/>
+	<xsd:enumeration value="12"/>
+	<xsd:enumeration value="16"/>
+	<xsd:enumeration value="18"/>
+	<xsd:enumeration value="FamilyViewing"/>
+      </xsd:restriction>
+    </xsd:simpleType>
+  </xsd:element>
+  <xsd:element name="ItemSearchResponse">
+    <xsd:complexType>
+      <xsd:sequence>
+	<xsd:element ref="tns:OperationRequest" minOccurs="0"/>
+	<xsd:element ref="tns:Items" minOccurs="0" maxOccurs="unbounded"/>
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="ItemLookupResponse">
+    <xsd:complexType>
+      <xsd:sequence>
+	<xsd:element ref="tns:OperationRequest" minOccurs="0"/>
+	<xsd:element ref="tns:Items" minOccurs="0" maxOccurs="unbounded"/>
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="SimilarityLookupResponse">
+    <xsd:complexType>
+      <xsd:sequence>
+	<xsd:element ref="tns:OperationRequest" minOccurs="0"/>
+	<xsd:element ref="tns:Items" minOccurs="0" maxOccurs="unbounded"/>
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="CartGetResponse">
+    <xsd:complexType>
+      <xsd:sequence>
+	<xsd:element ref="tns:OperationRequest" minOccurs="0"/>
+	<xsd:element ref="tns:Cart" minOccurs="0" maxOccurs="unbounded"/>
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="CartAddResponse">
+    <xsd:complexType>
+      <xsd:sequence>
+	<xsd:element ref="tns:OperationRequest" minOccurs="0"/>
+	<xsd:element ref="tns:Cart" minOccurs="0" maxOccurs="unbounded"/>
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="CartCreateResponse">
+    <xsd:complexType>
+      <xsd:sequence>
+	<xsd:element ref="tns:OperationRequest" minOccurs="0"/>
+	<xsd:element ref="tns:Cart" minOccurs="0" maxOccurs="unbounded"/>
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="CartModifyResponse">
+    <xsd:complexType>
+      <xsd:sequence>
+	<xsd:element ref="tns:OperationRequest" minOccurs="0"/>
+	<xsd:element ref="tns:Cart" minOccurs="0" maxOccurs="unbounded"/>
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="CartClearResponse">
+    <xsd:complexType>
+      <xsd:sequence>
+	<xsd:element ref="tns:OperationRequest" minOccurs="0"/>
+	<xsd:element ref="tns:Cart" minOccurs="0" maxOccurs="unbounded"/>
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="BrowseNodeLookupResponse">
+    <xsd:complexType>
+      <xsd:sequence>
+	<xsd:element ref="tns:OperationRequest" minOccurs="0"/>
+	<xsd:element ref="tns:BrowseNodes" minOccurs="0" maxOccurs="unbounded"/>
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="OperationRequest">
+    <xsd:complexType>
+      <xsd:sequence>
+	<xsd:element ref="tns:HTTPHeaders" minOccurs="0"/>
+	<xsd:element name="RequestId" type="xsd:string" minOccurs="0"/>
+	<xsd:element ref="tns:Arguments" minOccurs="0"/>
+	<xsd:element ref="tns:Errors" minOccurs="0"/>
+	<xsd:element name="RequestProcessingTime" type="xsd:float" minOccurs="0" maxOccurs="1"/>
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="Request">
+    <xsd:complexType>
+      <xsd:sequence>
+	<xsd:element name="IsValid" type="xsd:string" minOccurs="0"/>
+	<xsd:element name="BrowseNodeLookupRequest" type="tns:BrowseNodeLookupRequest" minOccurs="0"/>
+	<xsd:element name="ItemSearchRequest" type="tns:ItemSearchRequest" minOccurs="0"/>
+	<xsd:element name="ItemLookupRequest" type="tns:ItemLookupRequest" minOccurs="0"/>
+	<xsd:element name="SimilarityLookupRequest" type="tns:SimilarityLookupRequest" minOccurs="0"/>
+	<xsd:element name="CartGetRequest" type="tns:CartGetRequest" minOccurs="0"/>
+	<xsd:element name="CartAddRequest" type="tns:CartAddRequest" minOccurs="0"/>
+	<xsd:element name="CartCreateRequest" type="tns:CartCreateRequest" minOccurs="0"/>
+	<xsd:element name="CartModifyRequest" type="tns:CartModifyRequest" minOccurs="0"/>
+	<xsd:element name="CartClearRequest" type="tns:CartClearRequest" minOccurs="0"/>
+	<xsd:element ref="tns:Errors" minOccurs="0"/>
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="Arguments">
+    <xsd:complexType>
+      <xsd:sequence>
+	<xsd:element name="Argument" maxOccurs="unbounded">
+	  <xsd:complexType>
+	    <xsd:attribute name="Name" type="xsd:string" use="required"/>
+	    <xsd:attribute name="Value" type="xsd:string"/>
+	  </xsd:complexType>
+	</xsd:element>
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="HTTPHeaders">
+    <xsd:complexType>
+      <xsd:sequence>
+	<xsd:element name="Header" minOccurs="0" maxOccurs="unbounded">
+	  <xsd:complexType>
+	    <xsd:attribute name="Name" type="xsd:string" use="required"/>
+	    <xsd:attribute name="Value" type="xsd:string" use="required"/>
+	  </xsd:complexType>
+	</xsd:element>
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="Errors">
+    <xsd:complexType>
+      <xsd:sequence>
+	<xsd:element name="Error" maxOccurs="unbounded">
+	  <xsd:complexType>
+	    <xsd:sequence>
+	      <xsd:element name="Code" type="xsd:string"/>
+	      <xsd:element name="Message" type="xsd:string"/>
+	    </xsd:sequence>
+	  </xsd:complexType>
+	</xsd:element>
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="Items">
+    <xsd:complexType>
+      <xsd:sequence>
+	<xsd:element ref="tns:Request" minOccurs="0"/>
+	<xsd:element ref="tns:CorrectedQuery" minOccurs="0"/>
+	<xsd:element name="Qid" type="xsd:string" minOccurs="0"/>
+	<xsd:element name="EngineQuery" type="xsd:string" minOccurs="0"/>
+	<xsd:element name="TotalResults" type="xsd:nonNegativeInteger" minOccurs="0"/>
+	<xsd:element name="TotalPages" type="xsd:nonNegativeInteger" minOccurs="0"/>
+	<xsd:element name="MoreSearchResultsUrl" type="xsd:string" minOccurs="0"/>
+	<xsd:element ref="tns:SearchResultsMap" minOccurs="0"/>
+	<xsd:element ref="tns:Item" minOccurs="0" maxOccurs="unbounded"/>
+	<xsd:element ref="tns:SearchBinSets" minOccurs="0"/>
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="CorrectedQuery">
+    <xsd:complexType>
+      <xsd:sequence>
+	<xsd:element name="Keywords" type="xsd:string" minOccurs="0"/>
+	<xsd:element name="Message" type="xsd:string" minOccurs="0"/>
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="Cart">
+    <xsd:complexType>
+      <xsd:sequence>
+	<xsd:element ref="tns:Request" minOccurs="0"/>
+	<xsd:element name="CartId" type="xsd:string"/>
+	<xsd:element name="HMAC" type="xsd:string"/>
+	<xsd:element name="URLEncodedHMAC" type="xsd:string"/>
+	<xsd:element name="PurchaseURL" type="xsd:string" minOccurs="0"/>
+	<xsd:element name="MobileCartURL" type="xsd:string" minOccurs="0"/>
+	<xsd:element name="SubTotal" type="tns:Price" minOccurs="0"/>
+	<xsd:element ref="tns:CartItems" minOccurs="0"/>
+	<xsd:element ref="tns:SavedForLaterItems" minOccurs="0"/>
+	<xsd:element ref="tns:SimilarProducts" minOccurs="0"/>
+	<xsd:element ref="tns:TopSellers" minOccurs="0"/>
+	<xsd:element ref="tns:NewReleases" minOccurs="0"/>
+	<xsd:element ref="tns:SimilarViewedProducts" minOccurs="0"/>
+	<xsd:element ref="tns:OtherCategoriesSimilarProducts" minOccurs="0"/>
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="SearchResultsMap">
+    <xsd:complexType>
+      <xsd:sequence>
+	<xsd:element name="SearchIndex" maxOccurs="unbounded">
+	  <xsd:complexType>
+	    <xsd:sequence>
+	      <xsd:element name="IndexName" type="xsd:string"/>
+	      <xsd:element name="Results" type="xsd:nonNegativeInteger" minOccurs="0"/>
+	      <xsd:element name="Pages" type="xsd:nonNegativeInteger" minOccurs="0"/>
+	      <xsd:element ref="tns:CorrectedQuery" minOccurs="0"/>
+	      <xsd:element name="RelevanceRank" type="xsd:positiveInteger"/>
+	      <xsd:element name="ASIN" type="xsd:string" maxOccurs="unbounded"/>
+	    </xsd:sequence>
+	  </xsd:complexType>
+	</xsd:element>
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="Item">
+    <xsd:complexType>
+      <xsd:sequence>
+	<xsd:element name="ASIN" type="xsd:string"/>
+	<xsd:element name="ParentASIN" type="xsd:string" minOccurs="0"/>
+	<xsd:element ref="tns:Errors" minOccurs="0"/>
+	<xsd:element name="DetailPageURL" type="xsd:string" minOccurs="0"/>
+	<xsd:element ref="tns:ItemLinks" minOccurs="0"/>
+	<xsd:element name="SalesRank" type="xsd:string" minOccurs="0"/>
+	<xsd:element name="SmallImage" type="tns:Image" minOccurs="0"/>
+	<xsd:element name="MediumImage" type="tns:Image" minOccurs="0"/>
+	<xsd:element name="LargeImage" type="tns:Image" minOccurs="0"/>
+	<xsd:element name="ImageSets" minOccurs="0" maxOccurs="unbounded">
+	  <xsd:complexType>
+	    <xsd:sequence>
+	      <xsd:element ref="tns:ImageSet" minOccurs="0" maxOccurs="unbounded"/>
+	    </xsd:sequence>
+	  </xsd:complexType>
+	</xsd:element>
+	<xsd:element ref="tns:ItemAttributes" minOccurs="0"/>
+	<xsd:element name="VariationAttributes" minOccurs="0" maxOccurs="1">
+	  <xsd:complexType>
+	    <xsd:sequence>
+	      <xsd:element ref="tns:VariationAttribute" minOccurs="0" maxOccurs="unbounded"/>
+	    </xsd:sequence>
+	  </xsd:complexType>
+	</xsd:element>
+	<xsd:element ref="tns:RelatedItems" minOccurs="0" maxOccurs="unbounded"/>
+	<xsd:element ref="tns:Collections" minOccurs="0"/>
+	<xsd:element name="Subjects" minOccurs="0" maxOccurs="1">
+	  <xsd:complexType>
+	    <xsd:sequence>
+	      <xsd:element name="Subject" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+	    </xsd:sequence>
+	  </xsd:complexType>
+	</xsd:element>
+	<xsd:element ref="tns:OfferSummary" minOccurs="0"/>
+	<xsd:element ref="tns:Offers" minOccurs="0"/>
+	<xsd:element ref="tns:VariationSummary" minOccurs="0"/>
+	<xsd:element ref="tns:Variations" minOccurs="0"/>
+	<xsd:element ref="tns:CustomerReviews" minOccurs="0"/>
+	<xsd:element ref="tns:EditorialReviews" minOccurs="0"/>
+	<xsd:element ref="tns:SimilarProducts" minOccurs="0"/>
+	<xsd:element ref="tns:Accessories" minOccurs="0"/>
+	<xsd:element ref="tns:Tracks" minOccurs="0"/>
+	<xsd:element ref="tns:BrowseNodes" minOccurs="0"/>
+	<xsd:element name="AlternateVersions" minOccurs="0" maxOccurs="1">
+	  <xsd:complexType>
+	    <xsd:sequence>
+	      <xsd:element name="AlternateVersion" minOccurs="0" maxOccurs="unbounded">
+		<xsd:complexType>
+		  <xsd:sequence>
+		    <xsd:element name="ASIN" type="xsd:string"/>
+		    <xsd:element name="Title" type="xsd:string" minOccurs="0"/>
+		    <xsd:element name="Binding" type="xsd:string" minOccurs="0"/>
+		  </xsd:sequence>
+		</xsd:complexType>
+	      </xsd:element>
+	    </xsd:sequence>
+	  </xsd:complexType>
+	</xsd:element>
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="ItemLinks">
+    <xsd:complexType>
+      <xsd:sequence>
+	<xsd:element ref="tns:ItemLink" minOccurs="0" maxOccurs="unbounded"/>
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="ItemLink">
+    <xsd:complexType>
+      <xsd:sequence>
+	<xsd:element name="Description" type="xsd:string" minOccurs="0"/>
+	<xsd:element name="URL" type="xsd:string" minOccurs="0"/>
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="RelatedItems">
+    <xsd:complexType>
+      <xsd:sequence>
+	<xsd:element name="Relationship" minOccurs="0" maxOccurs="1">
+	  <xsd:simpleType>
+	    <xsd:restriction base="xsd:string">
+	      <xsd:enumeration value="Parents"/>
+	      <xsd:enumeration value="Children"/>
+	    </xsd:restriction>
+	  </xsd:simpleType>
+	</xsd:element>
+	<xsd:element name="RelationshipType" type="xsd:string" minOccurs="0" maxOccurs="1"/>
+	<xsd:element name="RelatedItemCount" type="xsd:nonNegativeInteger" minOccurs="0" maxOccurs="1"/>
+	<xsd:element name="RelatedItemPageCount" type="xsd:nonNegativeInteger" minOccurs="0" maxOccurs="1"/>
+	<xsd:element name="RelatedItemPage" type="xsd:nonNegativeInteger" minOccurs="0" maxOccurs="1"/>
+	<xsd:element ref="tns:RelatedItem" minOccurs="0" maxOccurs="unbounded"/>
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="RelatedItem">
+    <xsd:complexType>
+      <xsd:sequence>
+	<xsd:element ref="tns:Item" minOccurs="0" maxOccurs="1"/>
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="OfferSummary">
+    <xsd:complexType>
+      <xsd:sequence>
+	<xsd:element name="LowestNewPrice" type="tns:Price" minOccurs="0"/>
+	<xsd:element name="LowestUsedPrice" type="tns:Price" minOccurs="0"/>
+	<xsd:element name="LowestCollectiblePrice" type="tns:Price" minOccurs="0"/>
+	<xsd:element name="LowestRefurbishedPrice" type="tns:Price" minOccurs="0"/>
+	<xsd:element name="TotalNew" type="xsd:string" minOccurs="0"/>
+	<xsd:element name="TotalUsed" type="xsd:string" minOccurs="0"/>
+	<xsd:element name="TotalCollectible" type="xsd:string" minOccurs="0"/>
+	<xsd:element name="TotalRefurbished" type="xsd:string" minOccurs="0"/>
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="Offers">
+    <xsd:complexType>
+      <xsd:sequence>
+	<xsd:element name="TotalOffers" type="xsd:nonNegativeInteger" minOccurs="0"/>
+	<xsd:element name="TotalOfferPages" type="xsd:nonNegativeInteger" minOccurs="0"/>
+	<xsd:element name="MoreOffersUrl" type="xsd:string" minOccurs="0"/>
+	<xsd:element ref="tns:Offer" minOccurs="0" maxOccurs="unbounded"/>
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="Offer">
+    <xsd:complexType>
+      <xsd:sequence>
+	<xsd:element ref="tns:Merchant" minOccurs="0"/>
+	<xsd:element ref="tns:OfferAttributes" minOccurs="0"/>
+	<xsd:element ref="tns:OfferListing" minOccurs="0" maxOccurs="unbounded"/>
+	<xsd:element ref="tns:LoyaltyPoints" minOccurs="0"/>
+	<xsd:element ref="tns:Promotions" minOccurs="0"/>
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="OfferAttributes">
+    <xsd:complexType>
+      <xsd:sequence>
+	<xsd:element name="Condition" type="xsd:string" minOccurs="0"/>
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="Merchant">
+    <xsd:complexType>
+      <xsd:sequence>
+	<xsd:element name="Name" type="xsd:string" minOccurs="0"/>
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="OfferListing">
+    <xsd:complexType>
+      <xsd:sequence>
+	<xsd:element name="OfferListingId" type="xsd:string" minOccurs="0"/>
+	<xsd:element name="Price" type="tns:Price" minOccurs="0"/>
+	<xsd:element name="SalePrice" type="tns:Price" minOccurs="0"/>
+	<xsd:element name="AmountSaved" type="tns:Price" minOccurs="0"/>
+	<xsd:element name="PercentageSaved" type="xsd:nonNegativeInteger" minOccurs="0"/>
+	<xsd:element name="Availability" type="xsd:string" minOccurs="0"/>
+	<xsd:element name="AvailabilityAttributes" minOccurs="0">
+	  <xsd:complexType>
+	    <xsd:sequence>
+	      <xsd:element name="AvailabilityType" type="xsd:string" minOccurs="0"/>
+	      <xsd:element name="IsPreorder" type="xsd:boolean" minOccurs="0"/>
+	      <xsd:element name="MinimumHours" type="xsd:integer" minOccurs="0"/>
+	      <xsd:element name="MaximumHours" type="xsd:integer" minOccurs="0"/>
+	    </xsd:sequence>
+	  </xsd:complexType>
+	</xsd:element>
+	<xsd:element name="IsEligibleForSuperSaverShipping" type="xsd:boolean" minOccurs="0"/>
+	<xsd:element name="IsEligibleForPrime" type="xsd:boolean" minOccurs="0"/>
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="LoyaltyPoints">
+    <xsd:complexType>
+      <xsd:sequence>
+	<xsd:element name="Points" type="xsd:nonNegativeInteger" minOccurs="0"/>
+	<xsd:element name="TypicalRedemptionValue" type="tns:Price" minOccurs="0"/>
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="VariationAttribute">
+    <xsd:complexType>
+      <xsd:sequence>
+	<xsd:element name="Name" type="xsd:string"/>
+	<xsd:element name="Value" type="xsd:string" maxOccurs="unbounded"/>
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="VariationSummary">
+    <xsd:complexType>
+      <xsd:sequence>
+	<xsd:element name="LowestPrice" type="tns:Price" minOccurs="0"/>
+	<xsd:element name="HighestPrice" type="tns:Price" minOccurs="0"/>
+	<xsd:element name="LowestSalePrice" type="tns:Price" minOccurs="0"/>
+	<xsd:element name="HighestSalePrice" type="tns:Price" minOccurs="0"/>
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="Variations">
+    <xsd:complexType>
+      <xsd:sequence>
+	<xsd:element name="TotalVariations" type="xsd:nonNegativeInteger" minOccurs="0"/>
+	<xsd:element name="TotalVariationPages" type="xsd:nonNegativeInteger" minOccurs="0"/>
+	<xsd:element ref="tns:VariationDimensions" minOccurs="0"/>
+	<xsd:element ref="tns:Item" minOccurs="0" maxOccurs="unbounded"/>
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="VariationDimensions">
+    <xsd:complexType>
+      <xsd:sequence>
+	<xsd:element name="VariationDimension" type="xsd:string" maxOccurs="unbounded"/>
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="EditorialReviews">
+    <xsd:complexType>
+      <xsd:sequence>
+	<xsd:element ref="tns:EditorialReview" minOccurs="0" maxOccurs="unbounded"/>
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="Collections">
+    <xsd:complexType>
+      <xsd:sequence>
+	<xsd:element name="Collection" minOccurs="0" maxOccurs="unbounded">
+	  <xsd:complexType>
+	    <xsd:sequence>
+	      <xsd:element name="CollectionSummary" minOccurs="0" maxOccurs="1">
+		<xsd:complexType>
+		  <xsd:sequence>
+		    <xsd:element name="LowestListPrice" type="tns:Price" minOccurs="0" maxOccurs="1"/>
+		    <xsd:element name="HighestListPrice" type="tns:Price" minOccurs="0" maxOccurs="1"/>
+		    <xsd:element name="LowestSalePrice" type="tns:Price" minOccurs="0" maxOccurs="1"/>
+		    <xsd:element name="HighestSalePrice" type="tns:Price" minOccurs="0" maxOccurs="1"/>
+		  </xsd:sequence>
+		</xsd:complexType>
+	      </xsd:element>
+	      <xsd:element name="CollectionParent" minOccurs="0" maxOccurs="1">
+		<xsd:complexType>
+		  <xsd:sequence>
+		    <xsd:element name="ASIN" type="xsd:string" minOccurs="0" maxOccurs="1"/>
+		    <xsd:element name="Title" type="xsd:string" minOccurs="0" maxOccurs="1"/>
+		  </xsd:sequence>
+		</xsd:complexType>
+	      </xsd:element>
+	      <xsd:element name="CollectionItem" minOccurs="0" maxOccurs="unbounded">
+		<xsd:complexType>
+		  <xsd:sequence>
+		    <xsd:element name="ASIN" type="xsd:string" minOccurs="0" maxOccurs="1"/>
+		    <xsd:element name="Title" type="xsd:string" minOccurs="0" maxOccurs="1"/>
+		  </xsd:sequence>
+		</xsd:complexType>
+	      </xsd:element>
+	    </xsd:sequence>
+	  </xsd:complexType>
+	</xsd:element>
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="EditorialReview">
+    <xsd:complexType>
+      <xsd:sequence>
+	<xsd:element name="Source" type="xsd:string" minOccurs="0"/>
+	<xsd:element name="Content" type="xsd:string" minOccurs="0"/>
+	<xsd:element name="IsLinkSuppressed" type="xsd:boolean" minOccurs="0"/>
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="CustomerReviews">
+    <xsd:complexType>
+      <xsd:sequence>
+	<xsd:element name="IFrameURL" type="xsd:string" minOccurs="0"/>
+	<xsd:element name="HasReviews" type="xsd:boolean" minOccurs="0" maxOccurs="1"/>
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="Tracks">
+    <xsd:complexType>
+      <xsd:sequence>
+	<xsd:element name="Disc" maxOccurs="unbounded">
+	  <xsd:complexType>
+	    <xsd:sequence>
+	      <xsd:element name="Track" maxOccurs="unbounded">
+		<xsd:complexType>
+		  <xsd:simpleContent>
+		    <xsd:extension base="xsd:string">
+		      <xsd:attribute name="Number" type="xsd:positiveInteger" use="required"/>
+		    </xsd:extension>
+		  </xsd:simpleContent>
+		</xsd:complexType>
+	      </xsd:element>
+	    </xsd:sequence>
+	    <xsd:attribute name="Number" type="xsd:positiveInteger" use="required"/>
+	  </xsd:complexType>
+	</xsd:element>
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="SimilarProducts">
+    <xsd:complexType>
+      <xsd:sequence>
+	<xsd:element name="SimilarProduct" maxOccurs="unbounded">
+	  <xsd:complexType>
+	    <xsd:sequence>
+	      <xsd:element name="ASIN" type="xsd:string" minOccurs="0"/>
+	      <xsd:element name="Title" type="xsd:string" minOccurs="0"/>
+	    </xsd:sequence>
+	  </xsd:complexType>
+	</xsd:element>
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="TopSellers">
+    <xsd:complexType>
+      <xsd:sequence>
+	<xsd:element name="TopSeller" maxOccurs="unbounded">
+	  <xsd:complexType>
+	    <xsd:sequence>
+	      <xsd:element name="ASIN" type="xsd:string" minOccurs="0"/>
+	      <xsd:element name="Title" type="xsd:string" minOccurs="0"/>
+	    </xsd:sequence>
+	  </xsd:complexType>
+	</xsd:element>
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="NewReleases">
+    <xsd:complexType>
+      <xsd:sequence>
+	<xsd:element name="NewRelease" maxOccurs="unbounded">
+	  <xsd:complexType>
+	    <xsd:sequence>
+	      <xsd:element name="ASIN" type="xsd:string" minOccurs="0"/>
+	      <xsd:element name="Title" type="xsd:string" minOccurs="0"/>
+	    </xsd:sequence>
+	  </xsd:complexType>
+	</xsd:element>
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="TopItemSet">
+    <xsd:complexType>
+      <xsd:sequence>
+	<xsd:element name="Type" type="xsd:string" minOccurs="0"/>
+	<xsd:element name="TopItem" maxOccurs="unbounded">
+	  <xsd:complexType>
+	    <xsd:sequence>
+	      <xsd:element name="ASIN" type="xsd:string" minOccurs="0"/>
+	      <xsd:element name="Title" type="xsd:string" minOccurs="0"/>
+	      <xsd:element name="DetailPageURL" type="xsd:string" minOccurs="0"/>
+	      <xsd:element name="ProductGroup" type="xsd:string" minOccurs="0"/>
+	      <xsd:element name="Author" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+	      <xsd:element name="Artist" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+	      <xsd:element name="Actor" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+	    </xsd:sequence>
+	  </xsd:complexType>
+	</xsd:element>
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="SimilarViewedProducts">
+    <xsd:complexType>
+      <xsd:sequence>
+	<xsd:element name="SimilarViewedProduct" maxOccurs="unbounded">
+	  <xsd:complexType>
+	    <xsd:sequence>
+	      <xsd:element name="ASIN" type="xsd:string" minOccurs="0"/>
+	      <xsd:element name="Title" type="xsd:string" minOccurs="0"/>
+	    </xsd:sequence>
+	  </xsd:complexType>
+	</xsd:element>
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="OtherCategoriesSimilarProducts">
+    <xsd:complexType>
+      <xsd:sequence>
+	<xsd:element name="OtherCategoriesSimilarProduct" maxOccurs="unbounded">
+	  <xsd:complexType>
+	    <xsd:sequence>
+	      <xsd:element name="ASIN" type="xsd:string" minOccurs="0"/>
+	      <xsd:element name="Title" type="xsd:string" minOccurs="0"/>
+	    </xsd:sequence>
+	  </xsd:complexType>
+	</xsd:element>
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="Accessories">
+    <xsd:complexType>
+      <xsd:sequence>
+	<xsd:element name="Accessory" maxOccurs="unbounded">
+	  <xsd:complexType>
+	    <xsd:sequence>
+	      <xsd:element name="ASIN" type="xsd:string" minOccurs="0"/>
+	      <xsd:element name="Title" type="xsd:string" minOccurs="0"/>
+	    </xsd:sequence>
+	  </xsd:complexType>
+	</xsd:element>
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="Promotions">
+    <xsd:complexType>
+      <xsd:sequence>
+	<xsd:element ref="tns:Promotion" minOccurs="0" maxOccurs="unbounded"/>
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="Promotion">
+    <xsd:complexType>
+      <xsd:sequence>
+	<xsd:element name="Summary" minOccurs="0">
+	  <xsd:complexType>
+	    <xsd:sequence>
+	      <xsd:element name="PromotionId" type="xsd:string"/>
+	      <xsd:element name="Category" type="xsd:string" minOccurs="0"/>
+	      <xsd:element name="StartDate" type="xsd:string" minOccurs="0"/>
+	      <xsd:element name="EndDate" type="xsd:string" minOccurs="0"/>
+	      <xsd:element name="EligibilityRequirementDescription" type="xsd:string" minOccurs="0"/>
+	      <xsd:element name="BenefitDescription" type="xsd:string" minOccurs="0"/>
+	      <xsd:element name="TermsAndConditions" type="xsd:string" minOccurs="0"/>
+	    </xsd:sequence>
+	  </xsd:complexType>
+	</xsd:element>
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="BrowseNodes">
+    <xsd:complexType>
+      <xsd:sequence>
+	<xsd:element ref="tns:Request" minOccurs="0"/>
+	<xsd:element ref="tns:BrowseNode" minOccurs="0" maxOccurs="unbounded"/>
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="Property">
+    <xsd:complexType>
+      <xsd:sequence>
+	<xsd:element name="Name" type="xsd:string" minOccurs="0"/>
+	<xsd:element name="Value" type="xsd:string" minOccurs="0"/>
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="BrowseNode">
+    <xsd:complexType>
+      <xsd:sequence>
+	<xsd:element name="BrowseNodeId" type="xsd:string" minOccurs="0"/>
+	<xsd:element name="Name" type="xsd:string" minOccurs="0"/>
+	<xsd:element name="IsCategoryRoot" type="xsd:boolean" minOccurs="0"/>
+	<xsd:element name="Properties" minOccurs="0">
+	  <xsd:complexType>
+	    <xsd:sequence>
+	      <xsd:element ref="tns:Property" maxOccurs="unbounded"/>
+	    </xsd:sequence>
+	  </xsd:complexType>
+	</xsd:element>
+	<xsd:element name="Children" minOccurs="0">
+	  <xsd:complexType>
+	    <xsd:sequence>
+	      <xsd:element ref="tns:BrowseNode" maxOccurs="unbounded"/>
+	    </xsd:sequence>
+	  </xsd:complexType>
+	</xsd:element>
+	<xsd:element name="Ancestors" minOccurs="0">
+	  <xsd:complexType>
+	    <xsd:sequence>
+	      <xsd:element ref="tns:BrowseNode" maxOccurs="unbounded"/>
+	    </xsd:sequence>
+	  </xsd:complexType>
+	</xsd:element>
+	<xsd:element ref="tns:TopSellers" minOccurs="0"/>
+	<xsd:element ref="tns:NewReleases" minOccurs="0"/>
+	<xsd:element ref="tns:TopItemSet" minOccurs="0" maxOccurs="unbounded"/>
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="CartItems">
+    <xsd:complexType>
+      <xsd:sequence>
+	<xsd:element name="SubTotal" type="tns:Price" minOccurs="0"/>
+	<xsd:element name="CartItem" type="tns:CartItem" maxOccurs="unbounded"/>
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="SavedForLaterItems">
+    <xsd:complexType>
+      <xsd:sequence>
+	<xsd:element name="SubTotal" type="tns:Price" minOccurs="0"/>
+	<xsd:element name="SavedForLaterItem" type="tns:CartItem" maxOccurs="unbounded"/>
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:complexType name="CartItem">
+    <xsd:sequence>
+      <xsd:element name="CartItemId" type="xsd:string"/>
+      <xsd:element name="ASIN" type="xsd:string" minOccurs="0"/>
+      <xsd:element name="SellerNickname" type="xsd:string" minOccurs="0"/>
+      <xsd:element name="Quantity" type="xsd:string"/>
+      <xsd:element name="Title" type="xsd:string" minOccurs="0"/>
+      <xsd:element name="ProductGroup" type="xsd:string" minOccurs="0"/>
+      <xsd:element name="MetaData" minOccurs="0">
+	<xsd:complexType>
+	  <xsd:sequence>
+	    <xsd:element name="KeyValuePair" minOccurs="0" maxOccurs="unbounded">
+	      <xsd:complexType>
+		<xsd:sequence>
+		  <xsd:element name="Key" type="xsd:string"/>
+		  <xsd:element name="Value" type="xsd:string"/>
+		</xsd:sequence>
+	      </xsd:complexType>
+	    </xsd:element>
+	  </xsd:sequence>
+	</xsd:complexType>
+      </xsd:element>
+      <xsd:element name="Price" type="tns:Price" minOccurs="0"/>
+      <xsd:element name="ItemTotal" type="tns:Price" minOccurs="0"/>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:complexType name="Price">
+    <xsd:sequence>
+      <xsd:element name="Amount" type="xsd:integer" minOccurs="0"/>
+      <xsd:element name="CurrencyCode" type="xsd:string" minOccurs="0"/>
+      <xsd:element name="FormattedPrice" type="xsd:string"/>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:element name="ImageSet">
+    <xsd:complexType>
+      <xsd:sequence>
+	<xsd:element name="SwatchImage" type="tns:Image" minOccurs="0"/>
+	<xsd:element name="SmallImage" type="tns:Image" minOccurs="0"/>
+	<xsd:element name="ThumbnailImage" type="tns:Image" minOccurs="0"/>
+	<xsd:element name="TinyImage" type="tns:Image" minOccurs="0"/>
+	<xsd:element name="MediumImage" type="tns:Image" minOccurs="0"/>
+	<xsd:element name="LargeImage" type="tns:Image" minOccurs="0"/>
+      </xsd:sequence>
+      <xsd:attribute name="Category" type="xsd:string"/>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:complexType name="Image">
+    <xsd:sequence>
+      <xsd:element name="URL" type="xsd:string"/>
+      <xsd:element name="Height" type="tns:DecimalWithUnits"/>
+      <xsd:element name="Width" type="tns:DecimalWithUnits"/>
+      <xsd:element name="IsVerified" type="xsd:string" minOccurs="0"/>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:element name="ItemAttributes">
+    <xsd:complexType>
+      <xsd:sequence>
+	<xsd:element name="Actor" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+	<xsd:element name="Artist" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+	<xsd:element name="AspectRatio" type="xsd:string" minOccurs="0"/>
+	<xsd:element name="AudienceRating" type="xsd:string" minOccurs="0"/>
+	<xsd:element name="AudioFormat" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+	<xsd:element name="Author" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+	<xsd:element name="Binding" type="xsd:string" minOccurs="0"/>
+	<xsd:element name="Brand" type="xsd:string" minOccurs="0"/>
+	<xsd:element name="CatalogNumberList" minOccurs="0">
+	  <xsd:complexType>
+	    <xsd:sequence>
+	      <xsd:element name="CatalogNumberListElement" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+	    </xsd:sequence>
+	  </xsd:complexType>
+	</xsd:element>
+	<xsd:element name="Category" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+	<xsd:element name="CEROAgeRating" type="xsd:string" minOccurs="0"/>
+	<xsd:element name="ClothingSize" type="xsd:string" minOccurs="0"/>
+	<xsd:element name="Color" type="xsd:string" minOccurs="0"/>
+	<xsd:element name="Creator" minOccurs="0" maxOccurs="unbounded">
+	  <xsd:complexType>
+	    <xsd:simpleContent>
+	      <xsd:extension base="xsd:string">
+		<xsd:attribute name="Role" type="xsd:string" use="required"/>
+	      </xsd:extension>
+	    </xsd:simpleContent>
+	  </xsd:complexType>
+	</xsd:element>
+	<xsd:element name="Department" type="xsd:string" minOccurs="0"/>
+	<xsd:element name="Director" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+	<xsd:element name="EAN" type="xsd:string" minOccurs="0"/>
+	<xsd:element name="EANList" minOccurs="0">
+	  <xsd:complexType>
+	    <xsd:sequence>
+	      <xsd:element name="EANListElement" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+	    </xsd:sequence>
+	  </xsd:complexType>
+	</xsd:element>
+	<xsd:element name="Edition" type="xsd:string" minOccurs="0"/>
+	<xsd:element name="EISBN" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+	<xsd:element name="EpisodeSequence" type="xsd:string" minOccurs="0"/>
+	<xsd:element name="ESRBAgeRating" type="xsd:string" minOccurs="0"/>
+	<xsd:element name="Feature" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+	<xsd:element name="Format" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+	<xsd:element name="Genre" type="xsd:string" minOccurs="0"/>
+	<xsd:element name="HardwarePlatform" type="xsd:string" minOccurs="0"/>
+	<xsd:element name="HazardousMaterialType" type="xsd:string" minOccurs="0"/>
+	<xsd:element name="IsAdultProduct" type="xsd:boolean" minOccurs="0"/>
+	<xsd:element name="IsAutographed" type="xsd:boolean" minOccurs="0"/>
+	<xsd:element name="ISBN" type="xsd:string" minOccurs="0"/>
+	<xsd:element name="IsEligibleForTradeIn" type="xsd:boolean" minOccurs="0"/>
+	<xsd:element name="IsMemorabilia" type="xsd:boolean" minOccurs="0"/>
+	<xsd:element name="IssuesPerYear" type="xsd:string" minOccurs="0"/>
+	<xsd:element name="ItemDimensions" minOccurs="0" maxOccurs="1">
+	  <xsd:complexType>
+	    <xsd:sequence>
+	      <xsd:element name="Height" type="tns:DecimalWithUnits" minOccurs="0"/>
+	      <xsd:element name="Length" type="tns:DecimalWithUnits" minOccurs="0"/>
+	      <xsd:element name="Weight" type="tns:DecimalWithUnits" minOccurs="0"/>
+	      <xsd:element name="Width" type="tns:DecimalWithUnits" minOccurs="0"/>
+	    </xsd:sequence>
+	  </xsd:complexType>
+	</xsd:element>
+	<xsd:element name="ItemPartNumber" type="xsd:string" minOccurs="0"/>
+	<xsd:element name="Label" type="xsd:string" minOccurs="0"/>
+	<xsd:element name="Languages" minOccurs="0">
+	  <xsd:complexType>
+	    <xsd:sequence>
+	      <xsd:element name="Language" minOccurs="0" maxOccurs="unbounded">
+		<xsd:complexType>
+		  <xsd:sequence>
+		    <xsd:element name="Name" type="xsd:string"/>
+		    <xsd:element name="Type" type="xsd:string" minOccurs="0"/>
+		    <xsd:element name="AudioFormat" type="xsd:string" minOccurs="0"/>
+		  </xsd:sequence>
+		</xsd:complexType>
+	      </xsd:element>
+	    </xsd:sequence>
+	  </xsd:complexType>
+	</xsd:element>
+	<xsd:element name="LegalDisclaimer" type="xsd:string" minOccurs="0"/>
+	<xsd:element name="ListPrice" type="tns:Price" minOccurs="0"/>
+	<xsd:element name="MagazineType" type="xsd:string" minOccurs="0"/>
+	<xsd:element name="Manufacturer" type="xsd:string" minOccurs="0"/>
+	<xsd:element name="ManufacturerMaximumAge" type="tns:DecimalWithUnits" minOccurs="0"/>
+	<xsd:element name="ManufacturerMinimumAge" type="tns:DecimalWithUnits" minOccurs="0"/>
+	<xsd:element name="ManufacturerPartsWarrantyDescription" type="xsd:string" minOccurs="0"/>
+	<xsd:element name="MediaType" type="xsd:string" minOccurs="0"/>
+	<xsd:element name="Model" type="xsd:string" minOccurs="0"/>
+	<xsd:element name="ModelYear" type="xsd:nonNegativeInteger" minOccurs="0"/>
+	<xsd:element name="MPN" type="xsd:string" minOccurs="0"/>
+	<xsd:element name="NumberOfDiscs" type="xsd:nonNegativeInteger" minOccurs="0"/>
+	<xsd:element name="NumberOfIssues" type="xsd:nonNegativeInteger" minOccurs="0"/>
+	<xsd:element name="NumberOfItems" type="xsd:nonNegativeInteger" minOccurs="0"/>
+	<xsd:element name="NumberOfPages" type="xsd:nonNegativeInteger" minOccurs="0"/>
+	<xsd:element name="NumberOfTracks" type="xsd:nonNegativeInteger" minOccurs="0"/>
+	<xsd:element name="OperatingSystem" type="xsd:string" minOccurs="0"/>
+	<xsd:element name="PackageDimensions" minOccurs="0" maxOccurs="1">
+	  <xsd:complexType>
+	    <xsd:sequence>
+	      <xsd:element name="Height" type="tns:DecimalWithUnits" minOccurs="0"/>
+	      <xsd:element name="Length" type="tns:DecimalWithUnits" minOccurs="0"/>
+	      <xsd:element name="Weight" type="tns:DecimalWithUnits" minOccurs="0"/>
+	      <xsd:element name="Width" type="tns:DecimalWithUnits" minOccurs="0"/>
+	    </xsd:sequence>
+	  </xsd:complexType>
+	</xsd:element>
+	<xsd:element name="PackageQuantity" type="xsd:nonNegativeInteger" minOccurs="0"/>
+	<xsd:element name="PartNumber" type="xsd:string" minOccurs="0"/>
+	<xsd:element name="PictureFormat" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+	<xsd:element name="Platform" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+	<xsd:element name="ProductGroup" type="xsd:string" minOccurs="0"/>
+	<xsd:element name="ProductTypeName" type="xsd:string" minOccurs="0"/>
+	<xsd:element name="ProductTypeSubcategory" type="xsd:string" minOccurs="0"/>
+	<xsd:element name="PublicationDate" type="xsd:string" minOccurs="0"/>
+	<xsd:element name="Publisher" type="xsd:string" minOccurs="0"/>
+	<xsd:element name="RegionCode" type="xsd:string" minOccurs="0"/>
+	<xsd:element name="ReleaseDate" type="xsd:string" minOccurs="0"/>
+	<xsd:element name="RunningTime" type="tns:DecimalWithUnits" minOccurs="0"/>
+	<xsd:element name="SeikodoProductCode" type="xsd:string" minOccurs="0"/>
+	<xsd:element name="Size" type="xsd:string" minOccurs="0"/>
+	<xsd:element name="SKU" type="xsd:string" minOccurs="0"/>
+	<xsd:element name="Studio" type="xsd:string" minOccurs="0"/>
+	<xsd:element name="SubscriptionLength" type="tns:NonNegativeIntegerWithUnits" minOccurs="0"/>
+	<xsd:element name="Title" type="xsd:string" minOccurs="0"/>
+	<xsd:element name="TrackSequence" type="xsd:string" minOccurs="0"/>
+	<xsd:element name="TradeInValue" type="tns:Price" minOccurs="0"/>
+	<xsd:element name="UPC" type="xsd:string" minOccurs="0"/>
+	<xsd:element name="UPCList" minOccurs="0">
+	  <xsd:complexType>
+	    <xsd:sequence>
+	      <xsd:element name="UPCListElement" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+	    </xsd:sequence>
+	  </xsd:complexType>
+	</xsd:element>
+	<xsd:element name="Warranty" type="xsd:string" minOccurs="0"/>
+	<xsd:element name="WEEETaxValue" type="tns:Price" minOccurs="0"/>
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:complexType name="NonNegativeIntegerWithUnits">
+    <xsd:simpleContent>
+      <xsd:extension base="xsd:nonNegativeInteger">
+	<xsd:attribute name="Units" type="xsd:string" use="required"/>
+      </xsd:extension>
+    </xsd:simpleContent>
+  </xsd:complexType>
+  <xsd:complexType name="DecimalWithUnits">
+    <xsd:simpleContent>
+      <xsd:extension base="xsd:decimal">
+	<xsd:attribute name="Units" type="xsd:string" use="required"/>
+      </xsd:extension>
+    </xsd:simpleContent>
+  </xsd:complexType>
+  <xsd:complexType name="StringWithUnits">
+    <xsd:simpleContent>
+      <xsd:extension base="xsd:string">
+	<xsd:attribute name="Units" type="xsd:string" use="required"/>
+      </xsd:extension>
+    </xsd:simpleContent>
+  </xsd:complexType>
+  <xsd:simpleType name="positiveIntegerOrAll">
+    <xsd:union>
+      <xsd:simpleType>
+	<xsd:restriction base="xsd:positiveInteger"/>
+      </xsd:simpleType>
+      <xsd:simpleType>
+	<xsd:restriction base="xsd:string">
+	  <xsd:enumeration value="All"/>
+	</xsd:restriction>
+      </xsd:simpleType>
+    </xsd:union>
+  </xsd:simpleType>
+</xsd:schema>
+

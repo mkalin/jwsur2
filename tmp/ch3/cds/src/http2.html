@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+  <script 
+    src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.min.js">
+  </script>
+  <body>
+    <div ng-app="myApp" ng-controller="myCtrl"> 
+      <table border = 1>
+	<tr ng-repeat="x in cds">
+	  <td>{{ x.artist | uppercase }}</td>  <!-- a filtered expression -->
+	  <td>{{ x.title  }}</td>
+	  <td>{{ x.price  | currency  }}</td>  <!-- and another -->
+	  <td>{{ x.year   }}</td>
+	</tr>
+      </table>
+    </div>
+
+    <script>
+      var app = angular.module('myApp', [ ]);
+      app.controller('myCtrl', function($scope, $http) {
+      $http.get("getCDs.jsp")
+      .then(function (response) {$scope.cds = response.data;});
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,17 @@
+<project name="JerseyClient" basedir="." default="run">
+  <property name="lib.dir" value="${basedir}"/>
+  <path id="classpath">
+    <fileset dir="${lib.dir}" includes="**/*.jar"/>
+  </path>
+  <target name="compile">
+    <javac srcdir="${basedir}" destdir="${basedir}" classpathref="classpath"/>
+  </target>
+  <target name="run" depends="compile">
+    <java fork="true" classname="JerseyClient">
+      <classpath>
+        <path refid="classpath"/>
+	<pathelement location="${basedir}"/>
+      </classpath>
+    </java>
+  </target>
+</project>

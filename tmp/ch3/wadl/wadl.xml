@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="wadl2java-sayings" default="generate-sources" basedir=".">
+    
+    <description>Builds stubs for accessing predictions3 service.</description>
+    
+    <!-- #### Change for your system. #### -->
+    <property name="wadl.home" value="/home/mkalin/jwsur2/ch3/wadl/wadl113"/>
+
+    <taskdef name="wjc" 
+             classname="org.jvnet.ws.wadl2java.WJCTask">
+        <classpath>
+            <fileset dir="${wadl.home}/lib" includes="*.jar" 
+                     excludes="wadl-cmdline*.jar"/>
+        </classpath>
+    </taskdef>
+    
+    <target name="generate-sources">
+        <echo message="Compiling the description..." />
+        <mkdir dir="gen-src"/>
+        <wjc description="../predictions.wadl" 
+             package="predictions3" 
+             autoSchemaPackage="true" 
+             target="gen-src">
+            <produces dir="gen-src" 
+                      includes="**/*.java" />
+            <depends dir="." 
+                     includes="wadl.xml"/>
+        </wjc>
+    </target>
+</project>

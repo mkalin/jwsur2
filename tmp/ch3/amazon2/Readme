@@ -1,0 +1,6 @@
+To execute: java -jar Amazon2.jar <accessId> <secretKey>
+
+The source code from xjc and my own is included in the JAR file.
+The XML Schema amazon.xsd is included but caution is in order: Amazon occassionally changes the XML Schema, which
+means that everything should be re-generated with xjc.
+
