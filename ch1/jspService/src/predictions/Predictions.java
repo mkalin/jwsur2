@@ -6,7 +6,7 @@ import java.io.InputStreamReader;
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.beans.XMLEncoder; // simple and effective
-import javax.servlet.ServletContext;
+import jakarta.servlet.ServletContext;
 
 public class Predictions {
     private int n = 32;

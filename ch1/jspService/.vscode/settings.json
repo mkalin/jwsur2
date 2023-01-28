@@ -1,0 +1,7 @@
+{
+    "java.project.referencedLibraries": [
+        "lib/**/*.jar",
+        "/opt/homebrew/Cellar/ant/**/*.jar",
+        "/opt/homebrew/Cellar/tomcat/**/*.jar"
+    ]
+}

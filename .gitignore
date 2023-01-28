@@ -1,2 +1,10 @@
 build.xml
 *.zip
+*.class
+*.db
+*.xml
+*.jsp
+*.war
+build/*.java
+ch1/jspService/build/*
+ch1/.vscode/*.json
