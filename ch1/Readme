@@ -1,0 +1,3 @@
+The two *.java files can be compiled as usual. To run, provide each with a URL (e.g., http://www.amazon.com/index.html/) as 
+a command-line argument.
+
